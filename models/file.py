@@ -18,7 +18,7 @@ class FileObject(BaseModel):
         return self.size / 1024 / 1024 / 1024
 
     def is_exist(self):
-        return os.path.exists(f'{UFS_PATH}{self.messenger}/{self.name}')
+        return os.path.exists(self.get_destionation())
 
     def get_destionation(self):
         return f'{UFS_PATH}{self.messenger}/{self.name}'
@@ -31,17 +31,17 @@ class FileObject(BaseModel):
 
 
 class FilePack:
-    def __init__(self, zip_file):
+    def __init__(self, zip_file: zipfile.ZipInfo):
         self.origin = zip_file
 
     def get_format(self):
         return self.origin.filename.split('.')[-1]
 
     def size_to_mb(self):
-        return self.size / 1024 / 1024
+        return self.origin.file_size / 1024 / 1024
 
     def size_to_gb(self):
-        return self.size / 1024 / 1024 / 1024
+        return self.origin.file_size / 1024 / 1024 / 1024
 
 
 class ZIPObject:
