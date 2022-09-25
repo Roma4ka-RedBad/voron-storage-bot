@@ -1,4 +1,5 @@
 import os
+import zipfile
 
 from zipfile import ZipFile
 from pydantic import BaseModel
@@ -26,6 +27,9 @@ class FileObject(BaseModel):
 
     def get_format(self):
         return self.name.split('.')[-1]
+
+    def is_archive(self):
+        return zipfile.is_zipfile(self.get_destionation())
 
 
 class FilePack:

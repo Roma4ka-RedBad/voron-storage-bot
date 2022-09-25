@@ -10,7 +10,7 @@ available_formats = {
 
 
 async def get_task_for_format(file: FileObject):
-    if file.get_format() == 'zip':
+    if file.is_archive():
         formats = {}
         zip_archive = ZIPObject(file, 'r')
         if zip_archive.count() <= 100:
