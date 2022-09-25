@@ -1,7 +1,5 @@
 import os
 import zipfile
-
-from zipfile import ZipFile
 from pydantic import BaseModel
 
 UFS_PATH = '../ufs/'
@@ -48,7 +46,7 @@ class FilePack:
 
 class ZIPObject:
     def __init__(self, file: FileObject, mode: str):
-        self.file = ZipFile(file.get_destionation(), mode)
+        self.file = zipfile.ZipFile(file.get_destionation(), mode)
 
     def get_files(self):
         new_files_list = []
