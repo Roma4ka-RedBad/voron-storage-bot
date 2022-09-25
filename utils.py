@@ -1,5 +1,5 @@
-import zipfile
 from copy import copy
+from models import FileObject, ZIPObject
 
 available_formats = {
     '3D': ['scw', 'glb', 'dae', 'obj', 'fbx'],
@@ -9,21 +9,22 @@ available_formats = {
 }
 
 
-async def get_task_for_format(file_format: str, file_name: str = None):
-    if file_format == 'zip':
+async def get_task_for_format(file: FileObject):
+    if file.get_format() == 'zip':
         formats = {}
-        files = zipfile.ZipFile(file_name, 'r').infolist()
-        if len(files) <= 100:
-            for file in files:
-                file_format = file.filename.split('.')[-1]
-                formats[file.filename] = [copy(available_formats[group]) for group in available_formats if file_format in available_formats[group]]
-                formats[file.filename][0].remove(file_format)
+        zip_archive = ZIPObject(file, 'r')
+        if zip_archive.count() <= 100:
+            for zip_file in zip_archive.get_files():
+                formats[zip_file.origin.filename] = [copy(available_formats[group]) for group in available_formats if
+                                                     zip_file.get_format() in available_formats[group]]
+                formats[zip_file.origin.filename][0].remove(zip_file.get_format())
             return formats
         else:
             return []
 
-    formats = [copy(available_formats[group]) for group in available_formats if file_format in available_formats[group]]
-    formats[0].remove(file_format)
+    formats = [copy(available_formats[group]) for group in available_formats if
+               file.get_format() in available_formats[group]]
+    formats[0].remove(file.get_format())
     return formats[0]
 
 
