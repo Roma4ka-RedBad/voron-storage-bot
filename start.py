@@ -10,9 +10,13 @@ import utils
 config = config.Config('config.ini')
 server = FastAPI()
 
+@server.get("/config")
+async def get_config():
+    return await utils.create_response(True, content=config.box)
+
 
 @server.get("/limit/{file_format}")
-async def get_limit(file_format):
+async def get_limit(file_format: str):
     return await utils.create_response(True, content=config.get_size_by_format(file_format))
 
 
