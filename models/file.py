@@ -2,14 +2,15 @@ import os
 import zipfile
 from pydantic import BaseModel
 
-UFS_PATH = '../ufs/'
-
 
 class FileObject(BaseModel):
     name: str
     messenger: str
     size: int = 0
     tg_hash: str = None
+
+    def set_config(self, config):
+        FileObject.config = config
 
     def size_to_mb(self):
         return self.size / 1024 / 1024
@@ -21,7 +22,7 @@ class FileObject(BaseModel):
         return os.path.exists(self.get_destionation())
 
     def get_destionation(self):
-        return f'{UFS_PATH}{self.messenger}/{self.name}'
+        return f'{self.config.box.UFS.path}{self.messenger}/{self.name}'
 
     def get_format(self):
         return self.name.split('.')[-1]
