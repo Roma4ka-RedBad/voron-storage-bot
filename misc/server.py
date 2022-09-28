@@ -8,13 +8,15 @@ class Server:
         self.address = address
 
     async def send_message(self, endpoint: str, data: dict | list = None):
-        if data:
-            async with self.session.post(f'{self.address}/{endpoint}', json=data) as request:
+
+        try:
+            use_method = self.session.get(f'{self.address}/{endpoint}') if not data \
+                else self.session.post(f'{self.address}/{endpoint}', json=data)
+
+            async with use_method as request:
                 response = await request.json()
                 response = Box(response['content'])
-        else:
-            async with self.session.get(f'{self.address}/{endpoint}') as request:
-                response = await request.json()
-                response = Box(response['content'])
+        except:
+            response = None
 
         return response
