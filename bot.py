@@ -1,9 +1,9 @@
 import asyncio
+import aiohttp
 import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher.fsm.storage.memory import MemoryStorage
-import aiohttp
 
 from handlers import register_routers
 from misc.server import Server
@@ -18,7 +18,7 @@ async def main():
     )
     logger.info("Starting app")
 
-    server = Server('http://192.168.0.127:8910/')
+    server = Server('http://192.168.0.127:8910')
     config = await server.send_message('config')
     storage = MemoryStorage()
 

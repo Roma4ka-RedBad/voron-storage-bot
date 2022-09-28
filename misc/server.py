@@ -9,11 +9,11 @@ class Server:
 
     async def send_message(self, endpoint: str, data: dict | list = None):
         if data:
-            async with self.session.post(f'http://192.168.0.127:8910/{endpoint}', json=data) as request:
+            async with self.session.post(f'{self.address}/{endpoint}', json=data) as request:
                 response = await request.json()
                 response = Box(response['content'])
         else:
-            async with self.session.get(f'http://192.168.0.127:8910/{endpoint}') as request:
+            async with self.session.get(f'{self.address}/{endpoint}') as request:
                 response = await request.json()
                 response = Box(response['content'])
 
