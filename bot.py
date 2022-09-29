@@ -22,7 +22,7 @@ async def main():
     config = await server.send_message('config')
     storage = MemoryStorage()
 
-    bot = Bot(token=config.TG.token, parse_mode='HTML')
+    bot = Bot(token=config.content.TG.token, parse_mode='HTML')
     dp = Dispatcher(storage=storage)
     register_routers(dp, server, bot)
 

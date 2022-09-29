@@ -6,6 +6,7 @@ class Server:
     def __init__(self, address: str):
         self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=0))
         self.address = address
+        self.messenger = 'TG'
 
     async def send_message(self, endpoint: str, data: dict | list = None):
 
@@ -15,7 +16,7 @@ class Server:
 
             async with use_method as request:
                 response = await request.json()
-                response = Box(response['content'])
+                response = Box(response)
         except:
             response = None
 
