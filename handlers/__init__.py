@@ -2,7 +2,7 @@ from aiogram import Dispatcher, Bot
 from misc.server import Server
 
 from .group import create_group_router
-from .private import create_public_router
+from .public import create_public_router
 
 
 def register_routers(dp: Dispatcher, server: Server, bot: Bot):

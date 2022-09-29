@@ -7,11 +7,11 @@ from .start.base import command_start
 
 
 def create_public_router(server: Server, bot: Bot) -> Router:
-    private_router: Router = Router(name="public_router")
+    public_router: Router = Router(name="public_router")
 
     # Сообщения
 
-    private_router.message.middleware(InitMiddleware(server, bot))
-    private_router.message.register(command_start,
+    public_router.message.middleware(InitMiddleware(server, bot))
+    public_router.message.register(command_start,
                                     commands=["start"])
-    return private_router
+    return public_router
