@@ -17,7 +17,10 @@ async def get_task_for_format(file: FileObject):
             for zip_file in zip_archive.get_files():
                 formats[zip_file.origin.filename] = [copy(available_formats[group]) for group in available_formats if
                                                      zip_file.get_format() in available_formats[group]]
-                formats[zip_file.origin.filename][0].remove(zip_file.get_format())
+
+                if formats[zip_file.origin.filename]:
+                    formats[zip_file.origin.filename] = formats[zip_file.origin.filename][0]
+                    formats[zip_file.origin.filename].remove(zip_file.get_format())
         return formats
 
     formats = [copy(available_formats[group]) for group in available_formats if
