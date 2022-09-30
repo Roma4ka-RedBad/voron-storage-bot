@@ -12,21 +12,21 @@ available_converts = {
 async def get_converts_for_format(file: FileObject):
     if file.is_archive():
         converts = []
-        zip_archive = ArchiveObject(file, 'r')
-        if zip_archive.count() <= 100:
-            for zip_file in zip_archive.get_files():
-                if not zip_file.is_dir():
-                    zip_file_object = {
-                        'name': zip_file.origin.filename,
-                        'short_name': zip_file.get_shortname(),
+        archive = ArchiveObject(file, 'r')
+        if archive.count() <= 100:
+            for archive_file in archive.get_files():
+                if not archive_file.is_dir():
+                    archive_file_object = {
+                        'name': archive_file.origin.filename,
+                        'short_name': archive_file.get_shortname(),
                         'converts': [copy(available_converts[group]) for group in
                                      available_converts if
-                                     zip_file.get_format() in available_converts[group]]
+                                     archive_file.get_format() in available_converts[group]]
                     }
-                    if zip_file_object['converts']:
-                        zip_file_object['converts'] = zip_file_object['converts'][0]
-                        zip_file_object['converts'].remove(zip_file.get_format())
-                        converts.append(zip_file_object)
+                    if archive_file_object['converts']:
+                        archive_file_object['converts'] = archive_file_object['converts'][0]
+                        archive_file_object['converts'].remove(archive_file.get_format())
+                        converts.append(archive_file_object)
         return converts
 
     converts = [copy(available_converts[group]) for group in available_converts if
