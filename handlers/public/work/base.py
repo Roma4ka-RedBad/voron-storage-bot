@@ -18,8 +18,8 @@ async def command_work(message: Message, server: Server, bot: Bot):
         return await message.answer(text='Не удалось скачать файл! Возможно он слишком много весит...')
 
     keyboard = await get_buttons(file, server)
-    if not keyboard:
-        return await message.answer(text='Этот файл нельзя конвертировать ни в один из доступных мне форматов...')
+    if not keyboard[0]:
+        return await message.answer(text=keyboard[1])
 
     await message.answer(text=f'{message.from_user.first_name}, выбери нужную команду для этого файла:',
-                         reply_markup=keyboard)
+                         reply_markup=keyboard[1])

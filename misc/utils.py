@@ -24,12 +24,9 @@ async def download_file(message: Message, bot: Bot, server: Server, main_dir: st
 
 
 async def get_buttons(file: DownloadedFile, server: Server):
-    buttons = await server.send_message('buttons', data=[{
+    converts = await server.send_message('converts', data=[{
         'messenger': server.messenger,
         'name': file.get_dir()
     }])
 
-    if not buttons.content:
-        return None
-
-    return await work_keyb(buttons.content, file)
+    return converts.status, converts.error_msg if not converts.status else await work_keyb(converts.content, file)

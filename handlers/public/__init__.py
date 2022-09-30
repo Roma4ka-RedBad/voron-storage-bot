@@ -6,6 +6,7 @@ from misc.server import Server
 from .start.base import command_start
 from .work.base import command_work
 from .work.callbacks.show_filename import work_show_filename
+from .work.callbacks.convert import work_convert
 
 from keyboards.work import WorkCallback
 
@@ -20,4 +21,5 @@ def create_public_router(server: Server, bot: Bot) -> Router:
                                    commands=["start"])
     public_router.message.register(command_work, content_types=['document'])
     public_router.callback_query.register(work_show_filename, WorkCallback.filter(F.action == "show_filename"))
+    public_router.callback_query.register(work_convert, WorkCallback.filter(F.action == "convert"))
     return public_router
