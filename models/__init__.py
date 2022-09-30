@@ -1,4 +1,4 @@
-from .file import FileObject, ZIPObject
+from .files_object import FileObject, ArchiveObject
 from .game import GameObject
 from .client import ClientObject
 from .config import Config
@@ -7,6 +7,6 @@ __all__ = (
     "FileObject",
     "GameObject",
     "ClientObject",
-    "ZIPObject",
+    "ArchiveObject",
     "Config"
 )
