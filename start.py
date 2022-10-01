@@ -1,13 +1,27 @@
 import uvicorn
+import utils
 
 from fastapi import FastAPI
 from typing import List
 
-from models import files_object, config
-import utils
+from models import files_object, config, database
+from database import User
 
 config = config.Config('config.ini')
 server = FastAPI()
+
+
+@server.post("/user/set")
+async def set_user(data: database.UserModel):
+    user = User.get(vk_id=data.vk_id, tg_id=data.tg_id)
+    setattr(user, data.set_key, data.set_value)
+    user.save()
+    return await utils.create_response(True, content=user)
+
+
+@server.post("/user/get")
+async def get_user(data: database.UserModel):
+    return await utils.create_response(True, content=User.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
 
 
 @server.get("/config")
