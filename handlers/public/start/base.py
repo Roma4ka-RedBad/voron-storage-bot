@@ -1,13 +1,18 @@
+from aiogram import Bot
 from aiogram.types import Message
 
-from keyboards.start import start_kb
 from misc.server import Server
+from misc.utils import set_commands
 
 
-async def command_start(message: Message, server: Server):
-    config = await server.send_message('config')
-    if not config:
+async def command_start(message: Message, server: Server, bot: Bot):
+    user = await server.send_message('user/get', {
+        'tg_id': message.from_user.id
+    })
+    if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
 
-    await message.answer(text=f'Привет, {message.from_user.full_name}! Лимиты: {str(config.content.FILE_SIZE_LIMITS)}',
-                         reply_markup=start_kb())
+    await set_commands(bot)
+    await message.answer(
+        text=f'Привет, {user.content.__data__.nickname or message.from_user.first_name}! Я помогу тебе с файлами бравл старса!'
+    )

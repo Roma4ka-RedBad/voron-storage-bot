@@ -1,7 +1,6 @@
 from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware, Bot
-from aiohttp import ClientSession
 from aiogram.types import TelegramObject
 
 
