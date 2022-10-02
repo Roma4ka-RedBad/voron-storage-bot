@@ -60,7 +60,7 @@ async def get_converts(files: List[files_object.FileObject]):
             })
 
         return await utils.create_response(False,
-                                           error_msg="Этот файл нельзя конвертировать ни в один из доступных форматов!")
+                                           error_msg="этот файл нельзя конвертировать ни в один из доступных форматов!")
 
 
 uvicorn.run(server, host="192.168.0.127", port=8910)
