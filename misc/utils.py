@@ -33,23 +33,17 @@ async def get_buttons(file: DownloadedFile, server: Server):
     return converts.status, converts.error_msg if not converts.status else await work_keyb(converts.content, file)
 
 
-async def set_commands(bot: Bot):
-    default_ru = [
-        BotCommand(command="start", description="Главное меню"),
-        BotCommand(command="versions", description="Информация о версиях игры"),
-        BotCommand(command="download", description="Скачать файл из игры"),
-        BotCommand(command="profile", description="Профиль в боте"),
-        BotCommand(command="set_name", description="Изменить ник в профиле"),
-        BotCommand(command="connect", description="Привязать этот аккаунт к VK")
-    ]
+async def set_commands(bot: Bot, localization):
+    default = []
+    for command in localization.content.TID_START_COMMANDS:
+        default.append(BotCommand(command=command[0], description=command[1]))
 
     data = [
         (
-            default_ru,
-            BotCommandScopeDefault(),
-            'ru'
+            default,
+            BotCommandScopeDefault()
         )
     ]
 
-    for commands_list, commands_scope, language in data:
-        await bot.set_my_commands(commands=commands_list, scope=commands_scope, language_code=language)
+    for commands_list, commands_scope in data:
+        await bot.set_my_commands(commands=commands_list, scope=commands_scope)

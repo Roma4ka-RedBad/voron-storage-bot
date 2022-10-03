@@ -11,8 +11,9 @@ async def command_start(message: Message, server: Server, bot: Bot):
     })
     if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
+    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
-    await set_commands(bot)
-    await message.answer(
-        text=f'Привет, {user.content.__data__.nickname or message.from_user.first_name}! Я помогу тебе с файлами бравл старса!'
-    )
+    await set_commands(bot, localization)
+    await message.answer(text=localization.content.TID_START_TEXT % (
+        user.content.__data__.nickname or message.from_user.first_name
+    ))

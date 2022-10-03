@@ -10,11 +10,14 @@ async def command_profile(message: Message, server: Server):
     })
     if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
+    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
-    await message.answer(text=f"{message.from_user.first_name}, ваш профиль: "
-                              f"\n  НИК: {hbold(user.content.__data__.nickname or message.from_user.full_name)}"
-                              f"\n  ID: {hcode(user.content.__data__.id)}"
-                              f"\n  {server.messenger}_ID: {hcode(message.from_user.id)}"
-                              f"\n  РАНГ: {hbold(user.content.__data__.rank)}"
-                              f"\n  ПРЕДУПРЕЖДЕНИЯ: {hbold(user.content.__data__.warns)}"
-                              f"\n  ПРИВЯЗКА: {hcode(user.content.__data__.vk_id or 'ОТСУТСТВУЕТ')}")
+    await message.answer(text=localization.content.TID_PROFILE_TEXT % (
+        message.from_user.first_name,
+        hbold(user.content.__data__.nickname or 'ОТСУТСТВУЕТ'),
+        hcode(user.content.__data__.id),
+        server.messenger, hcode(message.from_user.id),
+        hbold(user.content.__data__.rank),
+        hbold(user.content.__data__.warns),
+        hcode(user.content.__data__.vk_id or 'ОТСУТСТВУЕТ')
+    ))

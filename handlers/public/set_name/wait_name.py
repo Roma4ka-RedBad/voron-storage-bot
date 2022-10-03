@@ -13,5 +13,8 @@ async def setname_waitname(message: Message, server: Server, state: FSMContext):
     })
     if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
+    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
-    await message.answer(f"Хорошо, теперь я буду тебя называть {user.content.__data__.nickname or message.from_user.first_name}!")
+    await message.answer(localization.content.TID_SETNAME_DONE % (
+        user.content.__data__.nickname
+    ))

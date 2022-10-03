@@ -12,21 +12,25 @@ async def command_work(message: Message, server: Server, bot: Bot):
     })
     if not config:
         return await message.answer(text='Подключение к серверу отсутствует!')
+    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
     if not message.document:
-        return await message.answer(
-            text=f'{user.content.__data__.nickname or message.from_user.first_name}, для работы команды нужно прикрепить файл!'
-        )
+        return await message.answer(localization.content.TID_WORK_FILENOTEXIST % (
+            user.content.__data__.nickname or message.from_user.first_name
+        ))
 
     file = await download_file(message, bot, server, config.content.UFS.path)
     if not file:
-        return await message.answer(
-            text=f'{user.content.__data__.nickname or message.from_user.first_name}, не удалось скачать файл! Возможно он слишком много весит...'
-        )
+        return await message.answer(localization.content.TID_WORK_DOWNLOADFALE % (
+            user.content.__data__.nickname or message.from_user.first_name
+        ))
 
     keyboard = await get_buttons(file, server)
     if not keyboard[0]:
-        return await message.answer(text=f"{user.content.__data__.nickname or message.from_user.first_name}, {keyboard[1]}")
+        return await message.answer(localization.content[keyboard[1]] % (
+            user.content.__data__.nickname or message.from_user.first_name
+        ))
 
-    await message.answer(text=f'{user.content.__data__.nickname or message.from_user.first_name}, выбери нужную команду для этого файла:',
-                         reply_markup=keyboard[1])
+    return await message.answer(localization.content.TID_WORK_TEXT % (
+        user.content.__data__.nickname or message.from_user.first_name
+    ), reply_markup=keyboard[1])
