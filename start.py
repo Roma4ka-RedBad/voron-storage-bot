@@ -5,10 +5,16 @@ from fastapi import FastAPI
 from typing import List
 
 from models import files_object, config, database
+from localization import languages
 from database import User
 
 config = config.Config('config.ini')
 server = FastAPI()
+
+
+@server.get("/localization/{language_code}")
+async def get_localization(language_code: str):
+    return await utils.create_response(True, content=languages[language_code])
 
 
 @server.post("/user/set")
@@ -60,7 +66,7 @@ async def get_converts(files: List[files_object.FileObject]):
             })
 
         return await utils.create_response(False,
-                                           error_msg="этот файл нельзя конвертировать ни в один из доступных форматов!")
+                                           error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
 uvicorn.run(server, host="192.168.0.127", port=8910)

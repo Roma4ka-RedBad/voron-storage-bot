@@ -1,5 +1,5 @@
 from datetime import datetime
-from peewee import IntegerField, TextField, DateTimeField
+from peewee import IntegerField, TextField, DateTimeField, CharField
 
 from .base import BaseModel
 
@@ -9,6 +9,7 @@ class User(BaseModel):
     tg_id = IntegerField(null=True)
     nickname = TextField(null=True)
     rank = IntegerField(default=0)
+    language_code = CharField(max_length=4, default='ru')
     size_multiplier = IntegerField(default=1)
     warns = IntegerField(default=0)
     created_at = DateTimeField(default=datetime.now())
