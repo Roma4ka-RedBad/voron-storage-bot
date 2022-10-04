@@ -7,7 +7,7 @@ from .base import BaseModel
 class User(BaseModel):
     vk_id = IntegerField(null=True)
     tg_id = IntegerField(null=True)
-    nickname = TextField(null=True)
+    nickname = TextField(default="")
     rank = IntegerField(default=0)
     language_code = CharField(max_length=4, default='ru')
     size_multiplier = IntegerField(default=1)
