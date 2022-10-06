@@ -11,7 +11,10 @@ available_converts = {
 
 async def get_converts_for_format(file: FileObject):
     if file.is_archive():
-        converts = []
+        converts = {
+            'files': [],
+            'converts': []
+        }
         archive = ArchiveObject(file, 'r')
         if archive.count() <= 100:
             for archive_file in archive.get_files():
@@ -26,7 +29,8 @@ async def get_converts_for_format(file: FileObject):
                     if archive_file_object['converts']:
                         archive_file_object['converts'] = archive_file_object['converts'][0]
                         archive_file_object['converts'].remove(archive_file.get_format())
-                        converts.append(archive_file_object)
+                        converts['files'].append(archive_file_object)
+                        converts['converts'] = list(set(converts['converts'] + archive_file_object['converts']))
         return converts
 
     converts = [copy(available_converts[group]) for group in available_converts if

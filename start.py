@@ -59,11 +59,17 @@ async def get_converts(files: List[files_object.FileObject]):
     else:
         files[0].set_config(config)
         converts = await utils.get_converts_for_format(files[0])
-        if converts:
+        if converts and not files[0].is_archive():
             return await utils.create_response(True, content={
                 'name': files[0].name,
                 'converts': converts
             })
+        else:
+            if converts['files'] or converts['converts']:
+                return await utils.create_response(True, content={
+                    'name': files[0].name,
+                    'converts': converts
+                })
 
         return await utils.create_response(False,
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
