@@ -4,7 +4,7 @@ from aiogram import Bot
 from aiogram.types.message import Message
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from keyboards.work import work_keyb
+from keyboards.work import work_converts_keyb
 from misc.server import Server
 from misc.file import DownloadedFile
 
@@ -24,13 +24,13 @@ async def download_file(message: Message, bot: Bot, server: Server, main_dir: st
         return None
 
 
-async def get_buttons(file: DownloadedFile, server: Server):
+async def get_buttons(file: DownloadedFile, server: Server, condition: bool = None):
     converts = await server.send_message('converts', data=[{
         'messenger': server.messenger,
         'name': file.get_dir()
     }])
 
-    return converts.status, converts.error_msg if not converts.status else await work_keyb(converts.content, file)
+    return converts.status, converts.error_msg if not converts.status else await work_converts_keyb(converts.content, file, condition)
 
 
 async def set_commands(bot: Bot, localization):
