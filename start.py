@@ -1,15 +1,32 @@
 import uvicorn
 import utils
+import toml
 
 from fastapi import FastAPI
 from typing import List
+from box import Box
 
-from models import files_object, config, database
+from logic_objects import FileObject, UserObject
+from convert.manager import ConvertManager
 from localization import languages
-from database import User
+from database import UserTable
 
-config = config.Config('config.ini')
+config = Box(toml.load('config.toml'))
+manager = ConvertManager(config)
 server = FastAPI()
+
+
+@server.post("/convert/{to_format}")
+async def convert(file: FileObject, to_format: str):
+    file.set_config(config)
+    result, process_dir = await manager.convert(file, to_format)
+    if result:
+        return await utils.create_response(True, content={
+            'result_file': result,
+            'process_dir': process_dir
+        })
+    else:
+        return await utils.create_response(False)
 
 
 @server.get("/localization/{language_code}")
@@ -18,61 +35,57 @@ async def get_localization(language_code: str):
 
 
 @server.post("/user/set")
-async def set_user(data: database.UserModel):
-    user = User.get(vk_id=data.vk_id, tg_id=data.tg_id)
+async def set_user(data: UserObject):
+    user = UserTable.get(vk_id=data.vk_id, tg_id=data.tg_id)
     setattr(user, data.set_key, data.set_value)
     user.save()
     return await utils.create_response(True, content=user)
 
 
 @server.post("/user/get")
-async def get_user(data: database.UserModel):
-    return await utils.create_response(True, content=User.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
+async def get_user(data: UserObject):
+    return await utils.create_response(True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
 
 
 @server.get("/config")
 async def get_config():
-    return await utils.create_response(True, content=config.box)
+    return await utils.create_response(True, content=config)
 
 
 @server.get("/limit/{file_format}")
 async def get_limit(file_format: str):
-    return await utils.create_response(True, content=config.get_size_by_format(file_format) * 1024 * 1024)
+    if file_format in config.FILE_SIZE_LIMITS:
+        result = config.FILE_SIZE_LIMITS[file_format]
+    else:
+        result = config.FILE_SIZE_LIMITS.default
+
+    return await utils.create_response(True, content=result * 1024 * 1024)
 
 
 @server.post("/converts")
-async def get_converts(files: List[files_object.FileObject]):
+async def get_converts(files: List[FileObject]):
     if len(files) > 1:
         content = []
         for file in files:
             file.set_config(config)
-            converts = []
-            if file.is_exist():
-                converts = await utils.get_converts_for_format(file)
-
+            file_converts = await utils.get_converts_by_file(file)
             content.append({
                 'name': file.name,
-                'converts': converts
+                'converts': file_converts
             })
         return await utils.create_response(True, content=content)
 
     else:
         files[0].set_config(config)
-        converts = await utils.get_converts_for_format(files[0])
-        if converts and not files[0].is_archive():
+        file_converts = await utils.get_converts_by_file(files[0])
+        if file_converts:
             return await utils.create_response(True, content={
                 'name': files[0].name,
-                'converts': converts
+                'converts': file_converts
             })
-        else:
-            if converts['files'] or converts['converts']:
-                return await utils.create_response(True, content={
-                    'name': files[0].name,
-                    'converts': converts
-                })
 
         return await utils.create_response(False,
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
-uvicorn.run(server, host="192.168.0.127", port=8910)
+uvicorn.run(server, host="192.168.0.127", port=80)

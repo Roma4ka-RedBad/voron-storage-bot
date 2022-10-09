@@ -1,8 +1,8 @@
 from .base import database
-from .user import User
+from .user import Users as UserTable
 
-database.create_tables([User], safe=True)
+database.create_tables([UserTable], safe=True)
 
 __all__ = (
-    "User"
+    "UserTable"
 )

@@ -1,0 +1,14 @@
+[FILE_SIZE_LIMITS]
+default = 1024
+
+[UFS]
+path = '../ufs/'
+
+[TG]
+token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
+
+[CONVERTS]
+3D = ['scw', 'glb', 'dae', 'obj', 'fbx']
+2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']
+2D_ANIM = ['sc', 'fla']
+CSV = ['compress', 'decompress', 'csv']
