@@ -8,11 +8,12 @@ from keyboards.work import work_keyb
 
 async def command_work(message: Message, server: Server, bot: Bot):
     config = await server.send_message('config')
+    if not config:
+        return await message.reply(text='Подключение к серверу отсутствует!')
+
     user = await server.send_message('user/get', {
         'tg_id': message.from_user.id
     })
-    if not config:
-        return await message.reply(text='Подключение к серверу отсутствует!')
     localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
     if not message.document:

@@ -1,5 +1,6 @@
-from aiogram.types import CallbackQuery
+import shutil
 
+from aiogram.types import CallbackQuery, FSInputFile
 from keyboards.work import WorkCallback
 from misc.file import DownloadedFile
 from misc.server import Server
@@ -21,4 +22,19 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
                                                               callback_data.row_index][0].text)
     if not file:
         return await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
+
     await cbq.answer(localization.content.TID_STARTWORK)
+
+    result = await server.send_message(f'convert/{callback_data.to_format}', {
+        'name': file.get_dir(),
+        'messenger': server.messenger
+    })
+    if result.status:
+        await cbq.message.reply_document(FSInputFile(result.content.result_file), caption=localization.content.TID_STARTWORK_DONE % (
+            user.content.__data__.nickname or cbq.from_user.first_name
+        ))
+        shutil.rmtree(result.content.process_dir)
+
+    await cbq.message.reply(localization.content.TID_STARTWORK_FILENOTCONVERT % (
+        user.content.__data__.nickname or cbq.from_user.first_name
+    ))
