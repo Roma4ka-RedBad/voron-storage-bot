@@ -34,7 +34,7 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
             user.content.__data__.nickname or cbq.from_user.first_name
         ))
         shutil.rmtree(result.content.process_dir)
-
-    await cbq.message.reply(localization.content.TID_STARTWORK_FILENOTCONVERT % (
-        user.content.__data__.nickname or cbq.from_user.first_name
-    ))
+    else:
+        await cbq.message.reply(localization.content.TID_STARTWORK_FILENOTCONVERT % (
+            user.content.__data__.nickname or cbq.from_user.first_name
+        ))
