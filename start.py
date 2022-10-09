@@ -69,10 +69,11 @@ async def get_converts(files: List[FileObject]):
         for file in files:
             file.set_config(config)
             file_converts = await utils.get_converts_by_file(file)
-            content.append({
-                'name': file.name,
-                'converts': file_converts
-            })
+            if file_converts:
+                content.append({
+                    'name': file.name,
+                    'converts': file_converts
+                })
         return await utils.create_response(True, content=content)
 
     else:
