@@ -1,7 +1,7 @@
 import os
 import shutil
-
 from datetime import datetime, timedelta
+
 from aiogram import Bot
 from aiogram.types.message import Message
 from aiogram.types import BotCommand, BotCommandScopeDefault
@@ -14,10 +14,10 @@ from misc.models.server import Server
 from misc.models.file import DownloadedFile
 
 
-async def download_file(message: Message, bot: Bot, server: Server, main_dir: str, scheduler: AsyncIOScheduler):
+async def download_file(message: Message, bot: Bot, server: Server, config, scheduler: AsyncIOScheduler):
     optimal_file_size = await server.send_message(f"limit/{message.document.file_name.split('.')[-1]}")
     if message.document.file_size < optimal_file_size.content:
-        main_dir = f"{main_dir}{server.messenger}"
+        main_dir = f"{config.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"
         if not os.path.exists(f"{main_dir}/{user_dir}"):
             os.makedirs(f"{main_dir}/{user_dir}")
@@ -31,7 +31,7 @@ async def download_file(message: Message, bot: Bot, server: Server, main_dir: st
                 args=[f"{main_dir}/{user_dir}/", message, bot],
                 id=f"{main_dir}/{user_dir}/",
                 trigger=DateTrigger(
-                    datetime.now(tz=server.timezone) + timedelta(minutes=5),
+                    datetime.now(tz=server.timezone) + timedelta(minutes=config.UFS.wait_for_delete_dir),
                     timezone=server.timezone
                 ),
                 misfire_grace_time=3

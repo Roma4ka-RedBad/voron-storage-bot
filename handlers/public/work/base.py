@@ -22,7 +22,7 @@ async def command_work(message: Message, server: Server, bot: Bot, scheduler: As
             user.content.__data__.nickname or message.from_user.first_name
         ))
 
-    file = await download_file(message, bot, server, config.content.UFS.path, scheduler)
+    file = await download_file(message, bot, server, config.content, scheduler)
     if not file:
         return await message.reply(localization.content.TID_WORK_DOWNLOADFALE % (
             user.content.__data__.nickname or message.from_user.first_name
