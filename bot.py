@@ -1,12 +1,13 @@
 import asyncio
-import aiohttp
 import logging
 
+from pytz import timezone
 from aiogram import Bot, Dispatcher
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.dispatcher.fsm.storage.memory import MemoryStorage
 
 from handlers import register_routers
-from misc.server import Server
+from misc.models.server import Server
 
 logger = logging.getLogger(__name__)
 
@@ -18,21 +19,25 @@ async def main():
     )
     logger.info("Starting app")
 
-    server = Server('http://192.168.0.127:8910')
+    server = Server('http://192.168.0.127')
     config = await server.send_message('config')
+    server.timezone = timezone(config.content.SERVER.timezone)
+    scheduler = AsyncIOScheduler()
     storage = MemoryStorage()
 
     bot = Bot(token=config.content.TG.token, parse_mode='HTML')
     dp = Dispatcher(storage=storage)
-    register_routers(dp, server, bot)
+    register_routers(dp, server, bot, scheduler)
 
     # start
     try:
         await bot.get_updates(-1)
+        scheduler.start()
         await dp.start_polling(bot)
     finally:
         await storage.close()
         await server.close()
+        scheduler.shutdown()
         await bot.session.close()
 
 

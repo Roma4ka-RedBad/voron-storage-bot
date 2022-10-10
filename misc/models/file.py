@@ -1,6 +1,6 @@
 import os
 from aiogram.types.message import Message
-from misc.server import Server
+from misc.models.server import Server
 from zipfile import is_zipfile
 
 

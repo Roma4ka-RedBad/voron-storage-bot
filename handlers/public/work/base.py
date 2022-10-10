@@ -1,12 +1,13 @@
 from aiogram import Bot
 from aiogram.types import Message
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from misc.server import Server
+from misc.models.server import Server
 from misc.utils import download_file, get_buttons
 from keyboards.work import work_keyb
 
 
-async def command_work(message: Message, server: Server, bot: Bot):
+async def command_work(message: Message, server: Server, bot: Bot, scheduler: AsyncIOScheduler):
     config = await server.send_message('config')
     if not config:
         return await message.reply(text='Подключение к серверу отсутствует!')
@@ -21,7 +22,7 @@ async def command_work(message: Message, server: Server, bot: Bot):
             user.content.__data__.nickname or message.from_user.first_name
         ))
 
-    file = await download_file(message, bot, server, config.content.UFS.path)
+    file = await download_file(message, bot, server, config.content.UFS.path, scheduler)
     if not file:
         return await message.reply(localization.content.TID_WORK_DOWNLOADFALE % (
             user.content.__data__.nickname or message.from_user.first_name

@@ -2,8 +2,8 @@ import shutil
 
 from aiogram.types import CallbackQuery, FSInputFile
 from keyboards.work import WorkCallback
-from misc.file import DownloadedFile
-from misc.server import Server
+from misc.models.file import DownloadedFile
+from misc.models.server import Server
 
 
 async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCallback):

@@ -2,7 +2,7 @@ from aiogram.dispatcher.fsm.context import FSMContext
 from aiogram.types import Message
 
 from states.user import UserStates
-from misc.server import Server
+from misc.models.server import Server
 
 
 async def command_setname(message: Message, server: Server, state: FSMContext):

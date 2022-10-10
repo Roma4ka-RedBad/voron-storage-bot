@@ -2,8 +2,8 @@ from aiogram.types import CallbackQuery
 
 from keyboards.work import WorkCallback
 from misc.utils import get_buttons
-from misc.file import DownloadedFile
-from misc.server import Server
+from misc.models.file import DownloadedFile
+from misc.models.server import Server
 
 
 async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: WorkCallback):

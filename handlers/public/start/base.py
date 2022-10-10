@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import Message
 
-from misc.server import Server
+from misc.models.server import Server
 from misc.utils import set_commands
 
 

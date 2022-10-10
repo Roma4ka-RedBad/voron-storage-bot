@@ -7,6 +7,7 @@ class Server:
         self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=0))
         self.address = address
         self.messenger = 'TG'
+        self.timezone = None
 
     async def send_message(self, endpoint: str, data: dict | list = None):
 
@@ -21,3 +22,6 @@ class Server:
             response = None
 
         return response
+
+    async def close(self):
+        await self.session.close()

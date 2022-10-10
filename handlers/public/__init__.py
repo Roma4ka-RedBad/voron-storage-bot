@@ -1,7 +1,8 @@
 from aiogram import Router, Bot, F
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from middlewares.init_contexts import InitMiddleware
-from misc.server import Server
+from middlewares.base import InitMiddleware
+from misc.models.server import Server
 
 from .start.base import command_start
 from .profile.base import command_profile
@@ -17,13 +18,13 @@ from states.user import UserStates
 from keyboards.work import WorkCallback
 
 
-def create_public_router(server: Server, bot: Bot) -> Router:
+def create_public_router(server: Server, bot: Bot, scheduler: AsyncIOScheduler) -> Router:
     public_router: Router = Router(name="public_router")
 
     # Сообщения
 
-    public_router.message.middleware(InitMiddleware(server, bot))
-    public_router.callback_query.middleware(InitMiddleware(server, bot))
+    public_router.message.middleware(InitMiddleware(server, bot, scheduler))
+    public_router.callback_query.middleware(InitMiddleware(server, bot, scheduler))
 
     public_router.message.register(command_start, commands=["start"])
     public_router.message.register(command_profile, commands=["profile"])
