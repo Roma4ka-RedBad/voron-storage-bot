@@ -17,9 +17,7 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
     if not cbq.message.reply_to_message:
         return await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
 
-    file = await DownloadedFile.get_file_by_index_or_name(cbq.message.reply_to_message, server,
-                                                          file_name=cbq.message.reply_markup.inline_keyboard[
-                                                              callback_data.row_index][0].text)
+    file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server)
     if not file:
         return await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
 
@@ -27,14 +25,17 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
 
     result = await server.send_message(f'convert/{callback_data.to_format}', {
         'name': file.get_dir(),
+        'archive_file': cbq.message.reply_markup.inline_keyboard[callback_data.row_index][
+            0].text if file.is_archive() else None,
         'messenger': server.messenger
     })
     if result.status:
-        await cbq.message.reply_document(FSInputFile(result.content.result_file), caption=localization.content.TID_STARTWORK_DONE % (
-            user.content.__data__.nickname or cbq.from_user.first_name
-        ))
+        await cbq.message.reply_document(FSInputFile(result.content.result_file),
+                                         caption=localization.content.TID_STARTWORK_DONE % (
+                                                 user.content.__data__.nickname or cbq.from_user.first_name
+                                         ))
         shutil.rmtree(result.content.process_dir)
     else:
         await cbq.message.reply(localization.content.TID_STARTWORK_FILENOTCONVERT % (
-            user.content.__data__.nickname or cbq.from_user.first_name
+                user.content.__data__.nickname or cbq.from_user.first_name
         ))

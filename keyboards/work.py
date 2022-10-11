@@ -9,13 +9,14 @@ class WorkCallback(CallbackData, prefix="work"):
     action: str
     to_format: str = None
     condition: bool = None
+    is_archive: bool = False
     row_index: int = 0
 
 
-async def construct_convert_buttons(converts, row_index):
+async def construct_convert_buttons(converts, row_index, is_archive=False):
     buttons = []
     for convert in converts:
-        callback_data = WorkCallback(action='convert', row_index=row_index, to_format=convert)
+        callback_data = WorkCallback(action='convert', row_index=row_index, to_format=convert, is_archive=is_archive)
         buttons.append(InlineKeyboardButton(text=convert, callback_data=callback_data.pack()))
     return buttons
 
@@ -36,7 +37,7 @@ async def work_converts_keyb(file_converts, file: DownloadedFile, condition: boo
     if file.is_archive() and not condition:
         row_index = 0
         for archive_file in file_converts.converts.archive_files:
-            convert_buttons = await construct_convert_buttons(archive_file.converts, row_index)
+            convert_buttons = await construct_convert_buttons(archive_file.converts, row_index, True)
             kb_obj.row(InlineKeyboardButton(
                 text=archive_file.short_name,
                 callback_data=WorkCallback(action='show_filename', row_index=row_index).pack()
@@ -44,7 +45,7 @@ async def work_converts_keyb(file_converts, file: DownloadedFile, condition: boo
             row_index += 1
     else:
         convert_buttons = await construct_convert_buttons(
-            file_converts.converts.archive_converts if file.is_archive() else file_converts.converts, 0)
+            file_converts.converts.archive_converts if file.is_archive() else file_converts.converts, 0, file.is_archive())
         kb_obj.row(InlineKeyboardButton(text=file.name,
                                         callback_data=WorkCallback(action='show_filename').pack()
                                         ), *convert_buttons, width=6)

@@ -1,7 +1,9 @@
 import os
 from aiogram.types.message import Message
 from misc.models.server import Server
+
 from zipfile import is_zipfile
+from rarfile import is_rarfile
 
 
 class DownloadedFile:
@@ -20,22 +22,13 @@ class DownloadedFile:
                 return files.index(file)
 
     def is_archive(self):
-        return is_zipfile(self.get_dir(full=True))
+        return is_zipfile(self.get_dir(full=True)) or is_rarfile(self.get_dir(full=True))
 
     @classmethod
-    async def get_file_by_index_or_name(cls, message: Message, server: Server, file_index: int = None,
-                                        file_name: str = None):
+    async def get_file_by_reply_message(cls, message: Message, server: Server):
         config = await server.send_message('config')
         main_dir = f"{config.content.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"
 
-        if os.path.exists(f"{main_dir}/{user_dir}"):
-            files = os.listdir(f"{main_dir}/{user_dir}")
-            for index, file in enumerate(files):
-                if file_index is not None:
-                    if index == file_index:
-                        return DownloadedFile(main_dir, user_dir, file)
-
-                if file_name:
-                    if file == file_name:
-                        return DownloadedFile(main_dir, user_dir, file)
+        if os.path.exists(f"{main_dir}/{user_dir}/{message.document.file_name}"):
+            return DownloadedFile(main_dir, user_dir, message.document.file_name)

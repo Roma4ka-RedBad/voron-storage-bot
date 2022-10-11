@@ -70,7 +70,7 @@ async def set_commands(bot: Bot, localization):
 
 async def delete_message_with_dir(user_dir: str, message: Message, bot: Bot):
     try:
-        shutil.rmtree(user_dir)
+        shutil.rmtree(user_dir, ignore_errors=True)
         await bot.delete_message(message.chat.id, message.message_id + 1)
     except:
         pass

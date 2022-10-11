@@ -17,8 +17,7 @@ async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: Wor
     if not cbq.message.reply_to_message:
         return await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
 
-    file = await DownloadedFile.get_file_by_index_or_name(cbq.message.reply_to_message, server,
-                                                          file_name=cbq.message.reply_to_message.document.file_name)
+    file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server)
     if not file:
         await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
 
