@@ -20,7 +20,14 @@ class ConvertManager:
         os.makedirs(process_dir)
 
         if archive := file.get_archive():
-            pass
+            if file.archive_file != file.get_destionation(only_shortname=True):
+                extract_file = archive.get_file_by_name(file.archive_file)
+                extracted_dir = extract_file.extract(process_dir)
+                file = FileObject(name=shutil.copy(extracted_dir, process_dir + extract_file.get_shortname()),
+                                  messenger=file.messenger, config=file.config)
+            else:
+                print("Ну пока...")
+                return None, None
         else:
             shutil.copy(file.get_destionation(), process_dir + file.get_destionation(only_shortname=True))
 

@@ -1,5 +1,6 @@
 import os
 import zipfile
+import rarfile
 
 from pydantic import BaseModel
 from box import Box
@@ -9,6 +10,7 @@ from copy import copy
 class FileObject(BaseModel):
     name: str
     messenger: str
+    archive_file: str = None
     config: Box = None
 
     def set_config(self, config):
@@ -41,13 +43,17 @@ class FileObject(BaseModel):
 
     def get_archive(self):
         if zipfile.is_zipfile(self.get_destionation()):
-            return ArchiveObject(self, 'r')
+            return ArchiveObject(self, 'r', zipfile.ZipFile)
+        elif rarfile.is_rarfile(self.get_destionation()):
+            return ArchiveObject(self, 'r', rarfile.RarFile)
 
 
 class ArchiveFile:
-    def __init__(self, zip_file: zipfile.ZipInfo, archive_file: FileObject):
+    def __init__(self, zip_file: zipfile.ZipInfo | rarfile.RarInfo, archive_file: FileObject,
+                 archive_object: zipfile.ZipFile | rarfile.RarFile):
         self.origin = zip_file
         self.archive_file = archive_file
+        self.archive_object = archive_object
 
     def get_format(self):
         return self.origin.filename.split('.')[-1]
@@ -61,6 +67,9 @@ class ArchiveFile:
     def size_to_mb(self):
         return self.origin.file_size / 1024 / 1024
 
+    def extract(self, path):
+        return self.archive_object.extract(self.origin, path)
+
     def get_available_converts(self):
         converts = [copy(self.archive_file.config.CONVERTS[group]) for group in self.archive_file.config.CONVERTS if
                     self.get_format() in self.archive_file.config.CONVERTS[group]]
@@ -72,14 +81,19 @@ class ArchiveFile:
 
 
 class ArchiveObject:
-    def __init__(self, file: FileObject, mode):
+    def __init__(self, file: FileObject, mode, archive_class: zipfile.ZipFile | rarfile.RarFile):
         self.file = file
-        self.archive = zipfile.ZipFile(file.get_destionation(), mode)
+        self.archive = archive_class(file.get_destionation(), mode)
+
+    def get_file_by_name(self, name):
+        for file in self.get_files():
+            if file.get_shortname() == name:
+                return file
 
     def get_files(self):
         new_files_list = []
         for file in self.archive.infolist():
-            new_files_list.append(ArchiveFile(file, self.file))
+            new_files_list.append(ArchiveFile(file, self.file, self.archive))
         return new_files_list
 
     def get_available_converts(self):
