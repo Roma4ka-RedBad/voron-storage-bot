@@ -8,6 +8,9 @@ wait_for_delete_dir = 5 # minutes
 [TG]
 token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
 
+[VK]
+token = 'vk1.a.kCpn3eQDAvkMJF0tFYA0FcOy5PQJ2o_1_4unP4d_6O5oU0fs22yRrBKN7ok_4fa7fVr48T7VbdyqlMQuA7-GgEkek9IjXv0ORTTGqeRRh94hDJkLqpTfk9dPAlw24qjjdxu3FX78ATaygtuHErJZ8q40bYdEyVjVR7DlSjM5WK1bay_diM4Rb8NeUhP2Pwgt'
+
 [CONVERTS]
 3D = ['scw', 'glb', 'dae', 'obj', 'fbx']
 2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']
