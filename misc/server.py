@@ -17,7 +17,7 @@ class Server:
             async with use_method as request:
                 response = await request.json()
                 response = Box(response)
-        except:
+        finally:
             response = None
 
         return response
