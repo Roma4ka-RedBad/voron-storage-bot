@@ -7,38 +7,33 @@ from misc.utils import download_file, get_buttons
 from keyboards.work import work_keyb
 
 
-async def command_work(message: Message, server: Server, bot: Bot, scheduler: AsyncIOScheduler):
-    config = await server.send_message('config')
-    if not config:
+async def command_work(message: Message, server: Server, bot: Bot, scheduler: AsyncIOScheduler, server_config,
+                       user_data, user_localization):
+    if not server_config:
         return await message.reply(text='Подключение к серверу отсутствует!')
 
-    user = await server.send_message('user/get', {
-        'tg_id': message.from_user.id
-    })
-    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
-
     if not message.document:
-        return await message.reply(localization.content.TID_WORK_FILENOTEXIST % (
-            user.content.__data__.nickname or message.from_user.first_name
+        return await message.reply(user_localization.TID_WORK_FILENOTEXIST.format(
+            name=user_data.nickname or message.from_user.first_name
         ))
 
-    file = await download_file(message, bot, server, config.content, scheduler)
+    file = await download_file(message, bot, server, server_config, scheduler)
     if not file:
-        return await message.reply(localization.content.TID_WORK_DOWNLOADFALE % (
-            user.content.__data__.nickname or message.from_user.first_name
+        return await message.reply(user_localization.TID_WORK_DOWNLOADFALE.format(
+            name=user_data.nickname or message.from_user.first_name
         ))
 
     if file.is_archive():
-        return await message.reply(localization.content.TID_WORK_ISARCHIVE % (
-            user.content.__data__.nickname or message.from_user.first_name
-        ), reply_markup=work_keyb(localization))
+        return await message.reply(user_localization.TID_WORK_ISARCHIVE.format(
+            name=user_data.nickname or message.from_user.first_name
+        ), reply_markup=work_keyb(user_localization))
 
     keyboard = await get_buttons(file, server)
     if not keyboard[0]:
-        return await message.reply(localization.content[keyboard[1]] % (
-            user.content.__data__.nickname or message.from_user.first_name
+        return await message.reply(user_localization[keyboard[1]].format(
+            name=user_data.nickname or message.from_user.first_name
         ))
 
-    return await message.reply(localization.content.TID_WORK_TEXT % (
-        user.content.__data__.nickname or message.from_user.first_name
+    return await message.reply(user_localization.TID_WORK_TEXT.format(
+        name=user_data.nickname or message.from_user.first_name
     ), reply_markup=keyboard[1])

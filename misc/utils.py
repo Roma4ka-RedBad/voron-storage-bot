@@ -25,11 +25,11 @@ async def download_file(message: Message, bot: Bot, server: Server, config, sche
         file = await bot.get_file(message.document.file_id)
         await bot.download_file(file.file_path, f"{main_dir}/{user_dir}/{message.document.file_name}")
 
-        if not scheduler.get_job(f"{main_dir}/{user_dir}/"):
+        if not scheduler.get_job(user_dir):
             scheduler.add_job(
                 func=delete_message_with_dir,
                 args=[f"{main_dir}/{user_dir}/", message, bot],
-                id=f"{main_dir}/{user_dir}/",
+                id=user_dir,
                 trigger=DateTrigger(
                     datetime.now(tz=server.timezone) + timedelta(minutes=config.UFS.wait_for_delete_dir),
                     timezone=server.timezone
@@ -54,7 +54,7 @@ async def get_buttons(file: DownloadedFile, server: Server, condition: bool = No
 
 async def set_commands(bot: Bot, localization):
     default = []
-    for command in localization.content.TID_START_COMMANDS:
+    for command in localization.TID_START_COMMANDS:
         default.append(BotCommand(command=command[0], description=command[1]))
 
     data = [
@@ -65,6 +65,7 @@ async def set_commands(bot: Bot, localization):
     ]
 
     for commands_list, commands_scope in data:
+        await bot.delete_my_commands(scope=commands_scope)
         await bot.set_my_commands(commands=commands_list, scope=commands_scope)
 
 

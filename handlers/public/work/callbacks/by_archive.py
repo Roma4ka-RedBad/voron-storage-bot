@@ -6,27 +6,23 @@ from misc.models.file import DownloadedFile
 from misc.models.server import Server
 
 
-async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: WorkCallback):
-    user = await server.send_message('user/get', {
-        'tg_id': cbq.from_user.id
-    })
-    if not user:
+async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, user_data, user_localization):
+    if not user_data:
         return await cbq.answer(text='Подключение к серверу отсутствует!')
-    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
     if not cbq.message.reply_to_message:
-        return await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
+        return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server)
     if not file:
-        await cbq.answer(localization.content.TID_STARTWORK_FILENOTFOUND)
+        await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     keyboard = await get_buttons(file, server, callback_data.condition)
     if not keyboard[0]:
-        return await cbq.message.edit_text(localization.content[keyboard[1]] % (
-                user.content.__data__.nickname or cbq.from_user.first_name
+        return await cbq.message.edit_text(user_localization[keyboard[1]].format(
+            name=user_data.nickname or cbq.from_user.first_name
         ))
 
-    return await cbq.message.edit_text(localization.content.TID_WORK_TEXT % (
-            user.content.__data__.nickname or cbq.from_user.first_name
-    ), reply_markup=keyboard[1])
+    return await cbq.message.edit_text(user_localization.TID_WORK_TEXT.format(
+            name=user_data.nickname or cbq.from_user.first_name
+        ), reply_markup=keyboard[1])

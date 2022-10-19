@@ -19,7 +19,7 @@ async def main():
     )
     logger.info("Starting app")
 
-    server = Server('http://192.168.0.127')
+    server = Server('http://192.168.0.102')
     config = await server.send_message('config')
     server.timezone = timezone(config.content.SERVER.timezone)
     scheduler = AsyncIOScheduler()

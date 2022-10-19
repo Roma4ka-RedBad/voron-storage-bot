@@ -4,7 +4,7 @@ from aiogram.types import Message
 from misc.models.server import Server
 
 
-async def setname_waitname(message: Message, server: Server, state: FSMContext):
+async def setname_waitname(message: Message, server: Server, state: FSMContext, user_localization):
     await state.clear()
     user = await server.send_message('user/set', {
         'tg_id': message.from_user.id,
@@ -13,8 +13,7 @@ async def setname_waitname(message: Message, server: Server, state: FSMContext):
     })
     if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
-    localization = await server.send_message(f'localization/{user.content.__data__.language_code}')
 
-    await message.answer(localization.content.TID_SETNAME_DONE % (
-        user.content.__data__.nickname
+    await message.answer(user_localization.TID_SETNAME_DONE.format(
+        name=user.content.__data__.nickname
     ))

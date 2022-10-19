@@ -23,9 +23,9 @@ async def construct_convert_buttons(converts, row_index, is_archive=False):
 
 def work_keyb(localization):
     kb_obj = InlineKeyboardBuilder()
-    kb_obj.row(InlineKeyboardButton(text=localization.content.TID_BUTTON_ARCHIVE_ALL,
+    kb_obj.row(InlineKeyboardButton(text=localization.TID_BUTTON_ARCHIVE_ALL,
                                     callback_data=WorkCallback(action='by_archive', condition=True).pack()))
-    kb_obj.row(InlineKeyboardButton(text=localization.content.TID_BUTTON_ARCHIVE_FILE,
+    kb_obj.row(InlineKeyboardButton(text=localization.TID_BUTTON_ARCHIVE_FILE,
                                     callback_data=WorkCallback(action='by_archive', condition=False).pack()))
 
     return kb_obj.as_markup()
