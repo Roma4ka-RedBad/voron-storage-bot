@@ -18,6 +18,7 @@ class ConvertManager:
     async def convert(self, file: FileObject, to_format: str):
         process_dir = file.get_destionation(only_dir=True) + f'process_{random.randint(0, 1000000)}/'
         os.makedirs(process_dir)
+        os.makedirs(process_dir + 'new_files')
 
         if archive := file.get_archive():
             if file.archive_file != file.get_destionation(only_shortname=True):

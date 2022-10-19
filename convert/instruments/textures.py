@@ -1,15 +1,14 @@
 from PIL import Image
 
 from logic_objects.file import FileObject
+from .base import Base
 
 
-class Textures:
+class Textures(Base):
     def __init__(self, file: FileObject, process_dir: str):
+        super().__init__(file)
         self.file = file
         self.process_dir = process_dir
-
-    def get_new_filename(self, to_format: str):
-        return f"{self.file.get_destionation(only_shortname=True).split('.')[0]}_new.{to_format}"
 
     async def convert_to(self, to_format: str):
         if self.file.get_format() in ['png', 'jpg'] and to_format in ['png', 'jpg']:

@@ -3,7 +3,7 @@ default = 1024
 
 [UFS]
 path = '../ufs/'
-wait_for_delete_dir = 5 # minutes
+wait_for_delete_dir = 1 # minutes
 
 [TG]
 token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
