@@ -17,9 +17,9 @@ class FileObject(BaseModel):
         self.config = config
 
     def is_exist(self):
-        return os.path.exists(self.get_destionation())
+        return os.path.exists(self.get_destination())
 
-    def get_destionation(self, only_dir=False, only_shortname=False):
+    def get_destination(self, only_dir=False, only_shortname=False):
         shortname = self.name.split('/')[-1]
         if only_dir:
             return f"{self.config.UFS.path}{self.messenger}/{self.name.replace(shortname, '')}"
@@ -42,9 +42,9 @@ class FileObject(BaseModel):
         return converts
 
     def get_archive(self):
-        if zipfile.is_zipfile(self.get_destionation()):
+        if zipfile.is_zipfile(self.get_destination()):
             return ArchiveObject(self, 'r', zipfile.ZipFile)
-        elif rarfile.is_rarfile(self.get_destionation()):
+        elif rarfile.is_rarfile(self.get_destination()):
             return ArchiveObject(self, 'r', rarfile.RarFile)
 
 
@@ -83,7 +83,7 @@ class ArchiveFile:
 class ArchiveObject:
     def __init__(self, file: FileObject, mode, archive_class: zipfile.ZipFile | rarfile.RarFile):
         self.file = file
-        self.archive = archive_class(file.get_destionation(), mode)
+        self.archive = archive_class(file.get_destination(), mode)
 
     def get_file_by_name(self, name):
         for file in self.get_files():

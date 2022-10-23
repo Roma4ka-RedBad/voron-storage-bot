@@ -17,13 +17,15 @@ server = FastAPI()
 
 
 @server.post("/convert/{to_format}")
-async def convert(file: FileObject, to_format: str):
+async def convert(file: FileObject, to_format: str, metadata: dict = None):
+    if metadata is None:
+        metadata = {}
     file.set_config(config)
-    result, process_dir = await manager.convert(file, to_format)
+    result, process_dir = await manager.convert(file, to_format, metadata)
     if result:
         return await utils.create_response(True, content={
             'result_file': result,
-            'process_dir': process_dir
+            'process_dir': process_dir,
         })
     else:
         return await utils.create_response(False)
@@ -32,6 +34,11 @@ async def convert(file: FileObject, to_format: str):
 @server.get("/localization/{language_code}")
 async def get_localization(language_code: str):
     return await utils.create_response(True, content=languages[language_code])
+
+
+@server.get("/localizations")
+async def get_localizations():
+    return await utils.create_response(True, content=languages)
 
 
 @server.post("/user/set")
@@ -89,4 +96,17 @@ async def get_converts(files: List[FileObject]):
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
-uvicorn.run(server, host="192.168.0.127", port=80)
+# Принимает словарь, где path: путь до папки, которую надо архивировать
+# Путь без конечного слеша
+@server.post("/to_archive")
+async def compress_folder(data: dict):
+    final_path = await manager.compress_to_archive(**data)
+    return await utils.create_response(
+            True, content={
+                'archive_path': final_path
+                })
+
+
+
+# uvicorn.run(server, host="192.168.0.127", port=80)
+uvicorn.run(server, host='127.0.0.1', port=8910)

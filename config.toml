@@ -16,6 +16,7 @@ token = 'vk1.a.kCpn3eQDAvkMJF0tFYA0FcOy5PQJ2o_1_4unP4d_6O5oU0fs22yRrBKN7ok_4fa7f
 2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']
 2D_ANIM = ['sc', 'fla']
 CSV = ['compress', 'decompress', 'csv']
+AUDIO = ['mp3', 'ogg', 'wav', 'flac', 'ape', 'aiff', 'swa', 'psf', 'aac', 'alac', 'dsd']
 
 [SERVER]
 timezone = 'Europe/Moscow'

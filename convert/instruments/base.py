@@ -2,8 +2,11 @@ from logic_objects.file import FileObject
 
 
 class Base:
-    def __init__(self, file: FileObject):
+    def __init__(self, file: FileObject, process_dir: str, result_dir: str):
         self.file = file
+        self.process_dir = process_dir
+        self.result_dir = result_dir
 
     def get_new_filename(self, to_format: str):
-        return f"new_files/{self.file.get_destionation(only_shortname=True).split('.')[0]}.{to_format}"
+        return f"{self.result_dir}/{self.file.get_destination(only_shortname=True).split('.')[0]}" \
+               f".{to_format}"
