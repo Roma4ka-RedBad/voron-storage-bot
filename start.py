@@ -3,7 +3,7 @@ import utils
 import toml
 
 from fastapi import FastAPI
-from typing import List
+from typing import List, Dict, Any
 from box import Box
 
 from logic_objects import FileObject, UserObject
@@ -17,9 +17,9 @@ server = FastAPI()
 
 
 @server.post("/convert/{to_format}")
-async def convert(file: FileObject, to_format: str):
+async def convert(file: FileObject, to_format: str, metadata: Dict[Any, Any] = None):
     file.set_config(config)
-    result, process_dir = await manager.convert(file, to_format)
+    result, process_dir = await manager.convert(file, to_format, metadata)
     if result:
         return await utils.create_response(True, content={
             'result_file': result,
@@ -71,7 +71,7 @@ async def get_converts(files: List[FileObject]):
             file_converts = await utils.get_converts_by_file(file)
             if file_converts:
                 content.append({
-                    'name': file.name,
+                    'path': file.path,
                     'converts': file_converts
                 })
         return await utils.create_response(True, content=content)
@@ -81,7 +81,7 @@ async def get_converts(files: List[FileObject]):
         file_converts = await utils.get_converts_by_file(files[0])
         if file_converts:
             return await utils.create_response(True, content={
-                'name': files[0].name,
+                'path': files[0].path,
                 'converts': file_converts
             })
 
@@ -89,4 +89,4 @@ async def get_converts(files: List[FileObject]):
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
-uvicorn.run(server, host="192.168.0.127", port=80)
+uvicorn.run(server, host="192.168.0.102", port=80)

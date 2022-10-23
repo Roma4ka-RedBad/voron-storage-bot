@@ -6,4 +6,4 @@ class Base:
         self.file = file
 
     def get_new_filename(self, to_format: str):
-        return f"new_files/{self.file.get_destionation(only_shortname=True).split('.')[0]}.{to_format}"
+        return f"new_files/{self.file.get_destionation(only_name=True).split('.')[0]}.{to_format}"
