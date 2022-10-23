@@ -6,11 +6,7 @@ from misc.models.server import Server
 
 async def setname_waitname(message: Message, server: Server, state: FSMContext, user_localization):
     await state.clear()
-    user = await server.send_message('user/set', {
-        'tg_id': message.from_user.id,
-        'set_key': 'nickname',
-        'set_value': message.text
-    })
+    user = await server.send_msg('user/set', tg_id=message.from_user.id, set_key='nickname', set_value=message.text)
     if not user:
         return await message.answer(text='Подключение к серверу отсутствует!')
 

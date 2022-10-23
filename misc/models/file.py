@@ -25,9 +25,8 @@ class DownloadedFile:
         return is_zipfile(self.get_dir(full=True)) or is_rarfile(self.get_dir(full=True))
 
     @classmethod
-    async def get_file_by_reply_message(cls, message: Message, server: Server):
-        config = await server.send_message('config')
-        main_dir = f"{config.content.UFS.path}{server.messenger}"
+    async def get_file_by_reply_message(cls, message: Message, server_config, server: Server):
+        main_dir = f"{server_config.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"
 
         if os.path.exists(f"{main_dir}/{user_dir}/{message.document.file_name}"):

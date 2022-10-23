@@ -22,14 +22,14 @@ class InitMiddleware(BaseMiddleware):
         data['user_data'] = None
         data['user_localization'] = None
 
-        if config := await data['server'].send_message('config'):
+        if config := await data['server'].send_msg('config'):
             data['server_config'] = config.content
 
         if from_user := getattr(obj, 'from_user'):
-            if user := await data['server'].send_message('user/get', {'tg_id': from_user.id}):
+            if user := await data['server'].send_msg('user/get', tg_id=from_user.id):
                 data['user_data'] = user.content.__data__
                 data['user_localization'] = (
-                    await data['server'].send_message(f'localization/{data["user_data"].language_code}')
+                    await data['server'].send_msg(f'localization/{data["user_data"].language_code}')
                 ).content
 
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],

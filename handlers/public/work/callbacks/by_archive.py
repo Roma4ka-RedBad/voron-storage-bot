@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery
 
 from keyboards.work import WorkCallback
-from misc.utils import get_buttons
+from misc.utils import get_keyboard
 from misc.models.file import DownloadedFile
 from misc.models.server import Server
 
@@ -17,7 +17,7 @@ async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: Wor
     if not file:
         await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
-    keyboard = await get_buttons(file, server, callback_data.condition)
+    keyboard = await get_keyboard(file, server, callback_data.condition)
     if not keyboard[0]:
         return await cbq.message.edit_text(user_localization[keyboard[1]].format(
             name=user_data.nickname or cbq.from_user.first_name

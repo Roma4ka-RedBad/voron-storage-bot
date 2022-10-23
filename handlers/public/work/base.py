@@ -3,7 +3,7 @@ from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from misc.models.server import Server
-from misc.utils import download_file, get_buttons
+from misc.utils import download_file, get_keyboard
 from keyboards.work import work_keyb
 
 
@@ -28,7 +28,7 @@ async def command_work(message: Message, server: Server, bot: Bot, scheduler: As
             name=user_data.nickname or message.from_user.first_name
         ), reply_markup=work_keyb(user_localization))
 
-    keyboard = await get_buttons(file, server)
+    keyboard = await get_keyboard(file, server)
     if not keyboard[0]:
         return await message.reply(user_localization[keyboard[1]].format(
             name=user_data.nickname or message.from_user.first_name
