@@ -8,5 +8,5 @@ class Base:
         self.result_dir = result_dir
 
     def get_new_filename(self, to_format: str):
-        return f"{self.result_dir}/{self.file.get_destination(only_shortname=True).split('.')[0]}" \
+        return f"{self.result_dir}/{self.file.get_destination(only_name=True).split('.')[0]}" \
                f".{to_format}"

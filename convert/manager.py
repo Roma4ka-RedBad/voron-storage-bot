@@ -2,9 +2,10 @@ import os
 import shutil
 import random
 
+from typing import List
 from zipfile import ZipFile
+from logic_objects import FileObject, ArchiveObject
 
-from logic_objects import FileObject
 from convert.instruments.textures import Textures
 from convert.instruments.audios import Audios
 
@@ -13,53 +14,59 @@ class ConvertManager:
     def __init__(self, config):
         self.config = config
 
-    async def start_tool(
-            self,
-            file: FileObject,
-            process_dir: str,
-            result_dir: str,
-            to_format: str,
-            data=None):
-        # так пичарм говорит делать вместо data={}
-        if data is None:
-            data = {}
+    async def start_tool(self, files: List[FileObject] | FileObject, process_dir: str, result_dir: str, to_format: str, metadata: dict):
+        result_file = None
+        if type(files) is list:
+            result_file = ArchiveObject(
+                FileObject.create(process_dir + 'archive.zip', files[0].messenger, files[0].config),
+                "w", "zip"
+            )
 
         if to_format in self.config.CONVERTS['2D']:
-            process = Textures(file, process_dir, result_dir)
-
+            if result_file:
+                for file in files:
+                    process = Textures(file, process_dir, result_dir)
+                    if result_dir := await process.convert_to(to_format):
+                        result_file.write(result_dir)
+                result_file = result_file.file.get_destination()
+            else:
+                process = Textures(file, process_dir, result_dir)
+                result_file = await process.convert_to(to_format)
+                
         elif to_format in self.config.CONVERTS['AUDIO']:
-            process = Audios(file, process_dir, result_dir, **data)
+            process = Audios(file, process_dir, result_dir, **metadata)
+            result_file = process.convert_to(to_format)
 
-        else:
-            return None, None
+        return result_file
 
-        return await process.convert_to(to_format)
-
-    async def convert(self, file: FileObject, to_format: str, data: dict):
+    async def convert(self, file: FileObject, to_format: str, metadata: list):
         main_dir = file.get_destination(only_dir=True)
         process_dir = main_dir + f'process_{random.randint(0, 1000000)}/'
         result_dir = main_dir + f'result/'
+        files = []
+
         os.makedirs(process_dir)
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
 
         if archive := file.get_archive():
-            if file.archive_file != file.get_destination(only_shortname=True):
+            if file.archive_file != file.get_destination(only_name=True):
                 extract_file = archive.get_file_by_name(file.archive_file)
                 extracted_dir = extract_file.extract(process_dir)
-                file = FileObject(
-                    name=shutil.copy(extracted_dir, process_dir + extract_file.get_shortname()),
-                    messenger=file.messenger, config=file.config)
+                shutil._samefile = lambda *a, **b: False
+                files = FileObject(path=shutil.copy(extracted_dir, process_dir + extract_file.get_shortname()),
+                                   messenger=file.messenger, config=file.config)
             else:
-                print("Ну пока...")
-                return None, None
+                for extract_file in archive.get_files():
+                    extracted_dir = extract_file.extract(process_dir)
+                    files.append(FileObject(path=extracted_dir,
+                                            messenger=file.messenger, config=file.config))
         else:
-            shutil.copy(
-                file.get_destination(), process_dir + file.get_destination(
-                    only_shortname=True))
+            files = file
+            shutil.copy(file.get_destination(), process_dir + file.get_destination(only_name=True))
 
-        result = await self.start_tool(file, process_dir, result_dir, to_format, data)
-        return result, result_dir
+        result = await self.start_tool(files, process_dir, result_dir, to_format, metadata)
+        return result, process_dir
 
     @staticmethod
     async def compress_to_archive(path: str, archive_name: str = None, archive_path: str = None):

@@ -13,7 +13,7 @@ class Textures(Base):
             return await self.to_jpg_or_png(to_format)
 
     async def to_jpg_or_png(self, to_format: str):
-        image = Image.open(self.process_dir + self.file.get_destination(only_shortname=True))
+        image = Image.open(self.process_dir + self.file.get_destination(only_name=True))
         new_image = image.convert("RGB" if to_format == 'jpg' else "RGBA")
         new_image.save(self.get_new_filename(to_format))
         return self.get_new_filename(to_format)

@@ -1,6 +1,7 @@
 import os
-import zipfile
-import rarfile
+
+from zipfile import ZipFile, ZipInfo, is_zipfile
+from rarfile import RarFile, RarInfo, is_rarfile
 
 from pydantic import BaseModel
 from box import Box
@@ -8,7 +9,7 @@ from copy import copy
 
 
 class FileObject(BaseModel):
-    name: str
+    path: str
     messenger: str
     archive_file: str = None
     config: Box = None
@@ -19,18 +20,24 @@ class FileObject(BaseModel):
     def is_exist(self):
         return os.path.exists(self.get_destination())
 
-    def get_destination(self, only_dir=False, only_shortname=False):
-        shortname = self.name.split('/')[-1]
+    @classmethod
+    def create(cls, filepath, messenger, config):
+        open(filepath, 'w').close()
+        filepath = filepath.replace(f'{config.UFS.path}{messenger}', '')
+        return FileObject(path=filepath, messenger=messenger, config=config)
+
+    def get_destination(self, only_dir=False, only_name=False):
+        name = self.path.replace('\\', '/').split('/')[-1]
         if only_dir:
-            return f"{self.config.UFS.path}{self.messenger}/{self.name.replace(shortname, '')}"
+            return f"{self.config.UFS.path}{self.messenger}/{self.path.replace(name, '')}"
 
-        if only_shortname:
-            return shortname
+        if only_name:
+            return name
 
-        return f"{self.config.UFS.path}{self.messenger}/{self.name}"
+        return f"{self.config.UFS.path}{self.messenger}/{self.path}"
 
     def get_format(self):
-        return self.name.split('.')[-1]
+        return self.path.split('.')[-1]
 
     def get_available_converts(self):
         converts = [copy(self.config.CONVERTS[group]) for group in self.config.CONVERTS if
@@ -42,15 +49,19 @@ class FileObject(BaseModel):
         return converts
 
     def get_archive(self):
-        if zipfile.is_zipfile(self.get_destination()):
-            return ArchiveObject(self, 'r', zipfile.ZipFile)
-        elif rarfile.is_rarfile(self.get_destination()):
-            return ArchiveObject(self, 'r', rarfile.RarFile)
+        archive_type = None
+        if is_zipfile(self.get_destination()):
+            archive_type = 'zip'
+        elif is_rarfile(self.get_destination()):
+            archive_type = 'rar'
+
+        if archive_type:
+            return ArchiveObject(self, 'r', archive_type)
 
 
 class ArchiveFile:
-    def __init__(self, zip_file: zipfile.ZipInfo | rarfile.RarInfo, archive_file: FileObject,
-                 archive_object: zipfile.ZipFile | rarfile.RarFile):
+    def __init__(self, zip_file: ZipInfo | RarInfo, archive_file: FileObject,
+                 archive_object: ZipFile | RarFile):
         self.origin = zip_file
         self.archive_file = archive_file
         self.archive_object = archive_object
@@ -81,9 +92,12 @@ class ArchiveFile:
 
 
 class ArchiveObject:
-    def __init__(self, file: FileObject, mode, archive_class: zipfile.ZipFile | rarfile.RarFile):
+    def __init__(self, file: FileObject, mode, archive_type: str):
         self.file = file
-        self.archive = archive_class(file.get_destination(), mode)
+        if archive_type == 'zip':
+            self.archive = ZipFile(file.get_destionation(), mode)
+        elif archive_type == 'rar':
+            self.archive = RarFile(file.get_destionation(), mode)
 
     def get_file_by_name(self, name):
         for file in self.get_files():
@@ -104,3 +118,6 @@ class ArchiveObject:
 
     def count(self):
         return len(self.archive.infolist())
+
+    def write(self, filepath):
+        self.archive.write(filepath, arcname=filepath.split('/')[-1])
