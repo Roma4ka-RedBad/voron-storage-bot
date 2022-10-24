@@ -22,7 +22,7 @@
   "TID_STARTWORK_FILENOTFOUND": "Ой-ой! Файл не найден! :(",
   "TID_STARTWORK_DONE": "{name}, ваш файл:",
   "TID_STARTWORK_DONE_FOR_MANY_FILES": "{name}, ваши файлы:",
-  "TID_STARTWORK_FILENOTCONVERT": "%s, не удалось конвертировать файл!",
+  "TID_STARTWORK_FILENOTCONVERT": "{name}, не удалось конвертировать файл!",
   "HAVE_NOT_BINDING": "ОТСУТСТВУЕТ",
   "TID_STARTWORK_FILESNOTCONVERT": "{name}, не удалось конвертировать файлы!",
   "TID_COMPRESSED_PHOTOS_TEXT": "Обнаружены сжатые фотографии. Чтобы открыть больше функий, отправьте фотографии документами!",

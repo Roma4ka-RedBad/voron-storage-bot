@@ -30,16 +30,16 @@ class ConvertManager:
                         result_file.write(result_dir)
                 result_file = result_file.file.get_destination()
             else:
-                process = Textures(file, process_dir, result_dir)
+                process = Textures(files, process_dir, result_dir)
                 result_file = await process.convert_to(to_format)
                 
         elif to_format in self.config.CONVERTS['AUDIO']:
-            process = Audios(file, process_dir, result_dir, **metadata)
+            process = Audios(files, process_dir, result_dir, **metadata)
             result_file = process.convert_to(to_format)
 
         return result_file
 
-    async def convert(self, file: FileObject, to_format: str, metadata: list):
+    async def convert(self, file: FileObject, to_format: str, metadata: dict):
         main_dir = file.get_destination(only_dir=True)
         process_dir = main_dir + f'process_{random.randint(0, 1000000)}/'
         result_dir = main_dir + f'result/'

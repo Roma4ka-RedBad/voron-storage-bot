@@ -94,8 +94,6 @@ async def get_converts(files: List[FileObject]):
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
-# Принимает словарь, где path: путь до папки, которую надо архивировать
-# Путь без конечного слеша
 @server.post("/to_archive")
 async def compress_folder(data: dict):
     final_path = await manager.compress_to_archive(**data)
