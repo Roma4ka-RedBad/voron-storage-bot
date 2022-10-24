@@ -18,7 +18,7 @@ class FileObject(BaseModel):
         self.config = config
 
     def is_exist(self):
-        return os.path.exists(self.get_destionation())
+        return os.path.exists(self.get_destination())
 
     @classmethod
     def create(cls, filepath, messenger, config):
@@ -26,7 +26,7 @@ class FileObject(BaseModel):
         filepath = filepath.replace(f'{config.UFS.path}{messenger}', '')
         return FileObject(path=filepath, messenger=messenger, config=config)
 
-    def get_destionation(self, only_dir=False, only_name=False):
+    def get_destination(self, only_dir=False, only_name=False):
         name = self.path.replace('\\', '/').split('/')[-1]
         if only_dir:
             return f"{self.config.UFS.path}{self.messenger}/{self.path.replace(name, '')}"
@@ -50,9 +50,9 @@ class FileObject(BaseModel):
 
     def get_archive(self):
         archive_type = None
-        if is_zipfile(self.get_destionation()):
+        if is_zipfile(self.get_destination()):
             archive_type = 'zip'
-        elif is_rarfile(self.get_destionation()):
+        elif is_rarfile(self.get_destination()):
             archive_type = 'rar'
 
         if archive_type:
