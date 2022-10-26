@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from typing import List, Dict, Any
 from box import Box
 
-from logic_objects import FileObject, UserObject
+from logic_objects import FileObject, UserObject, Metadata
 from convert.manager import ConvertManager
 from localization import languages
 from database import UserTable
@@ -19,10 +19,15 @@ server = FastAPI()
 @server.post("/convert/{to_format}")
 async def convert(file: FileObject, to_format: str, metadata: Dict[Any, Any] = None):
     file.set_config(config)
+    metadata = Metadata(metadata)
     result, process_dir = await manager.convert(file, to_format, metadata)
     if result:
+        if metadata.compress_to_archive and type(result) is list:
+            result = await utils.compress_to_archive(process_dir + 'archive.zip', file.messenger,
+                                                     config, file_paths=result)
+
         return await utils.create_response(True, content={
-            'result_file': result,
+            'result': result,
             'process_dir': process_dir,
         })
     else:
@@ -94,14 +99,13 @@ async def get_converts(files: List[FileObject]):
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
-@server.post("/to_archive")
-async def compress_folder(data: dict):
-    final_path = await manager.compress_to_archive(**data)
-    return await utils.create_response(
-            True, content={
-                'archive_path': final_path
-                })
-
+# @server.post("/to_archive")
+# async def compress_folder(data: dict):
+#    final_path = await manager.compress_to_archive(**data)
+#    return await utils.create_response(
+#        True, content={
+#            'archive_path': final_path
+#        })
 
 # uvicorn.run(server, host="192.168.0.127", port=80)
 uvicorn.run(server, host='127.0.0.1', port=8910)

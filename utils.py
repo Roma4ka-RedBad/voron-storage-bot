@@ -1,4 +1,5 @@
-from logic_objects import FileObject
+from logic_objects import FileObject, ArchiveObject
+from typing import List
 
 
 async def get_converts_by_file(file: FileObject):
@@ -19,6 +20,21 @@ async def get_converts_by_file(file: FileObject):
             return archive_converts
     else:
         return file.get_available_converts()
+
+
+async def compress_to_archive(archive_path: str, messenger: str, config: object, files_objects: List[FileObject] = None,
+                              file_paths: list = None):
+    archive = ArchiveObject(FileObject.create(archive_path, messenger, config), "w", "zip", compresslevel=10)
+
+    if files_objects:
+        for file in files_objects:
+            archive.write(file.get_destination())
+
+    if file_paths:
+        for file in file_paths:
+            archive.write(file)
+
+    return archive.close()
 
 
 async def create_response(status: bool, content=None, error_msg: str = None):

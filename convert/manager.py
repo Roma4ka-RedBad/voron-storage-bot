@@ -3,8 +3,7 @@ import shutil
 import random
 
 from typing import List
-from zipfile import ZipFile
-from logic_objects import FileObject, ArchiveObject
+from logic_objects import FileObject, Metadata
 
 from convert.instruments.textures import Textures
 from convert.instruments.audios import Audios
@@ -14,37 +13,30 @@ class ConvertManager:
     def __init__(self, config):
         self.config = config
 
-    async def start_tool(self, files: List[FileObject] | FileObject, process_dir: str, result_dir: str, to_format: str, metadata: dict):
-        result_file = None
-        if type(files) is list:
-            result_file = ArchiveObject(
-                FileObject.create(process_dir + 'archive.zip', files[0].messenger, files[0].config),
-                "w", "zip"
-            )
+    async def start_tool(self, files: List[FileObject], process_dir: str, result_dir: str, to_format: str,
+                         metadata: Metadata):
+        result = []
 
-        if to_format in self.config.CONVERTS['2D']:
-            if result_file:
-                for file in files:
-                    process = Textures(file, process_dir, result_dir)
-                    if result_dir := await process.convert_to(to_format):
-                        result_file.write(result_dir)
-                result_file = result_file.file.get_destination()
-            else:
-                process = Textures(files, process_dir, result_dir)
-                result_file = await process.convert_to(to_format)
-                
-        elif to_format in self.config.CONVERTS['AUDIO']:
-            process = Audios(files, process_dir, result_dir, **metadata)
-            result_file = process.convert_to(to_format)
+        for file in files:
+            if to_format in self.config.CONVERTS['2D']:
+                process = Textures(file, process_dir, result_dir)
+                if process := await process.convert_to(to_format):
+                    result.append(process)
 
-        return result_file
+            elif to_format in self.config.CONVERTS['AUDIO']:
+                process = Audios(file, process_dir, result_dir, metadata)
+                if process := await process.convert_to(to_format):
+                    result.append(process)
 
-    async def convert(self, file: FileObject, to_format: str, metadata: dict):
+        return result[0] if len(result) == 1 else result
+
+    async def convert(self, file: FileObject, to_format: str, metadata: Metadata):
         main_dir = file.get_destination(only_dir=True)
         process_dir = main_dir + f'process_{random.randint(0, 1000000)}/'
         result_dir = main_dir + f'result/'
         files = []
 
+        shutil._samefile = lambda *a, **b: False
         os.makedirs(process_dir)
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
@@ -52,35 +44,18 @@ class ConvertManager:
         if archive := file.get_archive():
             if file.archive_file != file.get_destination(only_name=True):
                 extract_file = archive.get_file_by_name(file.archive_file)
-                extracted_dir = extract_file.extract(process_dir)
-                shutil._samefile = lambda *a, **b: False
-                files = FileObject(path=shutil.copy(extracted_dir, process_dir + extract_file.get_shortname()),
-                                   messenger=file.messenger, config=file.config)
+                extracted_dir = shutil.copy(extract_file.extract(process_dir),
+                                            process_dir + extract_file.get_shortname())
+                files.append(FileObject(path=extracted_dir, messenger=file.messenger, config=file.config))
             else:
                 for extract_file in archive.get_files():
-                    extracted_dir = extract_file.extract(process_dir)
-                    files.append(FileObject(path=extracted_dir,
-                                            messenger=file.messenger, config=file.config))
+                    if not extract_file.is_dir():
+                        extracted_dir = shutil.copy(extract_file.extract(process_dir),
+                                                    process_dir + extract_file.get_shortname())
+                        files.append(FileObject(path=extracted_dir, messenger=file.messenger, config=file.config))
         else:
-            files = file
             shutil.copy(file.get_destination(), process_dir + file.get_destination(only_name=True))
+            files.append(file)
 
         result = await self.start_tool(files, process_dir, result_dir, to_format, metadata)
         return result, process_dir
-
-    @staticmethod
-    async def compress_to_archive(path: str, archive_name: str = None, archive_path: str = None):
-        if not archive_name:
-            archive_name = path.split('/')[-1] + '.zip'
-
-        if not archive_path:
-            archive_path = '/'.join(path.split('/')[:-1])
-
-        with ZipFile(f'{archive_path}/{archive_name}', 'w', compresslevel=10) as archive:
-            for folder, subfolder, files in os.walk(path):
-                for file in files:
-                    archive.write(
-                        os.path.join(folder, file),
-                        os.path.join(folder.replace(path, ''), file))
-
-        return f'{archive_path}/{archive_name}'

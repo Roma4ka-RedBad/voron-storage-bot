@@ -92,12 +92,12 @@ class ArchiveFile:
 
 
 class ArchiveObject:
-    def __init__(self, file: FileObject, mode, archive_type: str):
+    def __init__(self, file: FileObject, mode, archive_type: str, **kwargs):
         self.file = file
         if archive_type == 'zip':
-            self.archive = ZipFile(file.get_destination(), mode)
+            self.archive = ZipFile(file.get_destination(), mode, **kwargs)
         elif archive_type == 'rar':
-            self.archive = RarFile(file.get_destination(), mode)
+            self.archive = RarFile(file.get_destination(), mode, **kwargs)
 
     def get_file_by_name(self, name):
         for file in self.get_files():
@@ -121,3 +121,7 @@ class ArchiveObject:
 
     def write(self, filepath):
         self.archive.write(filepath, arcname=filepath.split('/')[-1])
+
+    def close(self):
+        self.archive.close()
+        return self.file.get_destination()
