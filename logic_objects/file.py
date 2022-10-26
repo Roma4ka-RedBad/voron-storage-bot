@@ -95,9 +95,9 @@ class ArchiveObject:
     def __init__(self, file: FileObject, mode, archive_type: str):
         self.file = file
         if archive_type == 'zip':
-            self.archive = ZipFile(file.get_destionation(), mode)
+            self.archive = ZipFile(file.get_destination(), mode)
         elif archive_type == 'rar':
-            self.archive = RarFile(file.get_destionation(), mode)
+            self.archive = RarFile(file.get_destination(), mode)
 
     def get_file_by_name(self, name):
         for file in self.get_files():
