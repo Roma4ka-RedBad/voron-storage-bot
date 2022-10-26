@@ -21,22 +21,27 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
         return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     await cbq.answer(user_localization.TID_STARTWORK)
-    scheduler.get_job(file.user_dir).pause()
+    scheduler.get_job(file.user_dir).pause() if scheduler.get_job(file.user_dir) else None
 
     result = await server.send_msg(f'convert/{callback_data.to_format}', file={
         'path': file.get_dir(),
         'messenger': server.messenger,
         'archive_file': cbq.message.reply_markup.inline_keyboard[callback_data.row_index][
             0].text if file.is_archive() else None,
-    })
+    }, metadata={'compress_to_archive': True})
     if result.status:
-        await cbq.message.reply_document(FSInputFile(result.content.result_file),
-                                         caption=user_localization.TID_STARTWORK_DONE.format(
-                                             name=user_data.nickname or cbq.from_user.first_name
-                                         ))
+        if result.content.result:
+            await cbq.message.reply_document(FSInputFile(result.content.result),
+                                             caption=user_localization.TID_STARTWORK_DONE.format(
+                                                 name=user_data.nickname or cbq.from_user.first_name
+                                             ))
+        else:
+            await cbq.message.reply(user_localization.TID_STARTWORK_FILENOTCONVERT.format(
+                name=user_data.nickname or cbq.from_user.first_name
+            ))
         shutil.rmtree(result.content.process_dir)
     else:
         await cbq.message.reply(user_localization.TID_STARTWORK_FILENOTCONVERT.format(
             name=user_data.nickname or cbq.from_user.first_name
         ))
-    scheduler.get_job(file.user_dir).resume()
+    scheduler.get_job(file.user_dir).resume() if scheduler.get_job(file.user_dir) else None

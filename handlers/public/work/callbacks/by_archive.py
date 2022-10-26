@@ -6,14 +6,14 @@ from misc.models.file import DownloadedFile
 from misc.models.server import Server
 
 
-async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, user_data, user_localization):
-    if not user_data:
+async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, server_config, user_data, user_localization):
+    if not server_config:
         return await cbq.answer(text='Подключение к серверу отсутствует!')
 
     if not cbq.message.reply_to_message:
         return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
-    file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server)
+    file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server_config, server)
     if not file:
         await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
