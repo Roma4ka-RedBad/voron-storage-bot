@@ -44,7 +44,6 @@ async def download_file(message: Message, bot: Bot, server: Server, config, sche
 
 async def get_keyboard(file: DownloadedFile, server: Server, condition: bool = None):
     converts = await server.send_msg('converts', [{
-        'messenger': server.messenger,
         'path': file.get_dir()
     }])
 

@@ -12,17 +12,17 @@ class DownloadedFile:
         self.user_dir = user_dir
         self.name = file_name
 
-    def get_dir(self, full=False, with_name=True):
-        return f"{self.main_dir + '/' if full else ''}{self.user_dir}/{self.name if with_name else ''}"
+    def get_dir(self, with_name=True):
+        return f"{self.main_dir}/{self.user_dir}/{self.name if with_name else ''}"
 
     def get_index(self):
-        files = os.listdir(self.get_dir(full=True, with_name=False))
+        files = os.listdir(self.get_dir(with_name=False))
         for file in files:
             if file == self.name:
                 return files.index(file)
 
     def is_archive(self):
-        return is_zipfile(self.get_dir(full=True)) or is_rarfile(self.get_dir(full=True))
+        return is_zipfile(self.get_dir()) or is_rarfile(self.get_dir())
 
     @classmethod
     async def get_file_by_reply_message(cls, message: Message, server_config, server: Server):
