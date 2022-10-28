@@ -23,8 +23,7 @@ async def convert(file: FileObject, to_format: str, metadata: Dict[Any, Any] = N
     result, process_dir = await manager.convert(file, to_format, metadata)
     if result:
         if metadata.compress_to_archive and type(result) is list:
-            result = await utils.compress_to_archive(process_dir + 'archive.zip', file.messenger,
-                                                     config, file_paths=result)
+            result = await utils.compress_to_archive(process_dir + 'archive.zip', config, file_paths=result)
 
         return await utils.create_response(True, content={
             'result': result,

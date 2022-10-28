@@ -1,5 +1,6 @@
-import os
+import shutil
 
+from pathlib import Path
 from zipfile import ZipFile, ZipInfo, is_zipfile
 from rarfile import RarFile, RarInfo, is_rarfile
 
@@ -9,50 +10,35 @@ from copy import copy
 
 
 class FileObject(BaseModel):
-    path: str
-    messenger: str
-    archive_file: str = None
+    path: Path
+    target_file: str = None
     config: Box = None
 
     def set_config(self, config):
         self.config = config
 
-    def is_exist(self):
-        return os.path.exists(self.get_destination())
+    def copy_to(self, filepath):
+        return FileObject(path=shutil.copy(str(self.path), str(filepath)), config=self.config)
 
     @classmethod
-    def create(cls, filepath, messenger, config):
+    def create(cls, filepath, config):
         open(filepath, 'w').close()
-        filepath = filepath.replace(f'{config.UFS.path}{messenger}', '')
-        return FileObject(path=filepath, messenger=messenger, config=config)
-
-    def get_destination(self, only_dir=False, only_name=False):
-        name = self.path.replace('\\', '/').split('/')[-1]
-        if only_dir:
-            return f"{self.config.UFS.path}{self.messenger}/{self.path.replace(name, '')}"
-
-        if only_name:
-            return name
-
-        return f"{self.config.UFS.path}{self.messenger}/{self.path}"
-
-    def get_format(self):
-        return self.path.split('.')[-1]
+        return FileObject(path=filepath, config=config)
 
     def get_available_converts(self):
         converts = [copy(self.config.CONVERTS[group]) for group in self.config.CONVERTS if
-                    self.get_format() in self.config.CONVERTS[group]]
+                    self.path.suffix[1:] in self.config.CONVERTS[group]]
         if converts:
             converts = converts[0]
-            converts.remove(self.get_format())
+            converts.remove(self.path.suffix[1:])
 
         return converts
 
     def get_archive(self):
         archive_type = None
-        if is_zipfile(self.get_destination()):
+        if is_zipfile(self.path):
             archive_type = 'zip'
-        elif is_rarfile(self.get_destination()):
+        elif is_rarfile(self.path):
             archive_type = 'rar'
 
         if archive_type:
@@ -60,10 +46,10 @@ class FileObject(BaseModel):
 
 
 class ArchiveFile:
-    def __init__(self, zip_file: ZipInfo | RarInfo, archive_file: FileObject,
+    def __init__(self, archive_file: ZipInfo | RarInfo, archive_file_object: FileObject,
                  archive_object: ZipFile | RarFile):
-        self.origin = zip_file
-        self.archive_file = archive_file
+        self.origin = archive_file
+        self.archive_file = archive_file_object
         self.archive_object = archive_object
 
     def get_format(self):
@@ -79,7 +65,7 @@ class ArchiveFile:
         return self.origin.file_size / 1024 / 1024
 
     def extract(self, path):
-        return self.archive_object.extract(self.origin, path)
+        return FileObject(path=self.archive_object.extract(self.origin, path), config=self.archive_file.config)
 
     def get_available_converts(self):
         converts = [copy(self.archive_file.config.CONVERTS[group]) for group in self.archive_file.config.CONVERTS if
@@ -95,9 +81,9 @@ class ArchiveObject:
     def __init__(self, file: FileObject, mode, archive_type: str, **kwargs):
         self.file = file
         if archive_type == 'zip':
-            self.archive = ZipFile(file.get_destination(), mode, **kwargs)
+            self.archive = ZipFile(file.path, mode, **kwargs)
         elif archive_type == 'rar':
-            self.archive = RarFile(file.get_destination(), mode, **kwargs)
+            self.archive = RarFile(file.path, mode, **kwargs)
 
     def get_file_by_name(self, name):
         for file in self.get_files():
@@ -124,4 +110,4 @@ class ArchiveObject:
 
     def close(self):
         self.archive.close()
-        return self.file.get_destination()
+        return self.file.path

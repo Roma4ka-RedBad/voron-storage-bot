@@ -31,9 +31,8 @@ class ConvertManager:
         return result[0] if len(result) == 1 else result
 
     async def convert(self, file: FileObject, to_format: str, metadata: Metadata):
-        main_dir = file.get_destination(only_dir=True)
-        process_dir = main_dir + f'process_{random.randint(0, 1000000)}/'
-        result_dir = main_dir + f'result/'
+        process_dir = file.path.parent / f'process_{random.randint(0, 1000000)}/'
+        result_dir = file.path.parent / 'result'
         files = []
 
         shutil._samefile = lambda *a, **b: False
@@ -42,20 +41,15 @@ class ConvertManager:
             os.makedirs(result_dir)
 
         if archive := file.get_archive():
-            if file.archive_file != file.get_destination(only_name=True):
-                extract_file = archive.get_file_by_name(file.archive_file)
-                extracted_dir = shutil.copy(extract_file.extract(process_dir),
-                                            process_dir + extract_file.get_shortname())
-                files.append(FileObject(path=extracted_dir, messenger=file.messenger, config=file.config))
+            if file.target_file != file.path.name:
+                extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
+                files.append(extract_file.copy_to(process_dir))
             else:
                 for extract_file in archive.get_files():
                     if not extract_file.is_dir():
-                        extracted_dir = shutil.copy(extract_file.extract(process_dir),
-                                                    process_dir + extract_file.get_shortname())
-                        files.append(FileObject(path=extracted_dir, messenger=file.messenger, config=file.config))
+                        files.append(extract_file.extract(process_dir).copy_to(process_dir))
         else:
-            shutil.copy(file.get_destination(), process_dir + file.get_destination(only_name=True))
-            files.append(file)
+            files.append(file.copy_to(process_dir))
 
         result = await self.start_tool(files, process_dir, result_dir, to_format, metadata)
         return result, process_dir

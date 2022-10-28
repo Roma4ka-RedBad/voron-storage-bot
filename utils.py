@@ -22,13 +22,13 @@ async def get_converts_by_file(file: FileObject):
         return file.get_available_converts()
 
 
-async def compress_to_archive(archive_path: str, messenger: str, config: object, files_objects: List[FileObject] = None,
+async def compress_to_archive(archive_path: str, config: object, files_objects: List[FileObject] = None,
                               file_paths: list = None):
-    archive = ArchiveObject(FileObject.create(archive_path, messenger, config), "w", "zip", compresslevel=10)
+    archive = ArchiveObject(FileObject.create(archive_path, config), "w", "zip", compresslevel=10)
 
     if files_objects:
         for file in files_objects:
-            archive.write(file.get_destination())
+            archive.write(file.path)
 
     if file_paths:
         for file in file_paths:
