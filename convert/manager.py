@@ -19,12 +19,12 @@ class ConvertManager:
 
         for file in files:
             if to_format in self.config.CONVERTS['2D']:
-                process = Textures(file, process_dir, result_dir)
+                process = Textures(file, result_dir)
                 if process := await process.convert_to(to_format):
                     result.append(process)
 
             elif to_format in self.config.CONVERTS['AUDIO']:
-                process = Audios(file, process_dir, result_dir, metadata)
+                process = Audios(file, process_dir, metadata)
                 if process := await process.convert_to(to_format):
                     result.append(process)
 
@@ -41,7 +41,7 @@ class ConvertManager:
             os.makedirs(result_dir)
 
         if archive := file.get_archive():
-            if file.target_file != file.path.name:
+            if file.target_file:
                 extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
                 files.append(extract_file.copy_to(process_dir))
             else:

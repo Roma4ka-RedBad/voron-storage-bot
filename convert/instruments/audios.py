@@ -8,14 +8,12 @@ DEFAULT_BITRATE = 90
 
 
 class Audios(Base):
-    def __init__(self, file: FileObject, process_dir: str, result_dir: str, metadata: Metadata):
-        super().__init__(file, process_dir, result_dir)
+    def __init__(self, file: FileObject, result_dir: str, metadata: Metadata):
+        super().__init__(file, result_dir)
         self.metadata = metadata
 
     async def convert_to(self, to_format: str):
-        audio = AudioSegment().from_file(
-            self.process_dir + self.file.get_destination(only_name=True)
-        )
+        audio = AudioSegment().from_file(self.file.path)
         if self.metadata.compress:
             audio = audio.set_frame_rate(self.metadata.sample_rate or DEFAULT_SAMPLE_RATE)
             audio.export(self.get_new_filename(to_format), format=to_format, bitrate=self.metadata.bitrate or DEFAULT_BITRATE)
