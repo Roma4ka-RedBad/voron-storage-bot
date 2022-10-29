@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram.utils.markdown import hcode, hbold
 
-from misc.models.server import Server
+from misc.models import Server
 
 
 async def command_profile(message: Message, server: Server, user_data, user_localization):

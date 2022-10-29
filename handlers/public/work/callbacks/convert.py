@@ -1,14 +1,12 @@
 import shutil
 
 from aiogram.types import CallbackQuery, FSInputFile
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from keyboards.work import WorkCallback
-from misc.models.file import DownloadedFile
-from misc.models.server import Server
+
+from misc.models import DownloadedFile, Server, Scheduler
 
 
-async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, scheduler: AsyncIOScheduler,
+async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, scheduler: Scheduler,
                        server_config, user_data, user_localization):
     if not server_config:
         return await cbq.answer(text='Подключение к серверу отсутствует!')
@@ -21,14 +19,15 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
         return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     await cbq.answer(user_localization.TID_STARTWORK)
-    scheduler.get_job(file.user_dir).pause() if scheduler.get_job(file.user_dir) else None
+    scheduler.pause_task(file.user_dir)
 
     result = await server.send_msg(f'convert/{callback_data.to_format}', file={
         'path': file.get_dir(),
         'messenger': server.messenger,
-        'archive_file': cbq.message.reply_markup.inline_keyboard[callback_data.row_index][
-            0].text if file.is_archive() else None,
+        'target_file': cbq.message.reply_markup.inline_keyboard[callback_data.row_index][
+            0].text if not callback_data.is_archive else None,
     }, metadata={'compress_to_archive': True})
+
     if result.status:
         if result.content.result:
             await cbq.message.reply_document(FSInputFile(result.content.result),
@@ -44,4 +43,4 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
         await cbq.message.reply(user_localization.TID_STARTWORK_FILENOTCONVERT.format(
             name=user_data.nickname or cbq.from_user.first_name
         ))
-    scheduler.get_job(file.user_dir).resume() if scheduler.get_job(file.user_dir) else None
+    scheduler.resume_task(file.user_dir)

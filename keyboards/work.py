@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from misc.models.file import DownloadedFile
+from misc.models import DownloadedFile
 
 
 class WorkCallback(CallbackData, prefix="work"):

@@ -3,11 +3,11 @@ import logging
 
 from pytz import timezone
 from aiogram import Bot, Dispatcher
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.dispatcher.fsm.storage.memory import MemoryStorage
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from handlers import register_routers
-from misc.models.server import Server
+from misc.models import Server, Scheduler
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ async def main():
 
     bot = Bot(token=config.content.TG.token, parse_mode='HTML')
     dp = Dispatcher(storage=storage)
-    register_routers(dp, server, bot, scheduler)
+    register_routers(dp, server, bot, Scheduler(scheduler, server.timezone))
 
     # start
     try:

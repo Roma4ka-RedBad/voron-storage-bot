@@ -11,18 +11,26 @@ class DownloadedFile:
         self.main_dir = main_dir
         self.user_dir = user_dir
         self.name = file_name
+        self.archive_files = []
 
     def get_dir(self, with_name=True):
         return f"{self.main_dir}/{self.user_dir}/{self.name if with_name else ''}"
 
-    def get_index(self):
-        files = os.listdir(self.get_dir(with_name=False))
-        for file in files:
-            if file == self.name:
-                return files.index(file)
-
     def is_archive(self):
         return is_zipfile(self.get_dir()) or is_rarfile(self.get_dir())
+
+    async def get_converts(self, server: Server):
+        converts = await server.send_msg('converts', [{
+            'path': self.get_dir()
+        }])
+        if self.is_archive():
+            for archive_file in converts.content.converts.archive_files:
+                self.archive_files.append(archive_file.name)
+
+        return converts.content
+
+    def get_index_by_archive_filename(self, archive_filename: str):
+        return self.archive_files.index(archive_filename)
 
     @classmethod
     async def get_file_by_reply_message(cls, message: Message, server_config, server: Server):

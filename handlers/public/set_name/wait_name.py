@@ -1,7 +1,7 @@
 from aiogram.dispatcher.fsm.context import FSMContext
 from aiogram.types import Message
 
-from misc.models.server import Server
+from misc.models import Server
 
 
 async def setname_waitname(message: Message, server: Server, state: FSMContext, user_localization):

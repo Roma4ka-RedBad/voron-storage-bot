@@ -1,20 +1,15 @@
 import os
 import shutil
-from datetime import datetime, timedelta
 
 from aiogram import Bot
 from aiogram.types.message import Message
 from aiogram.types import BotCommand, BotCommandScopeDefault
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.date import DateTrigger
-
 from keyboards.work import work_converts_keyb
-from misc.models.server import Server
-from misc.models.file import DownloadedFile
+from misc.models import Server, DownloadedFile, Scheduler, FilesStorage
 
 
-async def download_file(message: Message, bot: Bot, server: Server, config, scheduler: AsyncIOScheduler):
+async def download_file(message: Message, bot: Bot, server: Server, config, scheduler: Scheduler, fstorage: FilesStorage):
     optimal_file_size = await server.send_msg(f"limit/{message.document.file_name.split('.')[-1]}")
     if message.document.file_size < optimal_file_size.content:
         main_dir = f"{config.UFS.path}{server.messenger}"
@@ -24,22 +19,10 @@ async def download_file(message: Message, bot: Bot, server: Server, config, sche
 
         file = await bot.get_file(message.document.file_id)
         await bot.download_file(file.file_path, f"{main_dir}/{user_dir}/{message.document.file_name}")
-
-        if not scheduler.get_job(user_dir):
-            scheduler.add_job(
-                func=delete_message_with_dir,
-                args=[f"{main_dir}/{user_dir}/", message, bot],
-                id=user_dir,
-                trigger=DateTrigger(
-                    datetime.now(tz=server.timezone) + timedelta(minutes=config.UFS.wait_for_delete_dir),
-                    timezone=server.timezone
-                ),
-                misfire_grace_time=None
-            )
+        scheduler.create_task(delete_message_with_dir, [f"{main_dir}/{user_dir}", message, bot], user_dir,
+                              config.UFS.wait_for_delete_dir)
 
         return DownloadedFile(main_dir, user_dir, message.document.file_name)
-    else:
-        return None
 
 
 async def get_keyboard(file: DownloadedFile, server: Server, condition: bool = None):
