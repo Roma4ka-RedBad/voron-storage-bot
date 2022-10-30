@@ -13,7 +13,7 @@ class Audios(Base):
         self.metadata = metadata
 
     async def convert_to(self, to_format: str):
-        audio = AudioSegment().from_file(self.file.path)
+        audio = AudioSegment.from_file(self.file.path)
         if self.metadata.compress:
             audio = audio.set_frame_rate(self.metadata.sample_rate or DEFAULT_SAMPLE_RATE)
             audio.export(self.get_new_filename(to_format), format=to_format, bitrate=self.metadata.bitrate or DEFAULT_BITRATE)

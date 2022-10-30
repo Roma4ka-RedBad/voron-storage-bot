@@ -13,8 +13,7 @@ class ConvertManager:
     def __init__(self, config):
         self.config = config
 
-    async def start_tool(self, files: List[FileObject], process_dir: str, result_dir: str, to_format: str,
-                         metadata: Metadata):
+    async def start_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata):
         result = []
 
         for file in files:
@@ -24,7 +23,7 @@ class ConvertManager:
                     result.append(process)
 
             elif to_format in self.config.CONVERTS['AUDIO']:
-                process = Audios(file, process_dir, metadata)
+                process = Audios(file, result_dir, metadata)
                 if process := await process.convert_to(to_format):
                     result.append(process)
 
@@ -51,5 +50,5 @@ class ConvertManager:
         else:
             files.append(file.copy_to(process_dir))
 
-        result = await self.start_tool(files, process_dir, result_dir, to_format, metadata)
+        result = await self.start_tool(files, result_dir, to_format, metadata)
         return result, process_dir
