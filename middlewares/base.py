@@ -7,17 +7,18 @@ from aiogram.types import TelegramObject
 
 
 class Middleware(BaseMiddleware):
-    def __init__(self, server: Server, bot: Bot, scheduler: Scheduler):
+    def __init__(self, server: Server, bot: Bot, scheduler: Scheduler, fstorage: FilesStorage):
         self.server = server
         self.bot = bot
         self.scheduler = scheduler
+        self.fstorage = fstorage
         super().__init__()
 
     def client_data(self, data: Dict[str, Any]):
         data["bot"] = self.bot
         data["server"] = self.server
         data["scheduler"] = self.scheduler
-        data["fstorage"] = FilesStorage()
+        data["fstorage"] = self.fstorage
 
     async def server_data(self, data: Dict[str, Any], obj: TelegramObject):
         data['server_config'] = None

@@ -3,11 +3,13 @@ import logging
 
 from pytz import timezone
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from aiogram.dispatcher.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from handlers import register_routers
-from misc.models import Server, Scheduler
+from misc.models import Server, Scheduler, FilesStorage
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +27,10 @@ async def main():
     scheduler = AsyncIOScheduler()
     storage = MemoryStorage()
 
-    bot = Bot(token=config.content.TG.token, parse_mode='HTML')
+    bot = Bot(token=config.content.TG.token, parse_mode='HTML',
+              session=AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8080")))
     dp = Dispatcher(storage=storage)
-    register_routers(dp, server, bot, Scheduler(scheduler, server.timezone))
+    register_routers(dp, server, bot, Scheduler(scheduler, server.timezone), FilesStorage())
 
     # start
     try:

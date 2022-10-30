@@ -3,29 +3,25 @@ import shutil
 from aiogram.types import CallbackQuery, FSInputFile
 from keyboards.work import WorkCallback
 
-from misc.models import DownloadedFile, Server, Scheduler
+from misc.models import Server, Scheduler, FilesStorage
 
 
 async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, scheduler: Scheduler,
-                       server_config, user_data, user_localization):
+                       fstorage: FilesStorage, server_config, user_data, user_localization):
     if not server_config:
         return await cbq.answer(text='Подключение к серверу отсутствует!')
 
-    if not cbq.message.reply_to_message:
-        return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
-
-    file = await DownloadedFile.get_file_by_reply_message(cbq.message.reply_to_message, server_config, server)
+    file = await fstorage.get(callback_data.file_id)
     if not file:
         return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     await cbq.answer(user_localization.TID_STARTWORK)
-    scheduler.pause_task(file.user_dir)
+    await scheduler.pause_task(callback_data.file_id)
 
     result = await server.send_msg(f'convert/{callback_data.to_format}', file={
-        'path': file.get_dir(),
+        'path': str(file.path),
         'messenger': server.messenger,
-        'target_file': cbq.message.reply_markup.inline_keyboard[callback_data.row_index][
-            0].text if not callback_data.is_archive else None,
+        'target_file': file.get_target_filename_by_index(callback_data.subfile_id)
     }, metadata={'compress_to_archive': True})
 
     if result.status:
@@ -43,4 +39,5 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
         await cbq.message.reply(user_localization.TID_STARTWORK_FILENOTCONVERT.format(
             name=user_data.nickname or cbq.from_user.first_name
         ))
-    scheduler.resume_task(file.user_dir)
+    await scheduler.reload_task(callback_data.file_id, minutes=server_config.UFS.wait_for_delete_dir)
+    await scheduler.resume_task(callback_data.file_id)
