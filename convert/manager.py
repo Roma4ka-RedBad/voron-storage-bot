@@ -41,7 +41,7 @@ class ConvertManager:
             os.makedirs(result_dir)
 
         if archive := file.get_archive():
-            if file.target_file:
+            if file.target_file != None:
                 extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
                 files.append(extract_file.copy_to(process_dir))
             else:

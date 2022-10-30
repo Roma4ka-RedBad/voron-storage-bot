@@ -20,17 +20,17 @@ server = FastAPI()
 async def convert(file: FileObject, to_format: str, metadata: Dict[Any, Any] = None):
     file.set_config(config)
     metadata = Metadata(metadata)
-    result, process_dir = await manager.convert(file, to_format, metadata)
+    result, content = await manager.convert(file, to_format, metadata)
     if result:
         if metadata.compress_to_archive and type(result) is list:
-            result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=result)
+            result = await utils.compress_to_archive(content / 'archive.zip', config, file_paths=result)
 
         return await utils.create_response(True, content={
             'result': result,
-            'process_dir': process_dir,
+            'process_dir': content,
         })
     else:
-        return await utils.create_response(False)
+        return await utils.create_response(False, error_msg=content)
 
 
 @server.get("/localization/{language_code}")

@@ -87,7 +87,7 @@ class ArchiveObject:
 
     def get_file_by_name(self, name):
         for file in self.get_files():
-            if file.get_shortname() == name:
+            if file.origin.filename == name:
                 return file
 
     def get_files(self):
