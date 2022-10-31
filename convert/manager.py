@@ -7,7 +7,7 @@ from logic_objects import FileObject, Metadata, QueueFileObject
 
 from convert.instruments.textures import Textures
 from convert.instruments.audios import Audios
-from .queues import QueueManager
+from convert.queues import QueueManager
 
 
 class ConvertManager:

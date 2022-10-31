@@ -97,14 +97,5 @@ async def get_converts(files: List[FileObject]):
         return await utils.create_response(False,
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
-
-# @server.post("/to_archive")
-# async def compress_folder(data: dict):
-#    final_path = await manager.compress_to_archive(**data)
-#    return await utils.create_response(
-#        True, content={
-#            'archive_path': final_path
-#        })
-
 # uvicorn.run(server, host="192.168.0.127", port=80)
 uvicorn.run(server, host='127.0.0.1', port=8910)

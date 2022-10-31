@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Tuple, Any
+from typing import Tuple, Any
 from collections.abc import Callable, Coroutine, Awaitable
 
 

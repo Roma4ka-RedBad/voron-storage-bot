@@ -14,30 +14,45 @@ class QueueManager:
             asyncio.run(self._init())
 
     async def _init(self):
+        cores = cpu_count()
+
         # Ядра, берущие сначала мелкие задачи. Ориентир без премиума
-        for _ in range(2):
-            asyncio.create_task(
-                self.use_core(
-                    lambda x: (self._queue[x].priory[0], -self._queue[x].priory[1])))
+        if cores_count := self.get_free_cores(cores, 2):
+            for _ in range(cores_count):
+                asyncio.create_task(
+                    self.use_core(
+                        lambda x: (self._queue[x].priory[0], -self._queue[x].priory[1])))
+            cores -= cores_count
 
         # Ядро, берущее сначала тяжелые задачи. Ориентир без премиума
-        asyncio.create_task(
-            self.use_core(
-                lambda x: (self._queue[x].priory[0], self._queue[x].priory[1])))
+        if cores_count := self.get_free_cores(cores):
+            for _ in range(cores_count):
+                asyncio.create_task(
+                    self.use_core(
+                        lambda x: (self._queue[x].priory[0], self._queue[x].priory[1])))
+            cores -= cores_count
 
         # Два ядра, ориентированные на премиум. Задачи по порядку
-        for _ in range(2):
-            asyncio.create_task(
-                self.use_core(
-                    lambda x: (-self._queue[x].priory[0], self._queue[x].priory[1])))
+        if cores_count := self.get_free_cores(cores, 2):
+            for _ in range(cores_count):
+                asyncio.create_task(
+                    self.use_core(
+                        lambda x: (-self._queue[x].priory[0], self._queue[x].priory[1])))
+            cores -= cores_count
 
         # Добор свободных ядер. На моем сервере их 6
         # ядра, которые просто берут задачи по-порядку
-        for _ in range(cpu_count() - 5):
+        for _ in range(cores):
             asyncio.create_task(self.use_core())
 
     def empty(self):
         return not self._queue
+
+    @staticmethod
+    def get_free_cores(cores_count: int, priority_count: int = 1):
+        if cores_count > priority_count:
+            return priority_count
+        return cores_count
 
     async def get(self, sort_function=None) -> list:
         take = []
@@ -80,7 +95,6 @@ class QueueManager:
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):
         result = []
         for obj in objects:
-            print(obj)
             if isinstance(obj.target, Coroutine):
                 result.append(asyncio.run(obj.target))
 
