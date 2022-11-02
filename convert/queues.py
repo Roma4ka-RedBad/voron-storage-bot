@@ -3,6 +3,9 @@ from collections import OrderedDict
 from collections.abc import Callable, Coroutine
 import asyncio
 
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
 from logic_objects.queue_file import QueueFileObject
 
 
@@ -10,6 +13,7 @@ class QueueManager:
     def __init__(self, auto_set_cores=True):
         self._queue = OrderedDict()
         self.count = 0
+        self.cores = set()
         if auto_set_cores:
             asyncio.run(self._init())
 
@@ -19,31 +23,28 @@ class QueueManager:
         # Ядра, берущие сначала мелкие задачи. Ориентир без премиума
         if cores_count := self.get_free_cores(cores, 2):
             for _ in range(cores_count):
-                asyncio.create_task(
-                    self.use_core(
-                        lambda x: (self._queue[x].priory[0], -self._queue[x].priory[1])))
+                self.add_core(lambda x: (self._queue[x].priory[0], -self._queue[x].priory[1]))
             cores -= cores_count
 
         # Ядро, берущее сначала тяжелые задачи. Ориентир без премиума
         if cores_count := self.get_free_cores(cores):
             for _ in range(cores_count):
-                asyncio.create_task(
-                    self.use_core(
-                        lambda x: (self._queue[x].priory[0], self._queue[x].priory[1])))
+                self.add_core(lambda x: (self._queue[x].priory[0], self._queue[x].priory[1]))
             cores -= cores_count
 
         # Два ядра, ориентированные на премиум. Задачи по порядку
         if cores_count := self.get_free_cores(cores, 2):
             for _ in range(cores_count):
-                asyncio.create_task(
-                    self.use_core(
-                        lambda x: (-self._queue[x].priory[0], self._queue[x].priory[1])))
+                self.add_core(lambda x: (-self._queue[x].priory[0], self._queue[x].priory[1]))
             cores -= cores_count
 
         # Добор свободных ядер. На моем сервере их 6
         # ядра, которые просто берут задачи по-порядку
         for _ in range(cores):
-            asyncio.create_task(self.use_core())
+            self.add_core()
+
+    def add_core(self, sort_function=None):
+        self.cores.add(self.use_core(sort_function))
 
     def empty(self):
         return not self._queue
@@ -95,12 +96,13 @@ class QueueManager:
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):
         result = []
         for obj in objects:
-            if isinstance(obj.target, Coroutine):
-                result.append(asyncio.run(obj.target))
+            if isinstance(obj.target, Callable):
+                answer = obj.target.__call__(*obj.arguments)
 
-            elif isinstance(obj.target, Callable):
-                result.append(obj.target.__call__(*obj.arguments))
+                if isinstance(answer, Coroutine):
+                    answer = asyncio.run(answer)
 
+                result.append(answer)
             else:
                 result.append('Target is not a function!')
 

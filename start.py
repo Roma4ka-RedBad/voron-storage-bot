@@ -11,6 +11,7 @@ from convert.manager import ConvertManager
 from localization import languages
 from database import UserTable
 
+import asyncio
 config = Box(toml.load('config.toml'))
 manager = ConvertManager(config)
 server = FastAPI()
@@ -18,17 +19,19 @@ server = FastAPI()
 
 @server.post("/convert/{to_format}")
 async def convert(file: FileObject, to_format: str, metadata: Dict[Any, Any] = None):
+    print(file.path)
     file.set_config(config)
     metadata = Metadata(metadata)
     result, content = await manager.convert(file, to_format, metadata)
     if result:
         if metadata.compress_to_archive and type(result) is list:
-            result = await utils.compress_to_archive(content / 'archive.zip', config, file_paths=result)
+            result = await utils.compress_to_archive(
+                content / 'archive.zip', config, file_paths=result)
 
         return await utils.create_response(True, content={
             'result': result,
             'process_dir': content,
-        })
+            })
     else:
         return await utils.create_response(False, error_msg=content)
 
@@ -53,7 +56,8 @@ async def set_user(data: UserObject):
 
 @server.post("/user/get")
 async def get_user(data: UserObject):
-    return await utils.create_response(True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
+    return await utils.create_response(
+        True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
 
 
 @server.get("/config")
@@ -82,7 +86,7 @@ async def get_converts(files: List[FileObject]):
                 content.append({
                     'path': file.path,
                     'converts': file_converts
-                })
+                    })
         return await utils.create_response(True, content=content)
 
     else:
@@ -92,10 +96,20 @@ async def get_converts(files: List[FileObject]):
             return await utils.create_response(True, content={
                 'path': files[0].path,
                 'converts': file_converts
-            })
+                })
 
         return await utils.create_response(False,
                                            error_msg="TID_WORK_FORMATSNOTEXIST")
 
-# uvicorn.run(server, host="192.168.0.127", port=80)
-uvicorn.run(server, host='127.0.0.1', port=8910)
+
+async def main():
+    for core in manager.queue.cores:
+        asyncio.create_task(core)
+
+    # server_config = uvicorn.Config(server, host="192.168.0.127", port=80)
+    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
+    a = uvicorn.Server(server_config)
+    await a.serve()
+
+if __name__ == '__main__':
+    asyncio.run(main())

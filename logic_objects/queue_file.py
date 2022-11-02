@@ -4,7 +4,7 @@ from collections.abc import Callable, Coroutine, Awaitable
 
 
 class QueueFileObject(BaseModel):
-    target: Callable[[...], str] | Awaitable | Coroutine = None
+    target: Callable[[...], str] = None
     arguments: Tuple[Any] = None
     priory: Tuple[int] = (0, 10)  # system call, 0 is the highest priory
     done: bool = False  # uses by queue to check result

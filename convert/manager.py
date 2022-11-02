@@ -14,6 +14,7 @@ class ConvertManager:
     def __init__(self, config):
         self.config = config
         self.queue = QueueManager()
+        print(self.queue.cores)
 
     async def start_tool(
             self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata):
@@ -22,11 +23,13 @@ class ConvertManager:
         for file in files:
             if to_format in self.config.CONVERTS['2D']:
                 process = Textures(file, result_dir)
-                result.append(QueueFileObject(target=process.convert_to(to_format)))
+                result.append(QueueFileObject(target=process.convert_to,
+                                              arguments=(to_format, )))
 
             elif to_format in self.config.CONVERTS['AUDIO']:
                 process = Audios(file, result_dir, metadata)
-                result.append(QueueFileObject(target=process.convert_to(to_format)))
+                result.append(QueueFileObject(target=process.convert_to,
+                                              arguments=(to_format, )))
 
         result = await self.queue.wait_for_convert(result)
 
