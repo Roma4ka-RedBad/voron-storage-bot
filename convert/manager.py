@@ -16,8 +16,8 @@ class ConvertManager:
         self.queue = QueueManager()
         print(self.queue.cores)
 
-    async def start_tool(
-            self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata):
+    async def select_tool(
+            self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:
         result = []
 
         for file in files:
@@ -33,28 +33,35 @@ class ConvertManager:
 
         result = await self.queue.wait_for_convert(result)
 
-        return result[0].path_result if len(result) == 1 else [obj.path_result for obj in result]
+        return [obj.path_result for obj in result]
 
-    async def convert(self, file: FileObject, to_format: str, metadata: Metadata):
-        process_dir = file.path.parent / f'process_{random.randint(0, 1000000)}/'
-        result_dir = file.path.parent / 'result'
+    async def convert(self, raw_files: List[FileObject], to_format: str, metadata: Metadata):
+        process_dir = raw_files[0].path.parent / f'process_{random.randint(0, 1000000)}/'
+        result_dir = raw_files[0].path.parent / 'result'
         files = []
-
+        only_one_archive = [obj.get_archive() for obj in raw_files].count(True) == 1
         shutil._samefile = lambda *a, **b: False
         os.makedirs(process_dir)
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
 
-        if archive := file.get_archive():
-            if file.target_file is not None:
-                extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
-                files.append(extract_file.copy_to(process_dir))
+        for file in raw_files:
+            if archive := file.get_archive():
+                # я допускаю возможность кидать несколько архивов на вк, например, для премиум
+                # юзеров, но скорее всего, тогда конвертация будет только в один формат и я не
+                # буду передавать target_file. Если такое произойдет, я сделал проверку на то,
+                # чтобы был только один архив в файлах.
+                if file.target_file is not None and only_one_archive:
+                    extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
+                    files.append(extract_file.copy_to(process_dir))
+                else:
+                    for extract_file in archive.get_files():
+                        if not extract_file.is_dir():
+                            files.append(extract_file.extract(process_dir).copy_to(process_dir))
             else:
-                for extract_file in archive.get_files():
-                    if not extract_file.is_dir():
-                        files.append(extract_file.extract(process_dir).copy_to(process_dir))
-        else:
-            files.append(file.copy_to(process_dir))
+                files.append(file.copy_to(process_dir))
 
-        result = await self.start_tool(files, result_dir, to_format, metadata)
+        result = await self.select_tool(files, result_dir, to_format, metadata)
+        # result это список путей на результат конвертации каждого файла
+
         return result, process_dir

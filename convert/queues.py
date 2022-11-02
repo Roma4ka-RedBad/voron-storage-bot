@@ -58,7 +58,7 @@ class QueueManager:
     async def get(self, sort_function=None) -> list:
         take = []
         while self.empty():
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
 
         if sort_function:
             queue = sorted(self._queue, key=sort_function)
@@ -85,7 +85,7 @@ class QueueManager:
             process = Process(target=self.start_process, args=(putter, tasks))
             process.start()
             while process.is_alive():
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.1)
 
             result = getter.recv()
             for num, answer in enumerate(result):
@@ -114,6 +114,6 @@ class QueueManager:
             self._queue[self.count] = task
             self.count += 1
         while not all([task.done for task in tasks]):
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
 
         return tasks

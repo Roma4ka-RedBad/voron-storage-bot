@@ -105,8 +105,10 @@ class ArchiveObject:
     def count(self):
         return len(self.archive.infolist())
 
-    def write(self, filepath):
-        self.archive.write(filepath, arcname=filepath.split('/')[-1])
+    def write(self, filepath, arc_name=None):
+        if arc_name is None:
+            arc_name=filepath.split('/')[-1]
+        self.archive.write(filepath, arcname=arc_name)
 
     def close(self):
         self.archive.close()

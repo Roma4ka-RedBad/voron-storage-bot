@@ -1,5 +1,6 @@
 from logic_objects import FileObject, ArchiveObject
 from typing import List
+import os
 
 
 async def get_converts_by_file(file: FileObject):
@@ -22,7 +23,8 @@ async def get_converts_by_file(file: FileObject):
         return file.get_available_converts()
 
 
-async def compress_to_archive(archive_path: str, config: object, files_objects: List[FileObject] = None,
+async def compress_to_archive(archive_path: str, config: object,
+                              files_objects: List[FileObject] = None,
                               file_paths: list = None):
     archive = ArchiveObject(FileObject.create(archive_path, config), "w", "zip", compresslevel=10)
 
@@ -31,8 +33,15 @@ async def compress_to_archive(archive_path: str, config: object, files_objects: 
             archive.write(file.path)
 
     if file_paths:
-        for file in file_paths:
-            archive.write(file)
+        for path in file_paths:
+            if os.path.isdir(path):
+                for folder, _, files in os.walk(path):
+                    for _file in files:
+                        archive.write(
+                            os.path.join(folder, _file),
+                            arc_name=os.path.join(folder.replace(path, ''), _file))
+            else:
+                archive.write(path)
 
     return archive.close()
 
