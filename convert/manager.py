@@ -15,20 +15,19 @@ class ConvertManager:
         self.config = config
         self.queue = QueueManager()
 
-    async def select_tool(
-            self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:
+    async def select_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:
         result = []
 
         for file in files:
             if to_format in self.config.CONVERTS['2D']:
                 process = Textures(file, result_dir)
                 result.append(QueueFileObject(target=process.convert_to,
-                                              arguments=(to_format, )))
+                                              arguments=(to_format,)))
 
             elif to_format in self.config.CONVERTS['AUDIO']:
                 process = Audios(file, result_dir, metadata)
                 result.append(QueueFileObject(target=process.convert_to,
-                                              arguments=(to_format, )))
+                                              arguments=(to_format,)))
 
         result = await self.queue.wait_for_convert(result)
 
@@ -40,16 +39,13 @@ class ConvertManager:
         files = []
         only_one_archive = [obj.get_archive() for obj in raw_files].count(True) == 1
         shutil._samefile = lambda *a, **b: False
+
         os.makedirs(process_dir)
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
 
         for file in raw_files:
             if archive := file.get_archive():
-                # я допускаю возможность кидать несколько архивов на вк, например, для премиум
-                # юзеров, но скорее всего, тогда конвертация будет только в один формат и я не
-                # буду передавать target_file. Если такое произойдет, я сделал проверку на то,
-                # чтобы был только один архив в файлах.
                 if file.target_file is not None and only_one_archive:
                     extract_file = archive.get_file_by_name(file.target_file).extract(process_dir)
                     files.append(extract_file.copy_to(process_dir))
@@ -60,7 +56,7 @@ class ConvertManager:
             else:
                 files.append(file.copy_to(process_dir))
 
+        # список путей на результат конвертации каждого файла
         result = await self.select_tool(files, result_dir, to_format, metadata)
-        # result это список путей на результат конвертации каждого файла
 
         return result, process_dir

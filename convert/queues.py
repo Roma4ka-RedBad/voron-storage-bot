@@ -1,11 +1,13 @@
+import asyncio
+import warnings
+
 from multiprocessing import Process, Pipe, cpu_count
 from collections import OrderedDict
 from collections.abc import Callable, Coroutine
-import asyncio
 
 from logic_objects.queue_file import QueueFileObject
 
-import warnings
+
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 

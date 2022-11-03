@@ -14,6 +14,8 @@ from database import UserTable
 
 
 server = FastAPI()
+config = Box(toml.load('config.toml'))
+manager = ConvertManager(config)
 
 
 @server.post("/convert/{to_format}")
@@ -24,10 +26,12 @@ async def convert(file: FileObject | List[FileObject],
         file = [file]
     for _file in file:
         _file.set_config(config)
+
     metadata = Metadata(metadata)
     result, content = await manager.convert(file, to_format, metadata)
+    result = result[0] if len(result) == 1 else result
     if result:
-        if metadata.compress_to_archive:
+        if metadata.compress_to_archive and isinstance(result, list):
             result = await utils.compress_to_archive(
                 content / 'archive.zip', config, file_paths=result)
 
@@ -41,12 +45,9 @@ async def convert(file: FileObject | List[FileObject],
 
 @server.get("/localization/{language_code}")
 async def get_localization(language_code: str):
+    if language_code == '*':
+        return await utils.create_response(True, content=languages)
     return await utils.create_response(True, content=languages[language_code])
-
-
-@server.get("/localizations")
-async def get_localizations():
-    return await utils.create_response(True, content=languages)
 
 
 @server.post("/user/set")
@@ -115,6 +116,4 @@ async def main():
     await a.serve()
 
 if __name__ == '__main__':
-    config = Box(toml.load('config.toml'))
-    manager = ConvertManager(config)
     asyncio.run(main())

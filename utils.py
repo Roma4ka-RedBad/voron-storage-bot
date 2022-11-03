@@ -39,7 +39,8 @@ async def compress_to_archive(archive_path: str, config: object,
                     for _file in files:
                         archive.write(
                             os.path.join(folder, _file),
-                            arc_name=os.path.join(folder.replace(path, ''), _file))
+                            arc_name=os.path.join(folder.replace(path, ''), _file)
+                        )
             else:
                 archive.write(path)
 
