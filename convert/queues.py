@@ -3,10 +3,10 @@ from collections import OrderedDict
 from collections.abc import Callable, Coroutine
 import asyncio
 
+from logic_objects.queue_file import QueueFileObject
+
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
-
-from logic_objects.queue_file import QueueFileObject
 
 
 class QueueManager:
@@ -89,8 +89,11 @@ class QueueManager:
 
             result = getter.recv()
             for num, answer in enumerate(result):
-                tasks[num].path_result = answer
                 tasks[num].done = True
+                if answer['converted']:
+                    tasks[num].path_result = answer['path']
+                else:
+                    tasks[num].error = answer['error']
 
     @staticmethod
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):
@@ -104,7 +107,7 @@ class QueueManager:
 
                 result.append(answer)
             else:
-                result.append('Target is not a function!')
+                result.append({'converted': False, 'error': 'Target is not a function!'})
 
         pipe.send(result)
         pipe.close()

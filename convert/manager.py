@@ -14,7 +14,6 @@ class ConvertManager:
     def __init__(self, config):
         self.config = config
         self.queue = QueueManager()
-        print(self.queue.cores)
 
     async def select_tool(
             self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:

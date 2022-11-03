@@ -9,6 +9,7 @@ class QueueFileObject(BaseModel):
     priory: Tuple[int] = (0, 10)  # system call, 0 is the highest priory
     done: bool = False  # uses by queue to check result
     path_result: str = None  # uses by queue to give the result away
+    error: str = None  # uses by queue to store errors with convert
 
     class Config:
         arbitrary_types_allowed = True

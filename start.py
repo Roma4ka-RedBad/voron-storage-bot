@@ -2,6 +2,7 @@ import uvicorn
 import utils
 import toml
 
+import asyncio
 from fastapi import FastAPI
 from typing import List, Dict, Any
 from box import Box
@@ -11,9 +12,7 @@ from convert.manager import ConvertManager
 from localization import languages
 from database import UserTable
 
-import asyncio
-config = Box(toml.load('config.toml'))
-manager = ConvertManager(config)
+
 server = FastAPI()
 
 
@@ -22,7 +21,7 @@ async def convert(file: FileObject | List[FileObject],
                   to_format: str,
                   metadata: Dict[Any, Any] = None):
     if isinstance(file, FileObject):
-        file = []
+        file = [file]
     for _file in file:
         _file.set_config(config)
     metadata = Metadata(metadata)
@@ -116,4 +115,6 @@ async def main():
     await a.serve()
 
 if __name__ == '__main__':
+    config = Box(toml.load('config.toml'))
+    manager = ConvertManager(config)
     asyncio.run(main())
