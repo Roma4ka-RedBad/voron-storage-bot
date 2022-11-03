@@ -22,8 +22,9 @@ class DownloadedFile:
             'path': str(self.path)
         }])
         if self.is_archive():
-            for archive_file in converts.content.converts.archive_files:
-                self.target_files.append(archive_file.name)
+            if converts.status:
+                for archive_file in converts.content.converts.archive_files:
+                    self.target_files.append(archive_file.name)
         return converts
 
     def get_index_by_target_filename(self, archive_filename: str):

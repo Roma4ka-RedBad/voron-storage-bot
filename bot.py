@@ -28,7 +28,7 @@ async def main():
     storage = MemoryStorage()
 
     bot = Bot(token=config.content.TG.token, parse_mode='HTML',
-              session=AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8080")))
+              session=AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8080", is_local=True)))
     dp = Dispatcher(storage=storage)
     register_routers(dp, server, bot, Scheduler(scheduler, server.timezone), FilesStorage())
 

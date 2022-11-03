@@ -2,8 +2,7 @@ import os
 import shutil
 
 from aiogram import Bot
-from aiogram.types.message import Message
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeDefault, Message, File
 
 from misc.models import Server, DownloadedFile, FilesStorage
 
@@ -21,7 +20,7 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
             os.makedirs(f"{main_dir}/{user_dir}")
 
         file = await bot.get_file(document.file_id)
-        await bot.download_file(file.file_path, f"{main_dir}/{user_dir}/{document.file_name}")
+        shutil.copy(file.file_path, f"{main_dir}/{user_dir}/{document.file_name}")
 
         return DownloadedFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
 
@@ -41,6 +40,19 @@ async def set_commands(bot: Bot, localization):
     for commands_list, commands_scope in data:
         await bot.delete_my_commands(scope=commands_scope)
         await bot.set_my_commands(commands=commands_list, scope=commands_scope)
+
+
+async def array_to_pages(array: dict, count: int = 6) -> dict:
+    pages = {
+        0: []
+    }
+    for element in array:
+        last_page = list(pages)[-1]
+        if len(pages[last_page]) == count:
+            pages[last_page + 1] = [element]
+        else:
+            pages[last_page].append(element)
+    return pages
 
 
 async def delete_message_with_dir(file_id: int, fstorage: FilesStorage, bot: Bot):

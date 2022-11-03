@@ -17,12 +17,13 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
 
     await cbq.answer(user_localization.TID_STARTWORK)
     await scheduler.pause_task(callback_data.file_id)
+    convert_id = await fstorage.put_convert(callback_data.file_id)
 
     result = await server.send_msg(f'convert/{callback_data.to_format}', file={
         'path': str(file.path),
-        'messenger': server.messenger,
         'target_file': file.get_target_filename_by_index(callback_data.subfile_id)
     }, metadata={'compress_to_archive': True})
+    print(result)
 
     if result.status:
         if result.content.result:
@@ -39,5 +40,10 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
         await cbq.message.reply(user_localization.TID_STARTWORK_FILENOTCONVERT.format(
             name=user_data.nickname or cbq.from_user.first_name
         ))
-    await scheduler.reload_task(callback_data.file_id, minutes=server_config.UFS.wait_for_delete_dir)
-    await scheduler.resume_task(callback_data.file_id)
+
+    await fstorage.delete(convert_id, fstorage.active_converts)
+    print(fstorage.active_converts)
+    if not await fstorage.convert_worked(callback_data.file_id):
+        print(True)
+        await scheduler.reload_task(callback_data.file_id, minutes=server_config.UFS.wait_for_delete_dir)
+        await scheduler.resume_task(callback_data.file_id)
