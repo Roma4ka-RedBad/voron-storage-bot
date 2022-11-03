@@ -13,8 +13,8 @@
   "TID_SETNAME_DONE": "Хорошо, теперь я буду звать тебя {name}!",
   "TID_WORK_TEXT": "{name}, выбери нужную команду для этого файла:",
   "TID_WORK_ISARCHIVE": "{name}, данный файл является архивом, хотите декодировать все файлы в нём в один формат или каждый по отдельности?",
-  "TID_BUTTON_ARCHIVE_ALL": "В ОДИН ФОРМАТ",
-  "TID_BUTTON_ARCHIVE_FILE": "ПО ОТДЕЛЬНОСТИ",
+  "TID_BUTTON_ARCHIVE_ALL": "КОНВЕРТИРОВАТЬ ВСЁ В ОДИН ФОРМАТ",
+  "TID_BUTTON_ARCHIVE_FILE": "ВЫБОР ФАЙЛА ДЛЯ КОНВЕРТИРОВАНИЯ",
   "TID_WORK_FILENOTEXIST": "{name}, для работы команды нужно прикрепить файл!",
   "TID_WORK_DOWNLOADFAIL": "{name}, не удалось скачать файл! Возможно он слишком много весит...",
   "TID_WORK_FORMATSNOTEXIST": "{name}, этот файл нельзя конвертировать ни в один из доступных форматов!",
@@ -30,5 +30,10 @@
   "TID_ERROR": "Произошла ошибка",
   "TID_CONVERT_TO": "Скачать в {format}",
   "TID_CONVERT_AND_COMPRESS": "Сжать --> {format}",
-  "TID_CHOOSE_AUDIO_CONVERT": "{name}, вы можете скачать аудио в сжатом или несжатом виде"
+  "TID_CHOOSE_AUDIO_CONVERT": "{name}, вы можете скачать аудио в сжатом или несжатом виде",
+  "TID_SWITCH_RIGHT": "--->",
+  "TID_TOTAL_PAGE": "СТРАНИЦА {page}",
+  "TID_SWITCH_LEFT": "<---",
+  "TID_IS_START_PAGE": "Это первая страница!",
+  "TID_IS_LAST_PAGE": "Это последняя страница!"
 }
