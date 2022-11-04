@@ -1,5 +1,4 @@
 from pydub import AudioSegment
-from pathlib import Path
 
 from logic_objects import FileObject, Metadata
 from .base import Base
