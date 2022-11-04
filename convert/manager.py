@@ -1,5 +1,4 @@
 import os
-import shutil
 import random
 
 from typing import List
@@ -33,14 +32,13 @@ class ConvertManager:
 
         result = await self.queue.wait_for_convert(result)
 
-        return [obj.path_result for obj in result]
+        return [obj.path_result if obj.path_result else obj.tid for obj in result]
 
     async def convert(self, raw_files: List[FileObject], to_format: str, metadata: Metadata):
         process_dir = raw_files[0].path.parent / f'process_{random.randint(0, 1000000)}/'
         result_dir = raw_files[0].path.parent / 'result'
         files = []
-        only_one_archive = [obj.get_archive() for obj in raw_files].count(True) == 1
-        shutil._samefile = lambda *a, **b: False
+        only_one_archive = [True for obj in raw_files if obj.get_archive()].count(True) == 1
 
         os.makedirs(process_dir)
         if not os.path.exists(result_dir):

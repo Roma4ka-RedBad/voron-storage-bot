@@ -10,6 +10,7 @@ class QueueFileObject(BaseModel):
     done: bool = False  # uses by queue to check result
     path_result: str = None  # uses by queue to give the result away
     error: str = None  # uses by queue to store errors with convert
+    tid: str = None
 
     class Config:
         arbitrary_types_allowed = True

@@ -1,4 +1,4 @@
-import shutil
+import shutil, os
 
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, is_zipfile
@@ -18,7 +18,12 @@ class FileObject(BaseModel):
         self.config = config
 
     def copy_to(self, filepath):
-        return FileObject(path=shutil.copy(str(self.path), str(filepath)), config=self.config)
+        if self.path.parent != Path(filepath):
+            filepath = shutil.copy(str(self.path), str(filepath))
+        else:
+            filepath = self.path
+
+        return FileObject(path=filepath, config=self.config)
 
     @classmethod
     def create(cls, filepath, config):

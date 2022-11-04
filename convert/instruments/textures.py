@@ -18,7 +18,7 @@ class Textures(Base):
             'jpg': '{pvrtextool} -i {file_name} -f R8G8B8 -d {out_file} -o {temp_pvr_file}',
             'pvr': '{pvrtextool} -i {file_name} -f PVRTC2_4,UBN,lRGB -q pvrtcnormal -pot + -o {out_file}',
             'ktx': '{pvrtextool} -i {file_name} -f ETC1,UBN,lRGB -q etcfast -o {out_file}',
-            }
+        }
 
         if to_format in ['png', 'jpg', 'ktx', 'pvr']:
             output = run(
@@ -32,10 +32,8 @@ class Textures(Base):
                 stdout=PIPE, stderr=STDOUT, text=True)
 
             if output.returncode == 0:
-                return {'converted': True, 'path': self.get_new_filename(to_format)}
+                return {'converted': True, 'path': self.get_new_filename(to_format), 'TID': 'TID_STARTWORK_DONE'}
             else:
-                return {'converted': False, 'error': output.stdout}
+                return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
         elif to_format == 'sc':
-            return {'converted': False, 'error': 'Method is unavailable'}
-
-        return {'converted': False, 'error': 'Unsupported convert method'}
+            return {'converted': False, 'error': 'Method is unavailable', 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}

@@ -96,6 +96,7 @@ class QueueManager:
                     tasks[num].path_result = answer['path']
                 else:
                     tasks[num].error = answer['error']
+                tasks[num].tid = answer['TID']
 
     @staticmethod
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):
@@ -109,7 +110,7 @@ class QueueManager:
 
                 result.append(answer)
             else:
-                result.append({'converted': False, 'error': 'Target is not a function!'})
+                result.append({'converted': False, 'error': 'Target is not a function!', 'TID': None})
 
         pipe.send(result)
         pipe.close()

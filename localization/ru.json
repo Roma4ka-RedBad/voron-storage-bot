@@ -29,7 +29,7 @@
   "TID_COMPRESSED_PHOTOS_TEXT": "Обнаружены сжатые фотографии. Чтобы открыть больше функий, отправьте фотографии документами!",
   "TID_SNACKBAR_METHOD_IS_UNAVAILABLE": "Функция недоступна!",
   "TID_SOME_FILES_CONVERTED": "{name}, не все файлы удалось конвертировать!",
-  "TID_ERROR": "Произошла ошибка",
+  "TID_ERROR": "Произошла ошибка!",
   "TID_CONVERT_TO": "Скачать в {format}",
   "TID_CONVERT_AND_COMPRESS": "Сжать --> {format}",
   "TID_CHOOSE_AUDIO_CONVERT": "{name}, вы можете скачать аудио в сжатом или несжатом виде",
@@ -37,6 +37,6 @@
   "TID_TOTAL_PAGE": "СТРАНИЦА {page}",
   "TID_SWITCH_LEFT": "<---",
   "TID_IS_START_PAGE": "Это первая страница!",
-  "TID_IS_LAST_PAGE": "Это последняя страница!",
+  "TID_IS_LAST_PAGE": "Дальше страниц нет!",
   "TID_ARCHIVEISRENAMED": "ВК не разрешает загружать аудио в архивах. Перед распаковкой архива сотрите цифру 1 в конце!"
 }
