@@ -1,6 +1,7 @@
-from .static import compressed_photos_keyboard
+from .static import compressed_photos_keyboard, audio_keyboard
 
 
 __all__ = [
-    compressed_photos_keyboard
+    compressed_photos_keyboard,
+    audio_keyboard
 ]

@@ -1,6 +1,6 @@
 import os
 import shutil
-
+from typing import List, Tuple, Any
 from vkbottle.bot import Message
 
 from misc.server import Server
@@ -8,30 +8,31 @@ from misc.models.downloadable_file import File
 from misc.connection.downloads import get_files
 
 
-async def download_file(
-        message: Message, server: Server,
-        file_objects: list, config):
+async def download_files(message: Message, server: Server, file_objects: List[Tuple[str, Any]], config):
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_id}/{message.conversation_message_id}"
     if not os.path.exists(f"{main_dir}/{user_dir}"):
         os.makedirs(f"{main_dir}/{user_dir}")
 
     prepared_files = []
-    for FileObject in file_objects:
-        if 'title' in FileObject:
-            filename = FileObject.title
-        else:
+    for obj_type, FileObject in file_objects:
+        if obj_type in 'photo':
             filename = FileObject.url.split('?')[0].split('/')[-1]
-
-        if 'ext' in FileObject:
-            extension = FileObject.ext
-        else:
             extension = filename.split('.')[-1]
-
-        if FileObject.type != 'doc':
             size = 0
-        else:
+
+        elif obj_type == 'audio':
+            filename = f'{FileObject.artist} - {FileObject.title}.mp3'
+            extension = 'mp3'
+            size = 0
+
+        elif obj_type == 'doc':
+            filename = FileObject.title
+            extension = FileObject.ext
             size = FileObject.size
+
+        else:
+            continue
 
         file = File(
             name=filename, main_dir=main_dir, user_dir=user_dir, url=FileObject.url,

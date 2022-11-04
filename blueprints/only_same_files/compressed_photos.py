@@ -3,8 +3,8 @@ from vkbottle.bot import Blueprint, Message, MessageEvent
 
 from keyboard import compressed_photos_keyboard
 from misc.custom_rules import PayloadRule
-from misc.pathwork import download_file, remove_dir
-from misc.tools import remove_last_new
+from misc.pathwork import download_files, remove_dir
+from pathlib import Path
 
 bp = Blueprint('2d textures convert commands')
 bp.labeler.vbml_ignore_case = True
@@ -38,33 +38,33 @@ async def convert_photos(event: MessageEvent, userdata, localization, payload, s
 
     photos = []
     for photo in message.attachments:
-        photos.append(max(photo.photo.sizes, key=lambda x: (x.height, x.width)))
+        photos.append(('photo', max(photo.photo.sizes, key=lambda x: (x.height, x.width))))
 
-    files = await download_file(message, server, photos, config)
+    files = await download_files(message, server, photos, config)
     done = []
 
-    for file in files:
-        result = await server.send_message(
-            f'convert/{payload.convert_to}', {
-                'name': file.get_dir(),
-                'messenger': server.messenger
-                })
-        if result.status:
-            response_file = result.content.result_file
+    result = await server.send_message(
+            f'convert/{payload.convert_to}',
+            file=[{'path': file.get_dir()} for file in files],
+            metadata={'compress_to_archive': False})
+
+    if result.status:
+        for file in result.content.result:
+            response_file = Path(file)
             loaded = await DocMessagesUploader(bp.api).upload(
-                await remove_last_new(response_file),
-                open(response_file, 'rb').read(),
-                peer_id=event.peer_id)
+            response_file.name,
+            open(response_file, 'rb').read(),
+            peer_id=event.peer_id)
             done.append(loaded)
 
     user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
     if not done:
-        text = localization.TID_STARTWORK_FILESNOTCONVERT % f'[id{user.id}|{nickname}]'
+        text = localization.TID_STARTWORK_FILESNOTCONVERT.format(name=f'[id{user.id}|{nickname}]')
     elif len(done) < len(photos):
-        text = localization.content.TID_SOME_FILES_CONVERTED % f'[id{user.id}|{nickname}]'
+        text = localization.TID_SOME_FILES_CONVERTED.format(name=f'[id{user.id}|{nickname}]')
     elif len(done) == len(files):
-        text = localization.TID_STARTWORK_DONE_FOR_MANY_FILES % f'[id{user.id}|{nickname}]'
+        text = localization.TID_STARTWORK_DONE_FOR_MANY_FILES.format(name=f'[id{user.id}|{nickname}]')
     else:
         text = localization.TID_ERROR
 

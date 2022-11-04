@@ -13,14 +13,15 @@ async def download_and_save_file(session: ClientSession, file_object: File) -> D
     return DownloadedFile(file_object.main_dir, file_object.user_dir, file_object.name)
 
 
-async def get_files(file_objects: list[File, ...] | File) -> list[DownloadedFile, ...]:
+async def get_files(file_objects: list[File] | File) -> list[DownloadedFile]:
     if isinstance(file_objects, File):
         file_objects = [file_objects]
 
     file_models = []
     async with ClientSession() as session:
         for file_object in file_objects:
-            file = await download_and_save_file(session, file_object)
-            file_models.append(file)
+            if file_object.url:
+                file = await download_and_save_file(session, file_object)
+                file_models.append(file)
 
     return file_models

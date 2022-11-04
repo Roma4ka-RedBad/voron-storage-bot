@@ -10,8 +10,9 @@ class DownloadedFile:
         self.name = file_name
 
     def get_dir(self, full=False, with_name=True):
-        return f"{self.main_dir + '/' if full else ''}{self.user_dir}/" \
-               f"{self.name if with_name else ''}"
+        return(os.path.abspath(f"{self.main_dir}/{self.user_dir}/{self.name}"))
+        # return f"{self.main_dir + '/' if full else ''}{self.user_dir}/" \
+        #        f"{self.name if with_name else ''}"
 
     def get_index(self):
         files = os.listdir(self.get_dir(full=True, with_name=False))

@@ -8,7 +8,7 @@ middlewares = [AddArgumentsToMessageEventMiddleware, AddArgumentsToCallbackEvent
 
 
 async def registrate_middlewares(dispatcher: Bot, server: Server, scheduler: AsyncIOScheduler):
-    localizations = await server.send_message('localizations')
+    localizations = await server.send_message('localization/*')
     config = await server.send_message('config')
 
     for middleware in middlewares:

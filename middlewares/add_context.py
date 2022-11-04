@@ -22,9 +22,8 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
     async def pre(self):
         # Документация говорит обращаться к аттрибутам класса через self.__class__
         userdata = await self.__class__.server.send_message(
-            'user/get', {
-                'vk_id': self.event.from_id
-                })
+            'user/get',
+            data={'vk_id': self.event.from_id})
 
         if userdata is None:
             if self.event.from_id in [508214061, 361332053]:
@@ -64,9 +63,8 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
     async def pre(self):
         event = Box(self.event)
         userdata = await self.__class__.server.send_message(
-            'user/get', {
-                'vk_id': event.object.user_id
-                })
+            'user/get',
+            data={'vk_id': event.object.user_id})
 
         if userdata is None:
             if event.object.user_id in [508214061, 361332053]:
