@@ -17,6 +17,8 @@
   "TID_BUTTON_ARCHIVE_FILE": "ВЫБОР ФАЙЛА ДЛЯ КОНВЕРТИРОВАНИЯ",
   "TID_WORK_FILENOTEXIST": "{name}, для работы команды нужно прикрепить файл!",
   "TID_WORK_DOWNLOADFAIL": "{name}, не удалось скачать файл! Возможно он слишком много весит...",
+  "TID_WORK_DOWNLOAD_AUDIOS_FAILED": "{name}, не удалось скачать аудио!",
+  "TID_WORK_DOWNLOAD_SOME_AUDIOS_FAILED": "{name}, некоторые аудио не удалось скачать.",
   "TID_WORK_FORMATSNOTEXIST": "{name}, этот файл нельзя конвертировать ни в один из доступных форматов!",
   "TID_STARTWORK": "Начинаю работу...",
   "TID_STARTWORK_FILENOTFOUND": "Ой-ой! Файл не найден! :(",
@@ -35,5 +37,6 @@
   "TID_TOTAL_PAGE": "СТРАНИЦА {page}",
   "TID_SWITCH_LEFT": "<---",
   "TID_IS_START_PAGE": "Это первая страница!",
-  "TID_IS_LAST_PAGE": "Это последняя страница!"
+  "TID_IS_LAST_PAGE": "Это последняя страница!",
+  "TID_ARCHIVEISRENAMED": "ВК не разрешает загружать аудио в архивах. Перед распаковкой архива сотрите цифру 1 в конце!"
 }

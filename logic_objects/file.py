@@ -107,7 +107,7 @@ class ArchiveObject:
 
     def write(self, filepath, arc_name=None):
         if arc_name is None:
-            arc_name=filepath.split('/')[-1]
+            arc_name=filepath.name
         self.archive.write(filepath, arcname=arc_name)
 
     def close(self):

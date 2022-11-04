@@ -26,7 +26,7 @@ class Textures(Base):
                 .format(
                     pvrtextool=str(self.pvrtextool),
                     file_name=str(self.file.path.absolute()),
-                    out_file=str(Path(self.get_new_filename(to_format)).absolute()),
+                    out_file=str(self.get_new_filename(to_format).absolute()),
                     temp_pvr_file=str(self.file.path.absolute().parent / 'temp.pvr'))
                 .split(),
                 stdout=PIPE, stderr=STDOUT, text=True)

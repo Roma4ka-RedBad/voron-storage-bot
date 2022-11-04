@@ -1,4 +1,5 @@
 from logic_objects.file import FileObject
+from pathlib import Path
 
 
 class Base:
@@ -7,4 +8,4 @@ class Base:
         self.result_dir = result_dir
 
     def get_new_filename(self, to_format: str):
-        return f"{self.result_dir}/{self.file.path.stem}.{to_format}"
+        return Path(f"{self.result_dir}/{self.file.path.stem}.{to_format}")
