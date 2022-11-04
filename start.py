@@ -14,8 +14,6 @@ from database import UserTable
 
 
 server = FastAPI()
-config = Box(toml.load('config.toml'))
-manager = ConvertManager(config)
 
 
 @server.post("/convert/{to_format}")
@@ -29,11 +27,17 @@ async def convert(file: FileObject | List[FileObject],
 
     metadata = Metadata(metadata)
     result, content = await manager.convert(file, to_format, metadata)
-    result = result[0] if len(result) == 1 else result
+
     if result:
-        if metadata.compress_to_archive and isinstance(result, list):
-            result = await utils.compress_to_archive(
-                content / 'archive.zip', config, file_paths=result)
+        if metadata.compress_to_archive:
+            if metadata.archive_only:
+                result = await utils.compress_to_archive(
+                    content / 'archive.zip', config, file_paths=result)
+            else:
+                result = result[0] if len(result) == 1 else result
+                if isinstance(result, list):
+                    result = await utils.compress_to_archive(
+                        content / 'archive.zip', config, file_paths=result)
 
         return await utils.create_response(True, content={
             'result': result,
@@ -116,4 +120,6 @@ async def main():
     await a.serve()
 
 if __name__ == '__main__':
+    config = Box(toml.load('config.toml'))
+    manager = ConvertManager(config)
     asyncio.run(main())
