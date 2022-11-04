@@ -22,15 +22,15 @@ class Scheduler:
             )
 
     async def pause_task(self, task_id):
-        if task := self.scheduler.get_job(task_id):
+        if task := self.scheduler.get_job(str(task_id)):
             task.pause()
 
     async def resume_task(self, task_id):
-        if task := self.scheduler.get_job(task_id):
+        if task := self.scheduler.get_job(str(task_id)):
             task.resume()
 
     async def reload_task(self, task_id, **kwargs):
-        if task := self.scheduler.get_job(task_id):
+        if task := self.scheduler.get_job(str(task_id)):
             task.reschedule(
                 DateTrigger(
                     datetime.now(tz=self.timezone) + timedelta(**kwargs),

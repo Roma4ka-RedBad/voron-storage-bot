@@ -21,7 +21,7 @@ async def work_by_archive(cbq: CallbackQuery, server: Server, callback_data: Wor
         ))
 
     if callback_data.by_archive:
-        converts.content = await array_to_pages(converts.content.converts.archive_files * 3)
+        converts.content = await array_to_pages(converts.content.converts.archive_files)
 
     return await cbq.message.edit_text(user_localization.TID_WORK_TEXT.format(
         name=user_data.nickname or cbq.from_user.first_name

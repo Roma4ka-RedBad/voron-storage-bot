@@ -12,6 +12,7 @@ class DownloadedFile:
     def __init__(self, path, message: Message):
         self.path = Path(path)
         self.message = message
+        self.bot_answer = None
         self.target_files = []
 
     def is_archive(self):
@@ -31,5 +32,5 @@ class DownloadedFile:
         return self.target_files.index(archive_filename)
 
     def get_target_filename_by_index(self, index: int):
-        if index:
+        if index is not None:
             return self.target_files[index]

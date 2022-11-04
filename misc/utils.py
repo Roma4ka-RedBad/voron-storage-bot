@@ -2,7 +2,7 @@ import os
 import shutil
 
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault, Message, File
+from aiogram.types import BotCommand, Message, BotCommandScopeChat
 
 from misc.models import Server, DownloadedFile, FilesStorage
 
@@ -25,7 +25,7 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
         return DownloadedFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
 
 
-async def set_commands(bot: Bot, localization):
+async def set_commands(bot: Bot, localization, message: Message):
     default = []
     for command in localization.TID_START_COMMANDS:
         default.append(BotCommand(command=command[0], description=command[1]))
@@ -33,7 +33,7 @@ async def set_commands(bot: Bot, localization):
     data = [
         (
             default,
-            BotCommandScopeDefault()
+            BotCommandScopeChat(chat_id=message.chat.id)
         )
     ]
 
@@ -60,6 +60,7 @@ async def delete_message_with_dir(file_id: int, fstorage: FilesStorage, bot: Bot
         file = await fstorage.get(file_id)
         await fstorage.delete(file_id)
         shutil.rmtree(file.path.parent, ignore_errors=True)
-        await bot.delete_message(file.message.chat.id, file.message.message_id + 1)
+        await bot.delete_message(file.message.chat.id, file.bot_answer.message_id)
+        await bot.delete_message(file.message.chat.id, file.message.message_id)
     except:
         pass

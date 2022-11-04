@@ -27,9 +27,9 @@ async def command_work(message: Message, server: Server, bot: Bot, scheduler: Sc
         ))
 
     if file.is_archive():
-        converts.content = await array_to_pages(converts.content.converts.archive_files * 3)
+        converts.content = await array_to_pages(converts.content.converts.archive_files)
 
-    return await message.reply(user_localization.TID_WORK_TEXT.format(
+    file.bot_answer = await message.reply(user_localization.TID_WORK_TEXT.format(
         name=user_data.nickname or message.from_user.first_name
     ), reply_markup=await work_converts_keyb(converts.content, file, file_id, user_localization,
                                              by_archive=file.is_archive()))

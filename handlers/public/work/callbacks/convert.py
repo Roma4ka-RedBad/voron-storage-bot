@@ -41,9 +41,7 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
             name=user_data.nickname or cbq.from_user.first_name
         ))
 
-    await fstorage.delete(convert_id, fstorage.active_converts)
-    print(fstorage.active_converts)
+    await fstorage.delete_convert(convert_id)
     if not await fstorage.convert_worked(callback_data.file_id):
-        print(True)
         await scheduler.reload_task(callback_data.file_id, minutes=server_config.UFS.wait_for_delete_dir)
         await scheduler.resume_task(callback_data.file_id)

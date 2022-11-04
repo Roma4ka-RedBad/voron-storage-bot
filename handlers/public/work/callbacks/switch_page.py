@@ -22,7 +22,7 @@ async def work_switch_page(cbq: CallbackQuery, server: Server, callback_data: Wo
         return await cbq.message.reply(user_localization[converts.error_msg].format(
             name=user_data.nickname or cbq.from_user.first_name
         ))
-    converts = await array_to_pages(converts.content.converts.archive_files * 3)
+    converts = await array_to_pages(converts.content.converts.archive_files)
 
     if callback_data.page_index + 1 > len(converts):
         return await cbq.answer(user_localization.TID_IS_LAST_PAGE)

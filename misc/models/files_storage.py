@@ -20,23 +20,24 @@ class FilesStorage:
         self.active_converts.append(key_id)
         return key_id
 
-    async def convert_worked(self, file_id: int):
+    async def get(self, key_id: int) -> DownloadedFile:
+        try:
+            return self.storage[key_id]
+        except:
+            pass
+
+    async def get_convert(self, file_id: int):
         for key_id in self.active_converts:
             if str(file_id) in key_id:
                 return True
 
-    async def get(self, key_id: int, storage = None) -> DownloadedFile:
-        if not storage:
-            storage = self.storage
+    async def delete(self, key_id: int):
+        self.storage.pop(key_id)
 
-        if key_id in storage:
-            return storage[key_id]
+    async def delete_convert(self, key_id: str):
+        self.active_converts.remove(key_id)
 
-    async def delete(self, key_id, storage = None):
-        if not storage:
-            storage = self.storage
-
-        if isinstance(storage, list):
-            storage.remove(key_id)
-        else:
-            storage.pop(key_id)
+    async def convert_worked(self, file_id: int):
+        for key_id in self.active_converts:
+            if str(file_id) in key_id:
+                return True
