@@ -9,7 +9,8 @@ wait_for_delete_dir = 5 # minutes
 token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
 
 [VK]
-token = 'vk1.a.kCpn3eQDAvkMJF0tFYA0FcOy5PQJ2o_1_4unP4d_6O5oU0fs22yRrBKN7ok_4fa7fVr48T7VbdyqlMQuA7-GgEkek9IjXv0ORTTGqeRRh94hDJkLqpTfk9dPAlw24qjjdxu3FX78ATaygtuHErJZ8q40bYdEyVjVR7DlSjM5WK1bay_diM4Rb8NeUhP2Pwgt'
+bot_token = 'vk1.a.DI9yXZSFf1FrqZ35rdX-gimXHgg-UissgBOF1YY32Rz7n9eUXgeZw218dzUB5v5wXwbfaGAnZTodVHt7icH_xZlOzIxsE4HDd6lMkMCBWqHdLDvU1k648gNfsNRc4_gFqpf12sVwrzSpj-jt-_DQvd7yRiFlug9CgFZdNLKI4E29xSfWfkeC2rjyXAM0conIl1LL4CsPQ3w4gXbFx4Ke5g'
+user_token = 'vk1.a.n5JFyo07vJ9p8VKvh50v5xuuj7dq-szd6sCb0uZ6mQIL5M6A_RGOI1IwQlhDuwZtPnKMxtrrmUg-8cywyjnDmlHhhBhDrSYSWan0AcVzkcs6w1mX7xGeIJL6oT0iAfgtjBaXZEDhZHeg3AekXW8yiEv65MYoYjOFLJDKolASAflE3lRKqI_up4F5DQhwEivv'
 
 [CONVERTS]
 3D = ['scw', 'glb', 'dae', 'obj', 'fbx']
