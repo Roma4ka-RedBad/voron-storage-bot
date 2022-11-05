@@ -4,16 +4,14 @@ import random
 from typing import List
 from logic_objects import FileObject, Metadata, QueueFileObject
 
-from convert.instruments.textures import Textures
-from convert.instruments.audios import Audios
-from convert.queues import QueueManager
-from convert.gamemanager import GameManager
+from managers.instruments.textures import Textures
+from managers.instruments.audios import Audios
+from managers.queues import QueueManager
 
 
 class ConvertManager:
     def __init__(self, config):
         self.config = config
-        self.game = GameManager(("game.brawlstarsgame.com", 9339))
         self.queue = QueueManager()
 
     async def select_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:

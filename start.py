@@ -1,16 +1,17 @@
-import uvicorn
-import utils
 import toml
-
+import utils
 import asyncio
+import uvicorn
 from fastapi import FastAPI
-from typing import List, Dict, Any
-from box import Box
 
-from logic_objects import FileObject, UserObject, Metadata
-from convert.manager import ConvertManager
-from localization import languages
+from box import Box
 from database import UserTable
+from localization import languages
+from typing import List, Dict, Any
+from logic_objects import FileObject, UserObject, Metadata
+
+from managers.game import GameManager
+from managers.convert import ConvertManager
 
 
 server = FastAPI()
@@ -26,7 +27,7 @@ async def convert(file: FileObject | List[FileObject],
         _file.set_config(config)
 
     metadata = Metadata(metadata)
-    result, content = await manager.convert(file, to_format, metadata)
+    result, content = await convert_manager.convert(file, to_format, metadata)
 
     if result:
         if metadata.compress_to_archive:
@@ -111,8 +112,10 @@ async def get_converts(files: List[FileObject]):
 
 
 async def main():
-    for core in manager.queue.cores:
+    for core in convert_manager.queue.cores:
         asyncio.create_task(core)
+
+    asyncio.create_task(game_manager.init_prod_handler())
 
     # server_config = uvicorn.Config(server, host="192.168.0.127", port=80)
     server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
@@ -121,5 +124,6 @@ async def main():
 
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))
-    manager = ConvertManager(config)
+    convert_manager = ConvertManager(config)
+    game_manager = GameManager(("game.brawlstarsgame.com", 9339))
     asyncio.run(main())

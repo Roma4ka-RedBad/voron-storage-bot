@@ -1,61 +1,14 @@
+import asyncio
 import socket
 import requests
-import time
 
 from box import Box
 from json import loads
+from database import FingerprintTable
+from managers.instruments.bytestream import Reader, Writer
 
-from io import BufferedReader, BytesIO
-from struct import unpack, pack
-
-from google_play_scraper.scraper import PlayStoreScraper  # google-play-scraper-dmi
-from itunes_app_scraper.scraper import AppStoreScraper  # itunes-app-scraper-dmi
-
-
-class Writer:
-    def __init__(self):
-        self.buffer = b''
-
-    def write_int(self, integer: int, ctype: int, signed: bool, endian: str = '>'):
-        types = {64: "q", 32: "i", 16: "h", 8: "b"}
-        ctype = types[ctype] if signed else types[ctype].upper()
-        self.buffer += pack(f"{endian}{ctype}", integer)
-
-    def write_string(self, string: str, ctype: int):
-        encoded = string.encode('utf-8')
-        self.write_int(len(encoded), ctype, False)
-        self.buffer += encoded
-
-    def write_bool(self, boolean: bool):
-        if boolean:
-            self.write_int(1, 8, False)
-        else:
-            self.write_int(0, 8, False)
-
-
-class Reader(BufferedReader):
-    def __init__(self, initial_bytes: bytes):
-        super(Reader, self).__init__(BytesIO(initial_bytes))
-
-    def read_int(self, ctype: int, signed: bool, endian: str = '>') -> int:
-        types = {64: "q", 32: "i", 16: "h", 8: "b"}
-        _ctype = types[ctype] if signed else types[ctype].upper()
-        result = unpack(f"{endian}{_ctype}", self.read(round(ctype / 8)))[0]
-        if 2 ** ctype - 1 == result:
-            return -1
-        return result
-
-    def read_char(self, length: int = 1) -> str:
-        return self.read(length).decode('utf-8')
-
-    def read_bool(self) -> bool:
-        return self.read_int(8, False) == 1
-
-    def read_string(self, ctype: int) -> str:
-        length = self.read_int(ctype, False)
-        if length == -1:
-            return ""
-        return self.read_char(length)
+from google_play_scraper.scraper import PlayStoreScraper
+from itunes_app_scraper.scraper import AppStoreScraper  # async-itunes-app-scraper-dmi
 
 
 class SupercellServer:
@@ -137,6 +90,21 @@ class GameManager:
     def __init__(self, server_connection: tuple):
         self.server = SupercellServer(*server_connection)
 
+    async def init_prod_handler(self):
+        version = FingerprintTable.get_or_none(is_actual=True)
+        if version:
+            version = f"{version.major_v}.{version.build_v}.{version.revision_v}"
+
+        async for game_data in self.handle_server_update(version):
+            raw_version = game_data.fingerprint.version.split('.')
+            print('New version!')
+            if (FingerprintTable.get(is_actual=True)).sha != game_data.fingerprint.sha:
+                FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual == True).execute()
+                FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
+                                               build_v=raw_version[1], revision_v=raw_version[2])
+            else:
+                print('Skipping...')
+
     async def server_data(self, *args, **kwargs):
         message = self.server.encode_client_message(*args, **kwargs)
         message = self.server.send_message(message)
@@ -145,26 +113,22 @@ class GameManager:
             game_data.fingerprint = loads(game_data.fingerprint)
         return game_data
 
-    async def handle_server_update(self):
-        actual_version = None
+    async def handle_server_update(self, actual_version: str = None):
         maintenance_started = False
         while True:
             app = (await self.get_market_data(1)).version.split('.')
             game_data = await self.server_data(int(app[0]), int(app[1]), 1)
             if game_data.server_code == 10 and not maintenance_started:
-                print("Начался тех. перерыв!")
                 maintenance_started = True
                 yield game_data
 
             if game_data.server_code == 7:
                 maintenance_started = False
                 if game_data.fingerprint.version != actual_version:
-                    print(
-                        f"Сервер на новой версии! Предыдущая: {actual_version} | Текущая: {game_data.fingerprint.version}")
                     actual_version = game_data.fingerprint.version
                     yield game_data
 
-            time.sleep(3)
+            await asyncio.sleep(3)
 
     async def download_file(self, fingerprint_sha: str, name: str):
         app = (await self.get_market_data(1)).version.split('.')
@@ -181,9 +145,10 @@ class GameManager:
             if market_type == 2:
                 app_id = game_data.download_game_link.split('=')[-1]
                 app = PlayStoreScraper()
-                game_data = app.get_app_details(app_id, lang=language_code, country=country)
+                game_data = await app.get_app_details(app_id, lang=language_code, country=country)
             elif market_type == 1:
                 app_id = game_data.download_game_link.split('id')[-1]
                 app = AppStoreScraper()
-                game_data = app.get_app_details(app_id, lang=language_code, country=country)
+                game_data = await app.get_app_details(app_id, lang=language_code, country=country)
+
             return Box(game_data)
