@@ -23,7 +23,6 @@ class Server:
         except (TimeoutError, ContentTypeError):
             response = None
 
-        print(response, endpoint)
         return response
 
     async def close(self):

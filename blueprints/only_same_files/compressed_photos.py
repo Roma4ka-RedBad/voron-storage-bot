@@ -1,12 +1,13 @@
-from vkbottle import GroupEventType, DocMessagesUploader
+from vkbottle import GroupEventType
 from vkbottle.bot import Blueprint, Message, MessageEvent
+from pathlib import Path
 
 from keyboard import compressed_photos_keyboard
 from misc.custom_rules import PayloadRule
 from misc.pathwork import download_files, remove_dir
-from pathlib import Path
+from misc.connection.uploads import upload
 
-bp = Blueprint('2d textures convert commands')
+bp = Blueprint('compressed photos convert commands')
 bp.labeler.vbml_ignore_case = True
 
 
@@ -27,7 +28,7 @@ async def show_snackbar_handler(event: MessageEvent, localization):
 @bp.on.raw_event(
     GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
         {'type': 'convert'}))
-async def convert_photos(event: MessageEvent, userdata, localization, payload, server, config):
+async def convert_photos(event: MessageEvent, user_api, bot, userdata, localization, payload, server, config):
     await event.edit_message(
         keep_forward_messages=True,
         keyboard='[]',
@@ -35,8 +36,9 @@ async def convert_photos(event: MessageEvent, userdata, localization, payload, s
     message = (await bp.api.messages.get_by_conversation_message_id(
         peer_id=event.peer_id,
         conversation_message_ids=payload.msg_id)).items[0]
-
+    loaded_by_userapi = False
     photos = []
+
     for photo in message.attachments:
         photos.append(('photo', max(photo.photo.sizes, key=lambda x: (x.height, x.width))))
 
@@ -49,13 +51,9 @@ async def convert_photos(event: MessageEvent, userdata, localization, payload, s
             metadata={'compress_to_archive': False})
 
     if result.status:
-        for file in result.content.result:
-            response_file = Path(file)
-            loaded = await DocMessagesUploader(bp.api).upload(
-            response_file.name,
-            open(response_file, 'rb').read(),
-            peer_id=event.peer_id)
-            done.append(loaded)
+        done, loaded_by_userapi = await upload([Path(file) for file in result.content.result],
+                                               user_api, bot,
+                                               localization, event.peer_id)
 
     user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
@@ -68,5 +66,8 @@ async def convert_photos(event: MessageEvent, userdata, localization, payload, s
     else:
         text = localization.TID_ERROR
 
-    await event.send_message(text, attachment=done)
+    if loaded_by_userapi:
+        await event.send_message(text, forward_messages=done)
+    else:
+        await event.send_message(text, attachment=done)
     await remove_dir(event.user_id, message.conversation_message_id, config)

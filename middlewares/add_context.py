@@ -1,4 +1,4 @@
-from vkbottle import BaseMiddleware
+from vkbottle import BaseMiddleware, API
 from vkbottle.bot import Message, Bot
 
 from misc.server import Server
@@ -15,6 +15,8 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
     scheduler: AsyncIOScheduler = None
     localizations: dict | Box
     config: dict | Box
+    user_api: API
+    bot: Bot
 
     def __init__(self, event: Message, view):
         super().__init__(event, view)
@@ -45,7 +47,9 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
                     'localization': self.__class__.localizations[
                         userdata.content.__data__.language_code],
                     'config': self.__class__.config,
-                    'payload': payload
+                    'payload': payload,
+                    'user_api': self.__class__.user_api,
+                    'bot': self.__class__.bot
                     })
 
 
@@ -56,6 +60,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
     localizations: dict | Box
     config: dict | Box
     bot: Bot  # callback event не типизирован, поэтому для запросов к вк апи я это необходимо
+    user_api: API
 
     def __init__(self, event: dict, view):
         super().__init__(event, view)
@@ -85,7 +90,9 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
                     'localization': self.__class__.localizations[
                         userdata.content.__data__.language_code],
                     'config': self.__class__.config,
-                    'payload': Box(event.object.payload)
+                    'payload': Box(event.object.payload),
+                    'user_api': self.__class__.user_api,
+                    'bot': self.__class__.bot
                     })
 
     async def answer(self, text: str):

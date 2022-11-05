@@ -1,5 +1,6 @@
 from .add_context import AddArgumentsToCallbackEventMiddleware, AddArgumentsToMessageEventMiddleware
 
+from vkbottle import API
 from vkbottle.bot import Bot
 from misc.server import Server
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -17,6 +18,7 @@ async def registrate_middlewares(dispatcher: Bot, server: Server, scheduler: Asy
         middleware.localizations = localizations.content
         middleware.bot = dispatcher
         middleware.config = config.content
+        middleware.user_api = API(token=config.content.VK.user_token)
 
         if middleware.type == 'message':
             dispatcher.labeler.message_view.register_middleware(middleware)

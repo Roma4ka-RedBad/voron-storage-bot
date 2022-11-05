@@ -9,6 +9,7 @@ from middlewares import registrate_middlewares
 
 import asyncio
 
+
 async def main():
     server = Server('http://127.0.0.1:8910')
     config = await server.send_message('config')
@@ -17,7 +18,7 @@ async def main():
     scheduler = AsyncIOScheduler()
     scheduler.start()
 
-    bot = Bot(token=config.content.VK.token)
+    bot = Bot(token=config.content.VK.bot_token)
     await registrate_middlewares(bot, server, scheduler)
     for blueprint in load_blueprints_from_package('blueprints'):
         blueprint.load(bot)

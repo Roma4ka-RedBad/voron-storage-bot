@@ -1,11 +1,11 @@
-from vkbottle import GroupEventType, DocMessagesUploader
+from vkbottle import GroupEventType
 from vkbottle.bot import Blueprint, Message, MessageEvent
+from pathlib import Path
 
 from keyboard import audio_keyboard
 from misc.custom_rules import PayloadRule
 from misc.pathwork import download_files, remove_dir
-
-from box import Box
+from misc.connection.uploads import upload
 
 bp = Blueprint('only audio convert commands')
 
@@ -21,7 +21,7 @@ async def audio_handler(message: Message, localization):
     GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
         {'type': 'audio_convert'}))
 async def audio_convert_handler(event: MessageEvent, localization, server, config, userdata,
-                                payload):
+                                payload, user_api, bot):
     message = (await bp.api.messages.get_by_conversation_message_id(
         peer_id=event.peer_id,
         conversation_message_ids=payload.msg_id)).items[0]
@@ -33,6 +33,7 @@ async def audio_convert_handler(event: MessageEvent, localization, server, confi
         keyboard='[]',
         message=localization.TID_STARTWORK.format(name=f'[id{user.id}|{nickname}]'))
 
+    loaded_by_userapi = False
     audios = [('audio', i.audio) for i in message.attachments]
     files = await download_files(message, server, audios, config)
     done = []
@@ -53,13 +54,10 @@ async def audio_convert_handler(event: MessageEvent, localization, server, confi
             'compress': payload.compress
             })
     if result.status:
-        response_file = result.content.result
-        print(response_file)
-        loaded = await DocMessagesUploader(bp.api).upload(
-            'result.zip1',
-            open(response_file, 'rb').read(),
-            peer_id=event.peer_id)
-        done.append(loaded)
+        done, loaded_by_userapi = await upload(
+            [Path(file) for file in result.content.result],
+            user_api, bot,
+            localization, event.peer_id)
 
     if not done:
         text = warning_tid + '\n' + \
@@ -70,4 +68,8 @@ async def audio_convert_handler(event: MessageEvent, localization, server, confi
     else:
         text = localization.TID_ERROR
 
-    await event.send_message(text, attachment=done)
+    if loaded_by_userapi:
+        await event.send_message(text, forward_messages=done)
+    else:
+        await event.send_message(text, attachment=done)
+    await remove_dir(event.user_id, message.conversation_message_id, config)
