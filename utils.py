@@ -19,9 +19,9 @@ async def get_converts_by_file(file: FileObject):
         }
 
         if len(archive_converts['archive_files']):
-            return archive_converts
+            return archive_converts, len(archive_converts['archive_files'])
     else:
-        return file.get_available_converts()
+        return file.get_available_converts(), 1
 
 
 async def compress_to_archive(archive_path: str, config: object,
@@ -59,7 +59,7 @@ async def async_reqget(url: str, return_type: str, headers: dict = None):
                 return await resp.json()
 
 
-async def create_response(status: bool, content=None, error_msg: str = None):
+async def create_response(status: bool, content=None, error_msg: str | dict = None):
     response = {
         "status": status
     }

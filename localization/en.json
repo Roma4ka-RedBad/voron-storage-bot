@@ -39,5 +39,6 @@
   "TID_IS_LAST_PAGE": "No more pages!",
   "TID_ARCHIVEISRENAMED": "VK does not allow downloading audio in archives. Before unpacking the archive, erase the number 1 at the end!",
   "TID_SET_LANGUAGE": "Set Language",
-  "TID_DONE": "Done!"
+  "TID_DONE": "Done!",
+  "TID_TOO_MANY_FILES": "You sent too many files ({count}) The maximum number of files: {maximum}"
 }

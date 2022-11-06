@@ -18,10 +18,12 @@ server = FastAPI()
 # Для совместимости цветов с Windows
 init()
 
+
 @server.post("/convert/{to_format}")
-async def convert(file: FileObject | List[FileObject],
-                  to_format: str,
-                  metadata: Dict[Any, Any] = None):
+async def convert(
+    file: FileObject | List[FileObject],
+    to_format: str,
+    metadata: Dict[Any, Any] = None):
     if isinstance(file, FileObject):
         file = [file]
     for _file in file:
@@ -42,10 +44,11 @@ async def convert(file: FileObject | List[FileObject],
                     result = await utils.compress_to_archive(
                         content / 'archive.zip', config, file_paths=paths)
 
-        return await utils.create_response(True, content={
-            'result': result,
-            'process_dir': content,
-            })
+        return await utils.create_response(
+            True, content={
+                'result': result,
+                'process_dir': content,
+                })
     else:
         return await utils.create_response(False, error_msg=content)
 
@@ -89,13 +92,26 @@ async def get_limit(file_format: str):
 @server.post("/converts")
 async def get_converts(files: List[FileObject]):
     content = []
+    total_count = 0
     for file in files:
         file.set_config(config)
-        file_converts = await utils.get_converts_by_file(file)
+        file_converts, count_files = await utils.get_converts_by_file(file)
+        total_count += count_files
         if file_converts:
-            content.append({
-                'path': file.path,
-                'converts': file_converts
+            content.append(
+                {
+                    'path': file.path,
+                    'converts': file_converts
+                    })
+    print(total_count)
+    if total_count > 100:
+        # на будущее, сделай возможность передавать максимальное кол-во файлов суда (для премиума)
+        # ну и если хочешь, чтобы в error_msg была только строка, то еще и user.id, language_code и т. п.
+        return await utils.create_response(
+            False, error_msg={
+                'tid': 'TID_TOO_MANY_FILES',
+                'files_count': total_count,
+                'maximum': 100
                 })
     if content:
         return await utils.create_response(True, content=content)
@@ -113,6 +129,7 @@ async def main():
     server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
     a = uvicorn.Server(server_config)
     await a.serve()
+
 
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))
