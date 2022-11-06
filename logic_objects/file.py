@@ -36,6 +36,9 @@ class FileObject(BaseModel):
         if converts:
             converts = converts[0]
             converts.remove(self.path.suffix[1:])
+            
+            if self.path.suffix[1:] != 'scw' and 'update' in converts:
+                converts.remove('update')
 
         return converts
 
@@ -78,6 +81,9 @@ class ArchiveFile:
         if converts:
             converts = converts[0]
             converts.remove(self.get_format())
+
+            if self.get_format() != 'scw' and 'update' in converts:
+                converts.remove('update')
 
         return converts
 

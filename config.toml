@@ -13,7 +13,7 @@ bot_token = 'vk1.a.DI9yXZSFf1FrqZ35rdX-gimXHgg-UissgBOF1YY32Rz7n9eUXgeZw218dzUB5
 user_token = 'vk1.a.n5JFyo07vJ9p8VKvh50v5xuuj7dq-szd6sCb0uZ6mQIL5M6A_RGOI1IwQlhDuwZtPnKMxtrrmUg-8cywyjnDmlHhhBhDrSYSWan0AcVzkcs6w1mX7xGeIJL6oT0iAfgtjBaXZEDhZHeg3AekXW8yiEv65MYoYjOFLJDKolASAflE3lRKqI_up4F5DQhwEivv'
 
 [CONVERTS]
-3D = ['scw', 'glb', 'dae', 'obj', 'fbx']
+3D = ['scw', 'glb', 'dae', 'obj', 'fbx', 'update']
 2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']
 2D_ANIM = ['sc', 'fla']
 CSV = ['compress', 'decompress', 'csv']

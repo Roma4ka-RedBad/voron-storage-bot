@@ -19,17 +19,20 @@ class GameManager:
             version = f"{version.major_v}.{version.build_v}.{version.revision_v}"
 
         async for game_data in self.handle_server_update(version):
-            raw_version = game_data.fingerprint.version.split('.')
-            if actual_sha := FingerprintTable.get_or_none(is_actual=True):
-                actual_sha = actual_sha.sha
+            if game_data.server_code == 7:
+                raw_version = game_data.fingerprint.version.split('.')
+                if actual_sha := FingerprintTable.get_or_none(is_actual=True):
+                    actual_sha = actual_sha.sha
 
-            print('New version!')
-            if actual_sha != game_data.fingerprint.sha:
-                FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual).execute()
-                FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
-                                               build_v=raw_version[1], revision_v=raw_version[2])
-            else:
-                print('Skipping...')
+                print('New version!')
+                if actual_sha != game_data.fingerprint.sha:
+                    FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual).execute()
+                    FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
+                                                   build_v=raw_version[1], revision_v=raw_version[2])
+                else:
+                    print('Skipping...')
+            elif game_data.server_code == 10:
+                print(f'Start maintenance! Time: {game_data.maintenance_end_time}')
 
     async def server_data(self, *args, **kwargs):
         message = self.server.encode_client_message(*args, **kwargs)
