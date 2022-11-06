@@ -1,6 +1,7 @@
 from logic_objects import FileObject, ArchiveObject
 from typing import List
 import os
+import aiohttp
 
 
 async def get_converts_by_file(file: FileObject):
@@ -47,6 +48,16 @@ async def compress_to_archive(archive_path: str, config: object,
                     archive.write(path)
 
     return archive.close()
+
+
+async def async_reqget(url: str, return_type: str, headers: dict = None):
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url) as resp:
+            if return_type == 'text':
+                return await resp.text()
+
+            if return_type == 'json':
+                return await resp.json()
 
 
 async def create_response(status: bool, content=None, error_msg: str = None):

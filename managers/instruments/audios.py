@@ -1,7 +1,7 @@
 from pydub import AudioSegment
 
 from logic_objects import FileObject, Metadata
-from .base import Base
+from managers.instruments.base import Base
 
 DEFAULT_SAMPLE_RATE = 22050
 DEFAULT_BITRATE = '90k'

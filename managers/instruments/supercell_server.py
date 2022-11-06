@@ -1,26 +1,29 @@
-import socket
+import asyncio
 
 from box import Box
 from managers.instruments.bytestream import Reader, Writer
 
 
 class SupercellServer:
-    def __init__(self, ip_address: str, ip_port: int):
-        self.address = (ip_address, ip_port)
+    def __init__(self, ip_host: str, ip_port: int):
+        self.ip_host = ip_host
+        self.ip_port = ip_port
 
-    def send_message(self, message):
-        server = socket.create_connection(self.address)
-        server.send(message.buffer)
-        header = server.recv(7)
+    async def send_message(self, message):
+        receiver, sender = await asyncio.open_connection(self.ip_host, self.ip_port)
+        sender.write(message.buffer)
+        await sender.drain()
+        header = await receiver.read(7)
         packet_length = int.from_bytes(header[2:5], 'big')
         received_data = b''
         while packet_length > 0:
-            data = server.recv(packet_length)
+            data = await receiver.read(packet_length)
             if not data:
                 break
             received_data += data
             packet_length -= len(data)
-        server.close()
+        sender.close()
+        await sender.wait_closed()
         return received_data
 
     @staticmethod

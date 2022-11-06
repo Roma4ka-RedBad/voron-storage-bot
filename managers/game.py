@@ -1,13 +1,12 @@
 import asyncio
-import requests
 
 from box import Box
 from json import loads
 from database import FingerprintTable
-from managers.instruments.supercell_server import SupercellServer
 
-from google_play_scraper.scraper import PlayStoreScraper
-from itunes_app_scraper.scraper import AppStoreScraper  # async-itunes-app-scraper-dmi
+from utils import async_reqget
+from managers.instruments.supercell_server import SupercellServer
+from managers.instruments.market_scraper import MarketScraper
 
 
 class GameManager:
@@ -26,7 +25,7 @@ class GameManager:
 
             print('New version!')
             if actual_sha != game_data.fingerprint.sha:
-                FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual == True).execute()
+                FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual).execute()
                 FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
                                                build_v=raw_version[1], revision_v=raw_version[2])
             else:
@@ -34,7 +33,7 @@ class GameManager:
 
     async def server_data(self, *args, **kwargs):
         message = self.server.encode_client_message(*args, **kwargs)
-        message = self.server.send_message(message)
+        message = await self.server.send_message(message)
         game_data = self.server.decode_server_message(message)
         if game_data.server_code == 7:
             game_data.fingerprint = loads(game_data.fingerprint)
@@ -63,7 +62,7 @@ class GameManager:
         if fingerprint_sha == 'actual':
             fingerprint_sha = game_data.fingerprint.sha
 
-        request = requests.get(f"{game_data.assets_link}/{fingerprint_sha}/{name}")
+        request = await async_reqget(f"{game_data.assets_link}/{fingerprint_sha}/{name}", 'text')
         return request
 
     async def get_market_data(self, market_type: int, language_code: str = 'ru', country: str = 'us'):
@@ -71,11 +70,9 @@ class GameManager:
         if game_data.server_code == 8:
             if market_type == 2:
                 app_id = game_data.download_game_link.split('=')[-1]
-                app = PlayStoreScraper()
-                game_data = await app.get_app_details(app_id, lang=language_code, country=country)
+                game_data = await MarketScraper.get_google_app_details(app_id, lang=language_code, country=country)
             elif market_type == 1:
                 app_id = game_data.download_game_link.split('id')[-1]
-                app = AppStoreScraper()
-                game_data = await app.get_app_details(app_id, lang=language_code, country=country)
+                game_data = await MarketScraper.get_itunes_app_details(app_id, country=country)
 
             return Box(game_data)
