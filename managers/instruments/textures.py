@@ -21,7 +21,8 @@ class Textures(Base):
         }
 
         if to_format in ['png', 'jpg', 'ktx', 'pvr']:
-            input_name = self.file.path.replace('input' + self.file.path.suffix).absolute()
+            input_name = self.file.path.replace(
+                self.file.path.parent / ('input' + self.file.path.suffix)).absolute()
             output_name = self.get_new_filename(to_format).parent / ('output.' + to_format)
             output = run(
                 methods[to_format]
