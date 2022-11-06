@@ -9,7 +9,7 @@ from .base import Base
 class Textures(Base):
     def __init__(self, file: FileObject, result_dir: str):
         super().__init__(file, result_dir)
-        self.pvrtextool = Path("convert/instruments/pvrtextools/" +'pvrtextool.exe'
+        self.pvrtextool = Path("managers/instruments/pvrtextools/" +'pvrtextool.exe'
                                if platform.system() == 'Windows' else 'pvrtextool').absolute()
 
     async def convert_to(self, to_format: str):
@@ -36,4 +36,4 @@ class Textures(Base):
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
         elif to_format == 'sc':
-            return {'converted': False, 'error': 'Method is unavailable', 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}
+            return {'converted': False, 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}

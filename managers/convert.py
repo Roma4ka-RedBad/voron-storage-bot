@@ -14,7 +14,7 @@ class ConvertManager:
         self.config = config
         self.queue = QueueManager()
 
-    async def select_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata) -> List[str]:
+    async def select_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata):
         result = []
 
         for file in files:
@@ -30,7 +30,7 @@ class ConvertManager:
 
         result = await self.queue.wait_for_convert(result)
 
-        return [obj.path_result if obj.path_result else obj.tid for obj in result]
+        return [{'path': obj.path_result, 'tid': obj.tid} for obj in result]
 
     async def convert(self, raw_files: List[FileObject], to_format: str, metadata: Metadata):
         process_dir = raw_files[0].path.parent / f'process_{random.randint(0, 1000000)}/'
@@ -54,7 +54,6 @@ class ConvertManager:
             else:
                 files.append(file.copy_to(process_dir))
 
-        # список путей на результат конвертации каждого файла
         result = await self.select_tool(files, result_dir, to_format, metadata)
 
         return result, process_dir

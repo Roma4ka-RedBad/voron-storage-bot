@@ -96,7 +96,8 @@ class QueueManager:
                     tasks[num].path_result = answer['path']
                 else:
                     tasks[num].error = answer['error']
-                tasks[num].tid = answer['TID']
+                if tasks[num].tid:
+                    tasks[num].tid = answer['TID']
 
     @staticmethod
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):

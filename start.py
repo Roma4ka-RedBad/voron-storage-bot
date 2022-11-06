@@ -31,14 +31,15 @@ async def convert(file: FileObject | List[FileObject],
 
     if result:
         if metadata.compress_to_archive:
+            paths = [obj['path'] for obj in result if obj['path']]
             if metadata.archive_only:
                 result = await utils.compress_to_archive(
-                    content / 'archive.zip', config, file_paths=result)
+                    content / 'archive.zip', config, file_paths=paths)
             else:
                 result = result[0] if len(result) == 1 else result
                 if isinstance(result, list):
                     result = await utils.compress_to_archive(
-                        content / 'archive.zip', config, file_paths=result)
+                        content / 'archive.zip', config, file_paths=paths)
 
         return await utils.create_response(True, content={
             'result': result,
@@ -86,36 +87,26 @@ async def get_limit(file_format: str):
 
 @server.post("/converts")
 async def get_converts(files: List[FileObject]):
-    if len(files) > 1:
-        content = []
-        for file in files:
-            file.set_config(config)
-            file_converts = await utils.get_converts_by_file(file)
-            if file_converts:
-                content.append({
-                    'path': file.path,
-                    'converts': file_converts
-                    })
-        return await utils.create_response(True, content=content)
-
-    else:
-        files[0].set_config(config)
-        file_converts = await utils.get_converts_by_file(files[0])
+    content = []
+    for file in files:
+        file.set_config(config)
+        file_converts = await utils.get_converts_by_file(file)
         if file_converts:
-            return await utils.create_response(True, content={
-                'path': files[0].path,
+            content.append({
+                'path': file.path,
                 'converts': file_converts
                 })
-
-        return await utils.create_response(False,
-                                           error_msg="TID_WORK_FORMATSNOTEXIST")
+    if content:
+        return await utils.create_response(True, content=content)
+    else:
+        return await utils.create_response(False, error_msg="TID_WORK_FORMATSNOTEXIST")
 
 
 async def main():
     for core in convert_manager.queue.cores:
         asyncio.create_task(core)
 
-    asyncio.create_task(game_manager.init_prod_handler())
+    # asyncio.create_task(game_manager.init_prod_handler())
 
     # server_config = uvicorn.Config(server, host="192.168.0.127", port=80)
     server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
@@ -125,5 +116,5 @@ async def main():
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))
     convert_manager = ConvertManager(config)
-    game_manager = GameManager(("game.brawlstarsgame.com", 9339))
+    # game_manager = GameManager(("game.brawlstarsgame.com", 9339))
     asyncio.run(main())
