@@ -3,6 +3,7 @@ import utils
 import asyncio
 import uvicorn
 from fastapi import FastAPI
+from colorama import init
 
 from box import Box
 from database import UserTable
@@ -13,9 +14,9 @@ from logic_objects import FileObject, UserObject, Metadata
 from managers.game import GameManager
 from managers.convert import ConvertManager
 
-
 server = FastAPI()
-
+# Для совместимости цветов с Windows
+init()
 
 @server.post("/convert/{to_format}")
 async def convert(file: FileObject | List[FileObject],
@@ -106,7 +107,7 @@ async def main():
     for core in convert_manager.queue.cores:
         asyncio.create_task(core)
 
-    # asyncio.create_task(game_manager.init_prod_handler())
+    asyncio.create_task(game_manager.init_prod_handler())
 
     # server_config = uvicorn.Config(server, host="192.168.0.127", port=80)
     server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
@@ -116,5 +117,5 @@ async def main():
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))
     convert_manager = ConvertManager(config)
-    # game_manager = GameManager(("game.brawlstarsgame.com", 9339))
+    game_manager = GameManager(("game.brawlstarsgame.com", 9339))
     asyncio.run(main())

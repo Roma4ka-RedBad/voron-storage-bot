@@ -4,7 +4,7 @@ import warnings
 from multiprocessing import Process, Pipe, cpu_count
 from collections import OrderedDict
 from collections.abc import Callable, Coroutine
-
+from colorama import init
 from logic_objects.queue_file import QueueFileObject
 
 
@@ -72,7 +72,7 @@ class QueueManager:
         available = take[0].priory[1] - 1
         while available:
             for item in queue:
-                if self._queue[item].priory[1] < len(take):
+                if len(take) < self._queue[item].priory[1]:
                     available -= 1
                     take.append(self._queue.pop(item))
             break
@@ -83,6 +83,7 @@ class QueueManager:
         while True:
             getter, putter = Pipe(duplex=False)
             tasks = await self.get(sort_function=sort_function)
+            print('Размер очереди:', len(self._queue))
 
             process = Process(target=self.start_process, args=(putter, tasks))
             process.start()

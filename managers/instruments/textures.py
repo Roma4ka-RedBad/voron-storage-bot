@@ -1,6 +1,7 @@
 import platform
 from pathlib import Path
 from subprocess import run, STDOUT, PIPE
+from random import randint
 
 from logic_objects.file import FileObject
 from managers.instruments.base import Base
@@ -21,9 +22,11 @@ class Textures(Base):
         }
 
         if to_format in ['png', 'jpg', 'ktx', 'pvr']:
+            work_dir = self.file.path.parent / f'work{randint(1234, 56789)}/'
+            work_dir.mkdir(parents=True, exist_ok=True)
             input_name = self.file.path.replace(
-                self.file.path.parent / ('input' + self.file.path.suffix)).absolute()
-            output_name = self.get_new_filename(to_format).parent / ('output.' + to_format)
+                work_dir / ('input' + self.file.path.suffix)).absolute()
+            output_name = work_dir / ('output.' + to_format)
             output = run(
                 methods[to_format]
                     .format(
