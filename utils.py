@@ -34,7 +34,6 @@ async def compress_to_archive(archive_path: str, config: object,
             archive.write(file.path)
 
     if file_paths:
-        print(file_paths)
         for path in file_paths:
             if path:
                 if os.path.isdir(path):

@@ -21,19 +21,23 @@ class Textures(Base):
         }
 
         if to_format in ['png', 'jpg', 'ktx', 'pvr']:
+            input_name = self.file.path.replace('input' + self.file.path.suffix).absolute()
+            output_name = self.get_new_filename(to_format).parent / ('output.' + to_format)
             output = run(
                 methods[to_format]
                     .format(
                     pvrtextool=str(self.pvrtextool),
-                    file_name=str(self.file.path.absolute()),
-                    out_file=str(self.get_new_filename(to_format).absolute()),
+                    file_name=input_name,
+                    out_file=output_name,
                     temp_pvr_file=str(self.file.path.absolute().parent / 'temp.pvr'))
                     .split(),
                 stdout=PIPE, stderr=STDOUT, text=True)
 
             if output.returncode == 0:
+                output_name.replace(self.get_new_filename(to_format))
                 return {'converted': True, 'path': self.get_new_filename(to_format), 'TID': 'TID_STARTWORK_DONE'}
             else:
+                print(output.stdout)
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
         elif to_format == 'sc':
             return {'converted': False, 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}
