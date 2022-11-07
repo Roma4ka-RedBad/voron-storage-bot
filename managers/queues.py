@@ -1,5 +1,6 @@
 import asyncio
 import warnings
+import traceback
 
 from multiprocessing import Process, Pipe, cpu_count
 from collections import OrderedDict
@@ -97,6 +98,7 @@ class QueueManager:
                     tasks[num].path_result = answer['path']
                 else:
                     tasks[num].error = answer['error']
+                    print(answer['error'])
                 if tasks[num].tid:
                     tasks[num].tid = answer['TID']
 
@@ -104,15 +106,19 @@ class QueueManager:
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):
         result = []
         for obj in objects:
-            if isinstance(obj.target, Callable):
-                answer = obj.target.__call__(*obj.arguments)
+            try:
+                if isinstance(obj.target, Callable):
+                    answer = obj.target.__call__(*obj.arguments)
 
-                if isinstance(answer, Coroutine):
-                    answer = asyncio.run(answer)
+                    if isinstance(answer, Coroutine):
+                        answer = asyncio.run(answer)
 
-                result.append(answer)
-            else:
-                result.append({'converted': False, 'error': 'Target is not a function!', 'TID': None})
+                    result.append(answer)
+                else:
+                    result.append({'converted': False, 'error': 'Target is not a function!', 'TID': None})
+
+            except:
+                result.append({'converted': False, 'error': traceback.format_exc(), 'TID': None})
 
         pipe.send(result)
         pipe.close()
