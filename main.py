@@ -5,6 +5,7 @@ from pytz import timezone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from misc.server import Server
+from misc.models.scheduler import Scheduler
 from middlewares import registrate_middlewares
 
 import asyncio
@@ -15,8 +16,7 @@ async def main():
     config = await server.send_message('config')
     server.timezone = timezone(config.content.SERVER.timezone)
 
-    scheduler = AsyncIOScheduler()
-    scheduler.start()
+    scheduler = Scheduler(AsyncIOScheduler(), timezone(config.content.SERVER.timezone))
 
     bot = Bot(token=config.content.VK.bot_token)
     await registrate_middlewares(bot, server, scheduler)

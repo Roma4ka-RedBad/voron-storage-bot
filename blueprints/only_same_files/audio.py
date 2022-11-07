@@ -4,16 +4,19 @@ from pathlib import Path
 
 from keyboard import audio_keyboard
 from misc.custom_rules import PayloadRule
-from misc.pathwork import download_files, remove_dir
+from misc.pathwork import download_files
 from misc.connection.uploads import upload
+from misc.tools import remove_dir_and_file
 
 bp = Blueprint('only audio convert commands')
 
 
 @bp.on.message(attachment='audio')
-async def audio_handler(message: Message, localization):
+async def audio_handler(message: Message, localization, userdata):
+    user = (await bp.api.users.get(user_ids=[message.from_id]))[0]
+    nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
     await message.reply(
-        localization.TID_CHOOSE_AUDIO_CONVERT,
+        localization.TID_CHOOSE_AUDIO_CONVERT.format(name=nickname),
         keyboard=audio_keyboard(message.conversation_message_id, localization))
 
 
@@ -21,7 +24,7 @@ async def audio_handler(message: Message, localization):
     GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
         {'type': 'audio_convert'}))
 async def audio_convert_handler(event: MessageEvent, localization, server, config, userdata,
-                                payload, user_api, bot):
+                                payload, user_api, bot, file_storage, scheduler):
     message = (await bp.api.messages.get_by_conversation_message_id(
         peer_id=event.peer_id,
         conversation_message_ids=payload.msg_id)).items[0]
@@ -35,7 +38,8 @@ async def audio_convert_handler(event: MessageEvent, localization, server, confi
 
     loaded_by_userapi = False
     audios = [('audio', i.audio) for i in message.attachments]
-    files = await download_files(message, server, audios, config)
+
+    files = await download_files(message, server, audios, scheduler, file_storage, config)
     done = []
 
     warning_tid = ''
@@ -55,21 +59,21 @@ async def audio_convert_handler(event: MessageEvent, localization, server, confi
             })
     if result.status:
         done, loaded_by_userapi = await upload(
-            [Path(file) for file in result.content.result],
+            [Path(result.content.result)],
             user_api, bot,
-            localization, event.peer_id)
+            localization, event.peer_id, rename=True)
 
     if not done:
         text = warning_tid + '\n' + \
                localization.TID_STARTWORK_FILESNOTCONVERT.format(name=f'[id{user.id}|{nickname}]')
-    elif len(done) == 1:
+    elif len(done) == 1 or loaded_by_userapi:
         text = warning_tid + '\n' + \
                localization.TID_ARCHIVEISRENAMED.format(name=f'[id{user.id}|{nickname}]')
     else:
         text = localization.TID_ERROR
 
     if loaded_by_userapi:
-        await event.send_message(text, forward_messages=done)
+        await event.send_message(text, forward=done)
     else:
         await event.send_message(text, attachment=done)
-    await remove_dir(event.user_id, message.conversation_message_id, config)
+    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config, server)

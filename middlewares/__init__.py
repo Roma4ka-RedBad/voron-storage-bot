@@ -3,12 +3,12 @@ from .add_context import AddArgumentsToCallbackEventMiddleware, AddArgumentsToMe
 from vkbottle import API
 from vkbottle.bot import Bot
 from misc.server import Server
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from misc.models.scheduler import Scheduler
 
 middlewares = [AddArgumentsToMessageEventMiddleware, AddArgumentsToCallbackEventMiddleware]
 
 
-async def registrate_middlewares(dispatcher: Bot, server: Server, scheduler: AsyncIOScheduler):
+async def registrate_middlewares(dispatcher: Bot, server: Server, scheduler: Scheduler):
     localizations = await server.send_message('localization/*')
     config = await server.send_message('config')
 

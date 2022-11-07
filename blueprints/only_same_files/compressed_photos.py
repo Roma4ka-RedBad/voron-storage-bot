@@ -4,8 +4,9 @@ from pathlib import Path
 
 from keyboard import compressed_photos_keyboard
 from misc.custom_rules import PayloadRule
-from misc.pathwork import download_files, remove_dir
+from misc.pathwork import download_files
 from misc.connection.uploads import upload
+from misc.tools import remove_dir_and_file
 
 bp = Blueprint('compressed photos convert commands')
 bp.labeler.vbml_ignore_case = True
@@ -28,7 +29,8 @@ async def show_snackbar_handler(event: MessageEvent, localization):
 @bp.on.raw_event(
     GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
         {'type': 'convert'}))
-async def convert_photos(event: MessageEvent, user_api, bot, userdata, localization, payload, server, config):
+async def convert_photos(event: MessageEvent, user_api, bot, userdata, file_storage, localization, payload, server,
+                         config, scheduler):
     await event.edit_message(
         keep_forward_messages=True,
         keyboard='[]',
@@ -42,7 +44,7 @@ async def convert_photos(event: MessageEvent, user_api, bot, userdata, localizat
     for photo in message.attachments:
         photos.append(('photo', max(photo.photo.sizes, key=lambda x: (x.height, x.width))))
 
-    files = await download_files(message, server, photos, config)
+    files = await download_files(message, server, photos, scheduler, file_storage, config)
     done = []
 
     result = await server.send_message(
@@ -51,7 +53,7 @@ async def convert_photos(event: MessageEvent, user_api, bot, userdata, localizat
             metadata={'compress_to_archive': False})
 
     if result.status:
-        done, loaded_by_userapi = await upload([Path(file) for file in result.content.result],
+        done, loaded_by_userapi = await upload([Path(file.path) for file in result.content.result if file.path],
                                                user_api, bot,
                                                localization, event.peer_id)
 
@@ -70,4 +72,4 @@ async def convert_photos(event: MessageEvent, user_api, bot, userdata, localizat
         await event.send_message(text, forward_messages=done)
     else:
         await event.send_message(text, attachment=done)
-    await remove_dir(event.user_id, message.conversation_message_id, config)
+    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config, server)

@@ -2,21 +2,26 @@ from vkbottle import BaseMiddleware, API
 from vkbottle.bot import Message, Bot
 
 from misc.server import Server
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from misc.models.storage import FileStorage
+from misc.models.scheduler import Scheduler
 
 from json import loads
 from box import Box
 from random import randint
 
 
+STORAGE = FileStorage()
+
+
 class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
     type = 'message'
     server: Server = None
-    scheduler: AsyncIOScheduler = None
+    scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     user_api: API
     bot: Bot
+    file_storage: FileStorage
 
     def __init__(self, event: Message, view):
         super().__init__(event, view)
@@ -26,6 +31,7 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
         userdata = await self.__class__.server.send_message(
             'user/get',
             data={'vk_id': self.event.from_id})
+        file_storage = STORAGE
 
         if userdata is None:
             if self.event.from_id in [508214061, 361332053]:
@@ -49,18 +55,20 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
                     'config': self.__class__.config,
                     'payload': payload,
                     'user_api': self.__class__.user_api,
-                    'bot': self.__class__.bot
+                    'bot': self.__class__.bot,
+                    'file_storage': file_storage
                     })
 
 
 class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
     type = 'callback'
     server: Server = None
-    scheduler: AsyncIOScheduler = None
+    scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     bot: Bot  # callback event не типизирован, поэтому для запросов к вк апи я это необходимо
     user_api: API
+    file_storage: FileStorage
 
     def __init__(self, event: dict, view):
         super().__init__(event, view)
@@ -70,6 +78,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
         userdata = await self.__class__.server.send_message(
             'user/get',
             data={'vk_id': event.object.user_id})
+        file_storage = STORAGE
 
         if userdata is None:
             if event.object.user_id in [508214061, 361332053]:
@@ -92,7 +101,8 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
                     'config': self.__class__.config,
                     'payload': Box(event.object.payload),
                     'user_api': self.__class__.user_api,
-                    'bot': self.__class__.bot
+                    'bot': self.__class__.bot,
+                    'file_storage': file_storage
                     })
 
     async def answer(self, text: str):

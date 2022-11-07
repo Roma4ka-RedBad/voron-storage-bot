@@ -6,13 +6,26 @@ from vkbottle.bot import Message
 from misc.server import Server
 from misc.models.downloadable_file import File
 from misc.connection.downloads import get_files
+from misc.models.scheduler import Scheduler
+from misc.models.storage import FileStorage
+from misc.tools import remove_dir_and_file
 
 
-async def download_files(message: Message, server: Server, file_objects: List[Tuple[str, Any]], config):
+async def download_files(message: Message,
+                         server: Server,
+                         file_objects: List[Tuple[str, Any]],
+                         scheduler: Scheduler,
+                         storage: FileStorage,
+                         config):
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_id}/{message.conversation_message_id}"
     if not os.path.exists(f"{main_dir}/{user_dir}"):
         os.makedirs(f"{main_dir}/{user_dir}")
+    await scheduler.create_task(
+        remove_dir_and_file,
+        [storage, message.conversation_message_id, message.from_id, config, server],
+        (message.from_id, message.conversation_message_id),
+        minutes=config.UFS.wait_for_delete_dir)
 
     prepared_files = []
     for obj_type, FileObject in file_objects:
