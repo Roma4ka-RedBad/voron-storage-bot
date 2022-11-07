@@ -66,4 +66,4 @@ async def audio_convert_handler(event: MessageEvent, file_storage: FileStorage, 
     else:
         await event.send_message(text, attachment=done)
 
-    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)
+    await remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)

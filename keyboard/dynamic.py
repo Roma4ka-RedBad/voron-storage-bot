@@ -29,7 +29,7 @@ def converts_keyboard(buttons: List[List[str] | Tuple[str] | str],
                     data.append(item)
         else:
             data.append(obj)
-    is_last_page = len(data) == page * (max_buttons - 2)
+    is_last_page = len(data) <= page * (max_buttons - 2)
 
     if len(data) > max_buttons:
         data = data[(page - 1) * (max_buttons - 2):page * (max_buttons - 2)]

@@ -93,7 +93,7 @@ async def convert_documents_handler(event: MessageEvent, user_api: API, server: 
     else:
         await event.send_message(localization.TID_ERROR)
 
-    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)
+    await remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)
 
 
 @bp.on.raw_event(GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule({'type': 'move_page'}))
