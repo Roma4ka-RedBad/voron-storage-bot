@@ -2,7 +2,7 @@ from .add_context import AddArgumentsToCallbackEventMiddleware, AddArgumentsToMe
 
 from vkbottle import API
 from vkbottle.bot import Bot
-from misc.server import Server
+from misc.models.server import Server
 from misc.models.scheduler import Scheduler
 
 middlewares = [AddArgumentsToMessageEventMiddleware, AddArgumentsToCallbackEventMiddleware]

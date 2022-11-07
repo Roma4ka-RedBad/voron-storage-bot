@@ -1,9 +1,9 @@
 from aiohttp import ClientSession
-from misc.models.downloadable_file import File
-from misc.models.prepared_file import DownloadedFile
+from misc.models import FileModel
+from misc.models import DownloadedFile
 
 
-async def download_and_save_file(session: ClientSession, file_object: File) -> DownloadedFile:
+async def download_and_save_file(session: ClientSession, file_object: FileModel) -> DownloadedFile:
     path = f'{file_object.main_dir}/{file_object.user_dir}/{file_object.name}'
     async with session.get(file_object.url) as resp:
         with open(path, 'wb') as file:
@@ -13,8 +13,8 @@ async def download_and_save_file(session: ClientSession, file_object: File) -> D
     return DownloadedFile(file_object.main_dir, file_object.user_dir, file_object.name)
 
 
-async def get_files(file_objects: list[File] | File) -> list[DownloadedFile]:
-    if isinstance(file_objects, File):
+async def get_files(file_objects: list[FileModel] | FileModel) -> list[DownloadedFile]:
+    if isinstance(file_objects, FileModel):
         file_objects = [file_objects]
 
     file_models = []

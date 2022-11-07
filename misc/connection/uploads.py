@@ -1,6 +1,5 @@
-from vkbottle import API, Bot, DocMessagesUploader
+from vkbottle import API, Bot, BotBlueprint
 from vkbottle_types.objects import MessagesForward
-from typing import Tuple, List, Optional
 from aiohttp import ClientSession
 from pathlib import Path
 from random import randint
@@ -14,9 +13,9 @@ def get_valid_link(response):
     return f'doc{owner}_{doc_id}{("_" + access_key) if access_key else ""}'
 
 
-async def upload(docs: List[Path], user_api: API, bot: Bot,
+async def upload(docs: list[Path], user_api: API, bot: Bot | BotBlueprint,
                  localization, peer_id, rename: bool = False
-                 ) -> Tuple[List[str],bool]:
+                 ) -> tuple[list[str], bool]:
     have_big_file = any(file.stat().st_size > 220 * 1024 * 1024 for file in docs)
     files = []
     if have_big_file:
@@ -38,7 +37,7 @@ async def upload(docs: List[Path], user_api: API, bot: Bot,
                 files.append(get_valid_link(dump))
 
     if not files:
-        return files, have_big_file
+        return [], False
 
     if have_big_file:
         text = localization.TID_FILES_LOADED_VIA_USERAPI if len(files) > 1 else localization.TID_FILE_LOADED_VIA_USERAPI
@@ -50,7 +49,8 @@ async def upload(docs: List[Path], user_api: API, bot: Bot,
                 random_id=randint(1, 2345678))])
 
         result = MessagesForward(peer_id=470988909,
-                                 conversation_message_ids=[message.items[0].conversation_message_id]).json()
+                                 conversation_message_ids=[message.items[0].conversation_message_id]
+                                 ).json()
     else:
         result = files
 

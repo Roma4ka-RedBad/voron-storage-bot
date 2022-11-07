@@ -4,7 +4,7 @@ from vkbottle.bot import Bot
 from pytz import timezone
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from misc.server import Server
+from misc.models.server import Server
 from misc.models.scheduler import Scheduler
 from middlewares import registrate_middlewares
 
@@ -23,7 +23,11 @@ async def main():
     for blueprint in load_blueprints_from_package('blueprints'):
         blueprint.load(bot)
 
-    await bot.run_polling()
+    try:
+        await bot.run_polling()
+    except (SystemExit, KeyboardInterrupt):
+        await server.close()
+        print('Бот остановлен')
  
 
 if __name__ == '__main__':

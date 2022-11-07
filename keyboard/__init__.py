@@ -5,5 +5,4 @@ __all__ = [
     'compressed_photos_keyboard',
     'audio_keyboard',
     'converts_keyboard'
-
     ]

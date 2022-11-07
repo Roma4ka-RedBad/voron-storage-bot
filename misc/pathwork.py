@@ -3,11 +3,8 @@ import shutil
 from typing import List, Tuple, Any
 from vkbottle.bot import Message
 
-from misc.server import Server
-from misc.models.downloadable_file import File
 from misc.connection.downloads import get_files
-from misc.models.scheduler import Scheduler
-from misc.models.storage import FileStorage
+from misc.models import Scheduler, DownloadedFile, Server, FileModel, FileStorage
 from misc.tools import remove_dir_and_file
 
 
@@ -16,14 +13,14 @@ async def download_files(message: Message,
                          file_objects: List[Tuple[str, Any]],
                          scheduler: Scheduler,
                          storage: FileStorage,
-                         config):
+                         config) -> list[DownloadedFile]:
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_id}/{message.conversation_message_id}"
     if not os.path.exists(f"{main_dir}/{user_dir}"):
         os.makedirs(f"{main_dir}/{user_dir}")
     await scheduler.create_task(
         remove_dir_and_file,
-        [storage, message.conversation_message_id, message.from_id, config, server],
+        [storage, message.conversation_message_id, message.from_id, config],
         (message.from_id, message.conversation_message_id),
         minutes=config.UFS.wait_for_delete_dir)
 
@@ -47,7 +44,7 @@ async def download_files(message: Message,
         else:
             continue
 
-        file = File(
+        file = FileModel(
             name=filename, main_dir=main_dir, user_dir=user_dir, url=FileObject.url,
             ext=extension, size=size)
 

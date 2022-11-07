@@ -1,7 +1,7 @@
 from vkbottle import BaseMiddleware, API
 from vkbottle.bot import Message, Bot
 
-from misc.server import Server
+from misc.models.server import Server
 from misc.models.storage import FileStorage
 from misc.models.scheduler import Scheduler
 

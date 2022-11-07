@@ -3,6 +3,7 @@ from asyncio.exceptions import TimeoutError
 from aiohttp.client_exceptions import ContentTypeError
 from aiohttp import ClientSession, ClientTimeout
 
+
 class Server:
     def __init__(self, address: str):
         self.session = ClientSession(timeout=ClientTimeout(total=0))

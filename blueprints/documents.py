@@ -1,4 +1,4 @@
-from vkbottle import GroupEventType
+from vkbottle import GroupEventType, API
 from vkbottle.bot import Blueprint, Message, MessageEvent
 from pathlib import Path
 
@@ -6,16 +6,15 @@ from keyboard import converts_keyboard
 from misc.custom_rules import PayloadRule
 from misc.pathwork import download_files
 from misc.connection.uploads import upload
-from misc.models.storage import FileStorage
-from misc.models.scheduler import Scheduler
+from misc.models import FileStorage, Server, Scheduler
 from misc.tools import remove_dir_and_file
 
-bp = Blueprint('some documents convert commands')
+bp = Blueprint('all documents convert commands')
 
 
 @bp.on.private_message(attachment=['doc', 'photo', 'video', 'audio', 'wall', 'market'])
-async def documents_handler(message: Message, server, localization, userdata, config, scheduler: Scheduler,
-                            file_storage: FileStorage):
+async def documents_handler(message: Message, server: Server, file_storage: FileStorage, scheduler: Scheduler,
+                            config, localization, userdata):
     files = []
     for file in message.attachments:
         if file.audio:
@@ -32,12 +31,11 @@ async def documents_handler(message: Message, server, localization, userdata, co
     if files is None:
         await message.answer('Я запрещаю отправлять файлы больше 1ГБ без премиума!')
         return
+
     user = (await bp.api.users.get(user_ids=[message.from_id]))[0]
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
 
-    response = await server.send_message(
-        f'converts',
-        [{'path': str(file.get_dir())} for file in files])
+    response = await server.send_message(f'converts', [{'path': str(file.get_dir())} for file in files])
     if not response.status:
         if isinstance(response.error_msg, str):
             await message.reply(localization[response.error_msg].format(name=nickname))
@@ -46,6 +44,7 @@ async def documents_handler(message: Message, server, localization, userdata, co
                 localization[response.error_msg.tid].format(count=response.error_msg.files_count,
                                                             maximum=response.error_msg.maximum))
         return
+
     file_storage.put(message.from_id, message.conversation_message_id, response.content)
     buttons = file_storage.get_converts(message.from_id, message.conversation_message_id)
     keyboard = converts_keyboard(buttons, localization, message.conversation_message_id)
@@ -56,19 +55,16 @@ async def documents_handler(message: Message, server, localization, userdata, co
         await message.reply(localization.TID_WORK_TEXT.format(name=nickname), keyboard=keyboard)
 
 
-@bp.on.raw_event(
-    GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
-        {'type': 'doc_convert'}))
-async def convert_documents_handler(
-        event: MessageEvent, user_api, bot, userdata, localization, payload, server, config,
-        file_storage):
-    await event.edit_message(
-        keep_forward_messages=True,
-        keyboard='[]',
-        message=localization.TID_STARTWORK)
+@bp.on.raw_event(GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule({'type': 'doc_convert'}))
+async def convert_documents_handler(event: MessageEvent, user_api: API, server: Server, file_storage: FileStorage,
+                                    userdata, localization, payload, config):
+    await event.edit_message(keep_forward_messages=True,
+                             keyboard='[]',
+                             message=localization.TID_STARTWORK)
 
-    files = file_storage.get_files(event.user_id, payload.msg_id)
     prepared = []
+    files = file_storage.get_files(event.user_id, payload.msg_id)
+
     for file in files:
         if payload.convert_to in files[file]:
             prepared.append({'path': file})
@@ -77,40 +73,31 @@ async def convert_documents_handler(
         await event.send_message(localization.TID_STARTWORK_FILENOTFOUND)
         return
 
-    result = await server.send_message(
-        f'convert/{payload.convert_to}',
-        file=prepared,
-        metadata={
-            'compress_to_archive': True,
-            'archive_only': True
-            })
+    result = await server.send_message(endpoint=f'convert/{payload.convert_to}',
+                                       file=prepared,
+                                       metadata={'compress_to_archive': True,
+                                                 'archive_only': True})
 
     user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
     if result.status:
-        done, loaded_by_userapi = await upload(
-            [Path(result.content.result)],
-            user_api, bot, localization,
-            event.peer_id,
-            payload.convert_to in ['mp3', 'ogg', 'waw'])
+        done, loaded_by_userapi = await upload([Path(result.content.result)], user_api, bp, localization,
+                                               event.peer_id, payload.convert_to in ['mp3', 'ogg', 'waw'])
 
         text = localization.TID_STARTWORK_DONE.format(name=f'[id{user.id}|{nickname}]')
 
         if loaded_by_userapi:
-            await event.send_message(text, forward_messages=done)
+            await event.send_message(text, forward=done)
         else:
             await event.send_message(text, attachment=done)
     else:
         await event.send_message(localization.TID_ERROR)
 
-    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config, server)
+    remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)
 
 
-@bp.on.raw_event(
-    GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule(
-        {'type': 'move_page'}))
-async def switch_page_handler(
-        event: MessageEvent, userdata, localization, payload, file_storage):
+@bp.on.raw_event(GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule({'type': 'move_page'}))
+async def switch_page_handler(event: MessageEvent, file_storage: FileStorage, userdata, localization, payload):
     buttons = file_storage.get_converts(event.user_id, payload.msg_id)
     keyboard = converts_keyboard(buttons, localization, payload.msg_id, page=payload.page)
 
@@ -119,6 +106,6 @@ async def switch_page_handler(
     else:
         user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
         nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
-        await event.edit_message(localization.TID_WORK_TEXT.format(name=nickname),
+        await event.edit_message(message=localization.TID_WORK_TEXT.format(name=nickname),
                                  keyboard=keyboard,
                                  keep_forward_messages=True)

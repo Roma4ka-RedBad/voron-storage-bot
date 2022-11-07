@@ -1,6 +1,5 @@
 import os
-from misc.server import Server
-from zipfile import is_zipfile
+from misc.models.server import Server
 
 
 class DownloadedFile:
@@ -19,9 +18,6 @@ class DownloadedFile:
         for file in files:
             if file == self.name:
                 return files.index(file)
-
-    def is_archive(self):
-        return is_zipfile(self.get_dir(full=True))
 
     @classmethod
     async def get_file_by_index_or_name(
