@@ -8,6 +8,7 @@ class Scheduler:
     def __init__(self, scheduler: AsyncIOScheduler, timezone):
         self.scheduler = scheduler
         self.timezone = timezone
+        self.scheduler.start()
 
     async def create_task(self, task_func: Callable[[Any], Any],
                           task_args: list,
@@ -21,10 +22,13 @@ class Scheduler:
                 id=task_id,
                 trigger=DateTrigger(
                     datetime.now(tz=self.timezone) + timedelta(**kwargs),
-                    timezone=self.timezone
-                    ),
-                misfire_grace_time=None
-                )
+                    timezone=self.timezone),
+                misfire_grace_time=None)
+
+        # просто вывод всех заданий, которые должны сработать
+        for job in self.scheduler.get_jobs():
+            print(self.scheduler.get_job(job.id))
+        print(self.scheduler.get_jobs())
 
     async def pause_task(self, task_id: tuple[int | str, int | str] | int | str):
         if task := self.scheduler.get_job(self.get_task_id(task_id)):
@@ -45,3 +49,7 @@ class Scheduler:
         if isinstance(task_id, (str, int)):
             return str(task_id)
         return f'{task_id[0]}_{task_id[1]}'
+
+    async def get(self, task):
+        task_id = self.get_task_id(task)
+        return self.scheduler.get_job(task_id)

@@ -22,7 +22,7 @@ async def download_files(message: Message,
         remove_dir_and_file,
         [storage, message.conversation_message_id, message.from_id, config],
         (message.from_id, message.conversation_message_id),
-        minutes=config.UFS.wait_for_delete_dir)
+        minutes=0.01) # config.UFS.wait_for_delete_dir)
 
     prepared_files = []
     for obj_type, FileObject in file_objects:

@@ -1,5 +1,7 @@
 from vkbottle import BaseMiddleware, API
 from vkbottle.bot import Message, Bot
+from pytz import timezone
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from misc.models.server import Server
 from misc.models.storage import FileStorage
@@ -9,14 +11,15 @@ from json import loads
 from box import Box
 from random import randint
 
-
 STORAGE = FileStorage()
+# я пробовал создавать его где угодно, из мейн функции тоже. Пусть лежит тут пока
+SCHEDULER = Scheduler(AsyncIOScheduler(), timezone('Europe/Moscow'))
 
 
 class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
     type = 'message'
     server: Server = None
-    scheduler: Scheduler = None
+    # scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     user_api: API
@@ -48,7 +51,7 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
             self.send(
                 {
                     'server': self.__class__.server,
-                    'scheduler': self.__class__.scheduler,
+                    'scheduler': SCHEDULER,
                     'userdata': userdata.content.__data__,
                     'localization': self.__class__.localizations[
                         userdata.content.__data__.language_code],
@@ -63,7 +66,7 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
 class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
     type = 'callback'
     server: Server = None
-    scheduler: Scheduler = None
+    # scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     bot: Bot  # callback event не типизирован, поэтому для запросов к вк апи я это необходимо
@@ -94,7 +97,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
             self.send(
                 {
                     'server': self.__class__.server,
-                    'scheduler': self.__class__.scheduler,
+                    'scheduler': SCHEDULER,
                     'userdata': userdata.content.__data__,
                     'localization': self.__class__.localizations[
                         userdata.content.__data__.language_code],
