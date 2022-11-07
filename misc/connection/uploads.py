@@ -14,7 +14,9 @@ def get_valid_link(response):
     return f'doc{owner}_{doc_id}{("_" + access_key) if access_key else ""}'
 
 
-async def upload(docs: List[Path], user_api: API, bot: Bot, localization, peer_id) -> Tuple[List[str], bool]:
+async def upload(docs: List[Path], user_api: API, bot: Bot,
+                 localization, peer_id, rename: bool = False
+                 ) -> Tuple[List[str],bool]:
     have_big_file = any(file.stat().st_size > 220 * 1024 * 1024 for file in docs)
     files = []
     if have_big_file:
@@ -26,11 +28,13 @@ async def upload(docs: List[Path], user_api: API, bot: Bot, localization, peer_i
 
     async with ClientSession() as session:
         for filepath in docs:
+            if rename and filepath.suffix == '.zip':
+                filepath = filepath.rename(str(filepath) + '1')
+            name = filepath.name
             async with session.post(server.upload_url,
                                     data={'file': filepath.open('rb')}) as request:
                 response = await request.json()
-                dump = await api.docs.save(file=response['file'], title=filepath.name)
-                print(dump)
+                dump = await api.docs.save(file=response['file'], title=name)
                 files.append(get_valid_link(dump))
 
     if not files:
