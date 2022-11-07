@@ -64,9 +64,10 @@ async def create_response(status: bool, content=None, error_msg: str | dict = No
         "status": status
     }
 
-    if status:
+    if content:
         response['content'] = content
-    else:
+
+    if error_msg:
         response['error_msg'] = error_msg
 
     return response

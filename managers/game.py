@@ -31,6 +31,7 @@ class GameManager:
                                                    build_v=raw_version[1], revision_v=raw_version[2])
                 else:
                     print('Skipping...')
+
             elif game_data.server_code == 10:
                 print(f'Start maintenance! Time: {game_data.maintenance_end_time}')
 

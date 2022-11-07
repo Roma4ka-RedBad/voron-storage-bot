@@ -39,9 +39,8 @@ class Textures(Base):
 
             if output.returncode == 0:
                 output_name.replace(self.get_new_filename(to_format))
-                return {'converted': True, 'path': self.get_new_filename(to_format), 'TID': 'TID_STARTWORK_DONE'}
+                return {'converted': True, 'path': self.get_new_filename(to_format)}
             else:
-                print(output.stdout)
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
         elif to_format == 'sc':
-            return {'converted': False, 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}
+            return {'converted': False, 'error': '', 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}

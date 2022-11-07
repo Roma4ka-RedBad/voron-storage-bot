@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Tuple, Any
-from collections.abc import Callable, Coroutine, Awaitable
+from collections.abc import Callable
 
 
 class QueueFileObject(BaseModel):
@@ -14,6 +14,7 @@ class QueueFileObject(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
 
 '''
 Приоритеты:

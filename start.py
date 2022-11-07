@@ -3,7 +3,7 @@ import utils
 import asyncio
 import uvicorn
 from fastapi import FastAPI
-from colorama import init
+import colorama
 
 from box import Box
 from database import UserTable
@@ -15,42 +15,42 @@ from managers.game import GameManager
 from managers.convert import ConvertManager
 
 server = FastAPI()
-# Для совместимости цветов с Windows
-init()
 
 
 @server.post("/convert/{to_format}")
-async def convert(
-    file: FileObject | List[FileObject],
-    to_format: str,
-    metadata: Dict[Any, Any] = None):
+async def convert(file: FileObject | List[FileObject],
+                  to_format: str,
+                  metadata: Dict[Any, Any] = None):
     if isinstance(file, FileObject):
         file = [file]
     for _file in file:
         _file.set_config(config)
 
     metadata = Metadata(metadata)
-    result, content = await convert_manager.convert(file, to_format, metadata)
+    result, process_dir = await convert_manager.convert(file, to_format, metadata)
+    response_code = True
+    error_msg = None
 
-    if result:
-        if metadata.compress_to_archive:
-            paths = [obj['path'] for obj in result if obj['path']]
-            if metadata.archive_only:
-                result = await utils.compress_to_archive(
-                    content / 'archive.zip', config, file_paths=paths)
-            else:
-                result = result[0] if len(result) == 1 else result
-                if isinstance(result, list):
-                    result = await utils.compress_to_archive(
-                        content / 'archive.zip', config, file_paths=paths)
+    if metadata.check_first_file:
+        if not result[0]['path']:
+            response_code = False
+            error_msg = result[0]['tid']
 
-        return await utils.create_response(
-            True, content={
-                'result': result,
-                'process_dir': content,
-                })
-    else:
-        return await utils.create_response(False, error_msg=content)
+    if metadata.compress_to_archive:
+        paths = [obj['path'] for obj in result if obj['path']]
+        if metadata.archive_only:
+            result = await utils.compress_to_archive(
+                process_dir / 'archive.zip', config, file_paths=paths)
+        else:
+            paths = paths[0] if len(paths) == 1 else paths
+            if isinstance(paths, list):
+                result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=paths)
+                result = {'path': result, 'tid': None}
+
+    return await utils.create_response(response_code, content={
+        'result': result,
+        'process_dir': process_dir,
+    }, error_msg=error_msg)
 
 
 @server.get("/localization/{language_code}")
@@ -92,26 +92,13 @@ async def get_limit(file_format: str):
 @server.post("/converts")
 async def get_converts(files: List[FileObject]):
     content = []
-    total_count = 0
     for file in files:
         file.set_config(config)
-        file_converts, count_files = await utils.get_converts_by_file(file)
-        total_count += count_files
+        file_converts = await utils.get_converts_by_file(file)
         if file_converts:
-            content.append(
-                {
-                    'path': file.path,
-                    'converts': file_converts
-                    })
-    print(total_count)
-    if total_count > 100:
-        # на будущее, сделай возможность передавать максимальное кол-во файлов суда (для премиума)
-        # ну и если хочешь, чтобы в error_msg была только строка, то еще и user.id, language_code и т. п.
-        return await utils.create_response(
-            False, error_msg={
-                'tid': 'TID_TOO_MANY_FILES',
-                'files_count': total_count,
-                'maximum': 100
+            content.append({
+                'path': file.path,
+                'converts': file_converts
                 })
     if content:
         return await utils.create_response(True, content=content)
@@ -130,9 +117,10 @@ async def main():
     a = uvicorn.Server(server_config)
     await a.serve()
 
-
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))
     convert_manager = ConvertManager(config)
     game_manager = GameManager(("game.brawlstarsgame.com", 9339))
+
+    colorama.init()
     asyncio.run(main())

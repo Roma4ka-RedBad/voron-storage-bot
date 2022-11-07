@@ -5,7 +5,6 @@ import traceback
 from multiprocessing import Process, Pipe, cpu_count
 from collections import OrderedDict
 from collections.abc import Callable, Coroutine
-from colorama import init
 from logic_objects.queue_file import QueueFileObject
 
 
@@ -84,7 +83,6 @@ class QueueManager:
         while True:
             getter, putter = Pipe(duplex=False)
             tasks = await self.get(sort_function=sort_function)
-            print('Размер очереди:', len(self._queue))
 
             process = Process(target=self.start_process, args=(putter, tasks))
             process.start()
@@ -98,8 +96,6 @@ class QueueManager:
                     tasks[num].path_result = answer['path']
                 else:
                     tasks[num].error = answer['error']
-                    print(answer['error'])
-                if tasks[num].tid:
                     tasks[num].tid = answer['TID']
 
     @staticmethod
