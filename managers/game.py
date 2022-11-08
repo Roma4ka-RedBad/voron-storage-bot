@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 from box import Box
 from json import loads
@@ -44,19 +45,31 @@ class GameManager:
         return game_data
 
     async def handle_server_update(self, actual_version: str = None):
+        if not actual_version:
+            version = (await self.get_market_data(1)).version.split('.')
+        else:
+            version = actual_version.split('.')
         maintenance_started = False
-        while True:
-            app = (await self.get_market_data(1)).version.split('.')
-            game_data = await self.server_data(int(app[0]), int(app[1]), 1)
-            if game_data.server_code == 10 and not maintenance_started:
-                maintenance_started = True
-                yield game_data
 
-            if game_data.server_code == 7:
-                maintenance_started = False
-                if game_data.fingerprint.version != actual_version:
-                    actual_version = game_data.fingerprint.version
+        while True:
+            try:
+                game_data = await self.server_data(int(version[0]), int(version[1]), 1)
+                if game_data.server_code == 10 and not maintenance_started:
+                    maintenance_started = True
                     yield game_data
+
+                if maintenance_started and game_data.server_code != 10:
+                    maintenance_started = False
+
+                if game_data.server_code == 7:
+                    if game_data.fingerprint.version != actual_version:
+                        actual_version = game_data.fingerprint.version
+                        yield game_data
+
+                if game_data.server_code == 8:
+                    version = (await self.get_market_data(1)).version.split('.')
+            except:
+                print(f'Ошибка в хендлере версий! Traceback: {traceback.format_exc()}')
 
             await asyncio.sleep(3)
 

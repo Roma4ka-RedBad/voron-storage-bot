@@ -19,9 +19,9 @@ async def get_converts_by_file(file: FileObject):
         }
 
         if len(archive_converts['archive_files']):
-            return archive_converts, len(archive_converts['archive_files'])
+            return archive_converts
     else:
-        return file.get_available_converts(), 1
+        return file.get_available_converts()
 
 
 async def compress_to_archive(archive_path: str, config: object,

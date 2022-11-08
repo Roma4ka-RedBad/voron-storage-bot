@@ -1,4 +1,5 @@
 import shutil
+import os
 
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, is_zipfile
@@ -19,7 +20,7 @@ class FileObject(BaseModel):
 
     def copy_to(self, filepath):
         if self.path.parent != Path(filepath):
-            filepath = shutil.copy(str(self.path), str(filepath))
+            filepath = shutil.copy(self.path.absolute(), str(filepath))
         else:
             filepath = self.path
 

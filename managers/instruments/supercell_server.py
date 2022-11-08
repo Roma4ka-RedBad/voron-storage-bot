@@ -46,6 +46,8 @@ class SupercellServer:
             for _ in range(5):
                 data[f'unk{_}'] = reader.read_int(32, False)
             data.maintenance_end_time = reader.read_int(32, False)
+            for _ in range(5, 14):
+                data[f'unk{_}'] = reader.read_int(32, False)
         elif data.server_code in [7, 8, 9, 16]:
             data.fingerprint = reader.read_string(32)
             data.redirect_host = reader.read_string(32)

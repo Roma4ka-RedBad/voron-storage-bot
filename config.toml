@@ -1,5 +1,6 @@
-[FILE_SIZE_LIMITS]
-default = 1024
+[FILE_LIMITS]
+default_size = 1024
+default_count = 100
 
 [UFS]
 path = '../ufs/'

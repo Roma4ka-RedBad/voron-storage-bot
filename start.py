@@ -14,6 +14,7 @@ from logic_objects import FileObject, UserObject, Metadata
 from managers.game import GameManager
 from managers.convert import ConvertManager
 
+
 server = FastAPI()
 
 
@@ -79,14 +80,27 @@ async def get_config():
     return await utils.create_response(True, content=config)
 
 
-@server.get("/limit/{file_format}")
-async def get_limit(file_format: str):
-    if file_format in config.FILE_SIZE_LIMITS:
-        result = config.FILE_SIZE_LIMITS[file_format]
-    else:
-        result = config.FILE_SIZE_LIMITS.default
+@server.post("/check_count")
+async def check_count(files: List[FileObject]):
+    response_code = True
+    error_msg = None
 
-    return await utils.create_response(True, content=result * 1024 * 1024)
+    result = {
+        'files_count': 0,
+        'maximum_count': config.FILE_LIMITS.default_count
+    }
+
+    for file in files:
+        if archive := file.get_archive():
+            result['files_count'] += archive.count()
+        else:
+            result['files_count'] += 1
+
+    if result['files_count'] > result['maximum_count']:
+        response_code = False
+        error_msg = "TID_TOO_MANY_FILES"
+
+    return await utils.create_response(response_code, content=result, error_msg=error_msg)
 
 
 @server.post("/converts")
@@ -99,7 +113,7 @@ async def get_converts(files: List[FileObject]):
             content.append({
                 'path': file.path,
                 'converts': file_converts
-                })
+            })
     if content:
         return await utils.create_response(True, content=content)
     else:
@@ -110,12 +124,13 @@ async def main():
     for core in convert_manager.queue.cores:
         asyncio.create_task(core)
 
-    asyncio.create_task(game_manager.init_prod_handler())
+    game_tasks = set()
+    game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
 
-    # server_config = uvicorn.Config(server, host="192.168.0.127", port=80)
     server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
     a = uvicorn.Server(server_config)
     await a.serve()
+
 
 if __name__ == '__main__':
     config = Box(toml.load('config.toml'))

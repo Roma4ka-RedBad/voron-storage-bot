@@ -42,5 +42,5 @@
   "TID_FILES_LOADED_VIA_USERAPI": "Файлы загружены таким образом, так как один из них превышает 200МБ",
   "TID_SET_LANGUAGE": "Set Language",
   "TID_DONE": "Done!",
-  "TID_TOO_MANY_FILES": "You sent too many files ({count}) The maximum number of files: {maximum}"
+  "TID_TOO_MANY_FILES": "You sent too many files ({files_count})\nThe maximum number of files: {maximum_count}"
 }
