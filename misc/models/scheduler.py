@@ -13,7 +13,7 @@ class Scheduler:
             self.scheduler.add_job(
                 func=task_func,
                 args=task_args,
-                id=task_id,
+                id=str(task_id),
                 trigger=DateTrigger(
                     datetime.now(tz=self.timezone) + timedelta(**kwargs),
                     timezone=self.timezone

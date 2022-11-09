@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from misc.models import Server, Scheduler, FilesStorage
 
 from aiogram import BaseMiddleware, Bot
-from aiogram.types import TelegramObject
+from aiogram.types import TelegramObject, Update
 
 
 class Middleware(BaseMiddleware):
@@ -28,9 +28,9 @@ class Middleware(BaseMiddleware):
         if config := await data['server'].send_msg('config'):
             data['server_config'] = config.content
 
-        if from_user := getattr(obj, 'from_user'):
+        if from_user := getattr(obj, 'from_user', None):
             if user := await data['server'].send_msg('user/get', tg_id=from_user.id):
-                data['user_data'] = user.content.__data__
+                data['user_data'] = user.content
                 data['user_localization'] = (
                     await data['server'].send_msg(f'localization/{data["user_data"].language_code}')
                 ).content

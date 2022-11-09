@@ -1,5 +1,3 @@
-import os
-
 from pathlib import Path
 from aiogram.types.message import Message
 from misc.models.server import Server
@@ -14,19 +12,19 @@ class DownloadedFile:
         self.message = message
         self.bot_answer = None
         self.target_files = []
+        self.converts = None
 
     def is_archive(self):
         return is_zipfile(self.path) or is_rarfile(self.path)
 
     async def get_converts(self, server: Server):
-        converts = await server.send_msg('converts', [{
+        self.converts = await server.send_msg('converts', [{
             'path': str(self.path)
         }])
         if self.is_archive():
-            if converts.status:
-                for archive_file in converts.content.converts.archive_files:
+            if self.converts.status:
+                for archive_file in self.converts.content[0].converts.archive_files:
                     self.target_files.append(archive_file.name)
-        return converts
 
     def get_index_by_target_filename(self, archive_filename: str):
         return self.target_files.index(archive_filename)

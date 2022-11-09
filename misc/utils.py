@@ -12,8 +12,7 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
     if message.audio:
         document = message.audio
 
-    optimal_file_size = await server.send_msg(f"limit/{document.file_name.split('.')[-1]}")
-    if document.file_size < optimal_file_size.content:
+    if document.file_size < config.FILE_LIMITS.default_size * 1024 * 1024:
         main_dir = f"{config.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"
         if not os.path.exists(f"{main_dir}/{user_dir}"):
@@ -21,11 +20,12 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
 
         file = await bot.get_file(document.file_id)
         shutil.copy(file.file_path, f"{main_dir}/{user_dir}/{document.file_name}")
+        file = DownloadedFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
+        data = await server.send_msg("check_count", [{'path': str(file.path)}])
+        return data.status, file, getattr(data, 'error_msg', None), data.content
 
-        return DownloadedFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
 
-
-async def set_commands(bot: Bot, localization, message: Message):
+async def set_commands(bot: Bot, localization, chat_id: int):
     default = []
     for command in localization.TID_START_COMMANDS:
         default.append(BotCommand(command=command[0], description=command[1]))
@@ -33,7 +33,7 @@ async def set_commands(bot: Bot, localization, message: Message):
     data = [
         (
             default,
-            BotCommandScopeChat(chat_id=message.chat.id)
+            BotCommandScopeChat(chat_id=chat_id)
         )
     ]
 

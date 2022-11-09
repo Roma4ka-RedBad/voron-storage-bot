@@ -11,5 +11,5 @@ async def setname_waitname(message: Message, server: Server, state: FSMContext, 
         return await message.answer(text='Подключение к серверу отсутствует!')
 
     await message.answer(user_localization.TID_SETNAME_DONE.format(
-        name=user.content.__data__.nickname
+        name=user.content.nickname
     ))

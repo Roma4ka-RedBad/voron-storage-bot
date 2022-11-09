@@ -9,7 +9,6 @@ from aiogram.dispatcher.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from handlers import register_routers
-from misc.utils import set_commands
 from misc.models import Server, Scheduler, FilesStorage
 
 logger = logging.getLogger(__name__)

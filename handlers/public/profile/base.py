@@ -2,11 +2,17 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode, hbold
 
 from misc.models import Server
+from keyboards.profile import profile_kb
 
 
 async def command_profile(message: Message, server: Server, user_data, user_localization):
     if not user_data:
         return await message.answer(text='Подключение к серверу отсутствует!')
+
+    if user_data.language_code == 'ru':
+        user_data.language_code = 'en'
+    else:
+        user_data.language_code = 'ru'
 
     await message.answer(text=user_localization.TID_PROFILE_TEXT.format(
         name=message.from_user.first_name,
@@ -17,4 +23,4 @@ async def command_profile(message: Message, server: Server, user_data, user_loca
         rank=hbold(user_data.rank),
         warnings=hbold(user_data.warns),
         bind=hcode(user_data.vk_id or user_localization.TID_FAIL)
-    ))
+    ), reply_markup=profile_kb(user_data.language_code, user_localization))
