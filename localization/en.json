@@ -3,7 +3,7 @@
   "TID_START_TEXT": "Hi, {name}! I’ll help you with your brawl stars files!",
   "TID_START_COMMANDS": [
     ["start", "Main Menu"],
-    ["versions", "Game version information"],
+    ["fingers", "Game version information"],
     ["download", "Download game file"],
     ["profile", "Your profile"],
     ["set_name", "Change nick in profile"],

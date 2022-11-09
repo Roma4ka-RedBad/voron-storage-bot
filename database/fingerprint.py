@@ -10,4 +10,4 @@ class Fingerprints(BaseModel):
     revision_v = IntegerField(null=False)
     sha = TextField(null=False)
     is_actual = BooleanField(default=True)
-    created_at = DateTimeField(default=datetime.now())
+    created_at = DateTimeField(default=datetime.now)

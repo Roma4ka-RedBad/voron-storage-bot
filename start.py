@@ -6,7 +6,7 @@ from fastapi import FastAPI
 import colorama
 
 from box import Box
-from database import UserTable
+from database import UserTable, FingerprintTable
 from localization import languages
 from typing import List, Dict, Any
 from logic_objects import FileObject, UserObject, Metadata
@@ -19,9 +19,7 @@ server = FastAPI()
 
 
 @server.post("/convert/{to_format}")
-async def convert(file: FileObject | List[FileObject],
-                  to_format: str,
-                  metadata: Dict[Any, Any] = None):
+async def convert(file: FileObject | List[FileObject], to_format: str, metadata: Dict[Any, Any] = None):
     if isinstance(file, FileObject):
         file = [file]
     for _file in file:
@@ -32,21 +30,20 @@ async def convert(file: FileObject | List[FileObject],
     response_code = True
     error_msg = None
 
-    if metadata.check_first_file:
-        if not result[0]['path']:
-            response_code = False
-            error_msg = result[0]['tid']
-
     if metadata.compress_to_archive:
         paths = [obj['path'] for obj in result if obj['path']]
         if metadata.archive_only:
-            result = await utils.compress_to_archive(
-                process_dir / 'archive.zip', config, file_paths=paths)
+            result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=paths)
         else:
-            paths = paths[0] if len(paths) == 1 else paths
-            if isinstance(paths, list):
+            if len(paths) > 1:
                 result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=paths)
-                result = {'path': result, 'tid': None}
+                result = [{'path': result, 'tid': None}]
+
+    if metadata.return_one_file:
+        result = result[0]
+        if not result['path']:
+            response_code = False
+            error_msg = result['tid']
 
     return await utils.create_response(response_code, content={
         'result': result,
@@ -66,13 +63,19 @@ async def set_user(data: UserObject):
     user = UserTable.get(vk_id=data.vk_id, tg_id=data.tg_id)
     setattr(user, data.set_key, data.set_value)
     user.save()
-    return await utils.create_response(True, content=user)
+    return await utils.create_response(True, content=user.__data__)
+
+
+@server.get("/fingerprints")
+async def get_fingerprints():
+    content = [finger.__data__ for finger in FingerprintTable.select().execute()]
+    return await utils.create_response(True, content=content)
 
 
 @server.post("/user/get")
 async def get_user(data: UserObject):
     return await utils.create_response(
-        True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0])
+        True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0].__data__)
 
 
 @server.get("/config")
@@ -127,7 +130,7 @@ async def main():
     game_tasks = set()
     game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
 
-    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910)
+    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910, use_colors=True)
     a = uvicorn.Server(server_config)
     await a.serve()
 

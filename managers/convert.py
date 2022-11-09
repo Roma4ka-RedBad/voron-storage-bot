@@ -6,6 +6,8 @@ from logic_objects import FileObject, Metadata, QueueFileObject
 
 from managers.instruments.textures import Textures
 from managers.instruments.audios import Audios
+from managers.instruments.csv import Csv
+from managers.instruments.models import Models
 from managers.queues import QueueManager
 
 
@@ -18,15 +20,21 @@ class ConvertManager:
         result = []
 
         for file in files:
-            if to_format in self.config.CONVERTS['2D']:
+            if to_format in self.config.CONVERTS['2D'] and file.path.suffix[1:] in self.config.CONVERTS['2D']:
                 process = Textures(file, result_dir)
-                result.append(QueueFileObject(target=process.convert_to,
-                                              arguments=(to_format,)))
+                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
 
-            elif to_format in self.config.CONVERTS['AUDIO']:
+            elif to_format in self.config.CONVERTS['AUDIO'] and file.path.suffix[1:] in self.config.CONVERTS['AUDIO']:
                 process = Audios(file, result_dir, metadata)
-                result.append(QueueFileObject(target=process.convert_to,
-                                              arguments=(to_format,)))
+                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
+
+            elif to_format in self.config.CONVERTS['CSV'] and file.path.suffix[1:] in self.config.CONVERTS['CSV']:
+                process = Csv(file, result_dir)
+                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
+
+            elif to_format in self.config.CONVERTS['3D'] and file.path.suffix[1:] in self.config.CONVERTS['3D']:
+                process = Models(file, result_dir)
+                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
 
         result = await self.queue.wait_for_convert(result)
 

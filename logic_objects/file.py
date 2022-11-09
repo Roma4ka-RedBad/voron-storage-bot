@@ -1,6 +1,4 @@
 import shutil
-import os
-
 from pathlib import Path
 from zipfile import ZipFile, ZipInfo, is_zipfile
 from rarfile import RarFile, RarInfo, is_rarfile
@@ -26,9 +24,15 @@ class FileObject(BaseModel):
 
         return FileObject(path=filepath, config=self.config)
 
-    @classmethod
-    def create(cls, filepath, config):
-        open(filepath, 'w').close()
+    def open(self, mode):
+        return open(self.path, mode)
+
+    @staticmethod
+    def create(filepath, config, buffer: bytes = None):
+        file = open(filepath, 'wb')
+        if buffer:
+            file.write(buffer)
+        file.close()
         return FileObject(path=filepath, config=config)
 
     def get_available_converts(self):
@@ -119,7 +123,7 @@ class ArchiveObject:
 
     def write(self, filepath, arc_name=None):
         if arc_name is None:
-            arc_name=filepath.name
+            arc_name = Path(filepath).name
         self.archive.write(filepath, arcname=arc_name)
 
     def close(self):
