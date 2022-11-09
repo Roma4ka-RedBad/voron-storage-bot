@@ -14,7 +14,6 @@ from logic_objects import FileObject, UserObject, Metadata
 from managers.game import GameManager
 from managers.convert import ConvertManager
 
-
 server = FastAPI()
 
 
@@ -66,9 +65,29 @@ async def set_user(data: UserObject):
     return await utils.create_response(True, content=user.__data__)
 
 
+@server.get("/markets/{language_code}")
+async def get_markets(language_code: str):
+    content = {
+        1: await game_manager.get_market_data(1, language_code),
+        2: await game_manager.get_market_data(2, language_code)
+    }
+
+    return await utils.create_response(True, content=content)
+
+
 @server.get("/fingerprints")
 async def get_fingerprints():
-    content = [finger.__data__ for finger in FingerprintTable.select().execute()]
+    actual_finger = FingerprintTable.get(FingerprintTable.is_actual)
+    new_finger = await game_manager.server_data(actual_finger.major_v, actual_finger.build_v, actual_finger.revision_v)
+    content = {
+        'actual_finger': actual_finger.__data__,
+        'new_finger': new_finger,
+        'old_finger': FingerprintTable.get(FingerprintTable.id == (actual_finger.id - 1)).__data__,
+        'fingerprints': [finger.__data__ for finger in
+                         FingerprintTable.select().order_by(-FingerprintTable.major_v,
+                                                            -FingerprintTable.build_v).execute()],
+    }
+
     return await utils.create_response(True, content=content)
 
 

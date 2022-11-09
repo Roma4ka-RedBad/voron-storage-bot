@@ -1,18 +1,20 @@
 {
   "TID_PROFILE_TEXT": "{name}, ваш профиль:\n  НИК: {nickname}\n  ID: {bot_id}\n  {platform} ID: {platform_id}\n  РАНГ: {rank}\n  ПРЕДУПРЕЖДЕНИЯ: {warnings}\n  ПРИВЯЗКА: {bind}",
-  "TID_START_TEXT": "Привет, {name}! Я помогу тебе с файлами бравл старса!",
+  "TID_START_TEXT": "\uD83D\uDC4B Привет, {name}!\nЯ помогу тебе с файлами игры Brawl Stars!\n\uD83D\uDCA0 Через меня можно получить много полезной информации из игры и её сайтов!\n\n⌨ Просто отправь мне файл для начала работы или воспользуйся клавиатурой, которую я тебе отправил!\n❗ Бот всё ещё в разработке!",
   "TID_START_COMMANDS": [
-    ["start", "Главное меню"],
-    ["fingers", "Информация о версиях игры"],
-    ["download", "Скачать файл из игры"],
-    ["profile", "Профиль в боте"],
-    ["set_name", "Изменить ник в профиле"],
-    ["connect", "Привязать этот аккаунт к VK"]
+    ["start", "\uD83D\uDFE5 Главное меню"],
+    ["fingers", "\uD83D\uDFE7 Информация о версиях игры"],
+    ["download", "\uD83D\uDFE8 Скачать файл из игры"],
+    ["profile", "\uD83D\uDFE9 Профиль в боте"],
+    ["set_name", "\uD83D\uDFE6 Изменить ник в профиле"],
+    ["connect", "\uD83D\uDFEA Привязать этот аккаунт к VK"]
   ],
   "TID_SETNAME_TEXT": "{name}, как мне тебя называть?",
   "TID_SETNAME_DONE": "Хорошо, теперь я буду звать тебя {name}!",
+  "TID_FINGERS_TEXT": "Прошлая версия ( {old_version} ):\n   {old_sha}\n\nТекущая версия ( {actual_version} ):\n   {actual_sha}\n\nСерверная версия ( {new_version} ):\n   {new_sha}\n\n\nВсе сохранённые версии: {versions}",
+  "TID_MAINTENANCE": "ТЕХ. ПЕРЕРЫВ",
+  "TID_MAINTENANCE_ENDTIME": "До конца: {maintenance_end_time} сек.",
   "TID_WORK_TEXT": "{name}, выбери нужную команду для этого файла:",
-  "TID_WORK_ISARCHIVE": "{name}, данный файл является архивом, хотите декодировать все файлы в нём в один формат или каждый по отдельности?",
   "TID_BUTTON_ARCHIVE_ALL": "КОНВЕРТИРОВАТЬ ВСЁ В ОДИН ФОРМАТ",
   "TID_BUTTON_ARCHIVE_FILE": "ВЫБОР ФАЙЛА ДЛЯ КОНВЕРТИРОВАНИЯ",
   "TID_WORK_FILENOTEXIST": "{name}, для работы команды нужно прикрепить файл!",

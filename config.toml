@@ -8,6 +8,8 @@ wait_for_delete_dir = 5 # minutes
 
 [TG]
 token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
+telegraph_token = '5cade08f78e188681bd4306fab11d69ceb1bc202e91cb6d7cf7843aa2809'
+admins_ids = [1225973623]
 
 [VK]
 bot_token = 'vk1.a.DI9yXZSFf1FrqZ35rdX-gimXHgg-UissgBOF1YY32Rz7n9eUXgeZw218dzUB5v5wXwbfaGAnZTodVHt7icH_xZlOzIxsE4HDd6lMkMCBWqHdLDvU1k648gNfsNRc4_gFqpf12sVwrzSpj-jt-_DQvd7yRiFlug9CgFZdNLKI4E29xSfWfkeC2rjyXAM0conIl1LL4CsPQ3w4gXbFx4Ke5g'

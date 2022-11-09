@@ -1,16 +1,19 @@
 {
   "TID_PROFILE_TEXT": "{name}, your profile:\n  NICK: {nickname}\n  ID: {bot_id}\n  {platform} ID: {platform_id}\n  RANK: {rank}\n  WARNS: {warnings}\n  BINDING: {bind}",
-  "TID_START_TEXT": "Hi, {name}! I’ll help you with your brawl stars files!",
+  "TID_START_TEXT": "\uD83D\uDC4B Hi, {name}!\nI’ll help you with the Brawl Stars files!\n\uD83D\uDCA0 Through me you can get a lot of useful information from the game and its sites!\n\n⌨ Just send me the file to get started or use the keyboard I sent you!\n❗ The bot is still in development!",
   "TID_START_COMMANDS": [
-    ["start", "Main Menu"],
-    ["fingers", "Game version information"],
-    ["download", "Download game file"],
-    ["profile", "Your profile"],
-    ["set_name", "Change nick in profile"],
-    ["connect", "Bind this account to VK"]
+    ["start", "\uD83D\uDFE5 Main Menu"],
+    ["fingers", "\uD83D\uDFE7 Game version information"],
+    ["download", "\uD83D\uDFE8 Download game file"],
+    ["profile", "\uD83D\uDFE9 Your profile"],
+    ["set_name", "\uD83D\uDFE6 Change nick in profile"],
+    ["connect", "\uD83D\uDFEA Bind this account to VK"]
   ],
   "TID_SETNAME_TEXT": "{name}, what should I call you?",
   "TID_SETNAME_DONE": "Okay, now I’ll call you {name}!",
+  "TID_FINGERS_TEXT": "Last version ( {old_version} ):\n   {old_sha}\n\nActual version ( {actual_version} ):\n   {actual_sha}\n\nServer version ( {new_version} ):\n   {new_sha}\n\n\nAll saved versions: {versions}",
+  "TID_MAINTENANCE": "MAINTENANCE",
+  "TID_MAINTENANCE_ENDTIME": "To the end: {maintenance_end_time} sec.",
   "TID_WORK_TEXT": "{name}, choose the right command for this file:",
   "TID_BUTTON_ARCHIVE_ALL": "CONVERT ALL TO ONE FORMAT",
   "TID_BUTTON_ARCHIVE_FILE": "FILE SELECTION FOR CONVERSION",
@@ -38,8 +41,8 @@
   "TID_IS_START_PAGE": "It’s the front page!",
   "TID_IS_LAST_PAGE": "No more pages!",
   "TID_ARCHIVEISRENAMED": "VK does not allow downloading audio in archives. Before unpacking the archive, erase the number 1 at the end!",
-  "TID_FILE_LOADED_VIA_USERAPI": "Файл загружен таким образом, так как превышает 200МБ",
-  "TID_FILES_LOADED_VIA_USERAPI": "Файлы загружены таким образом, так как один из них превышает 200МБ",
+  "TID_FILE_LOADED_VIA_USERAPI": "The file is loaded this way, as it exceeds 200MB",
+  "TID_FILES_LOADED_VIA_USERAPI": "Files are uploaded this way because one of them exceeds 200MB",
   "TID_SET_LANGUAGE": "Set Language",
   "TID_DONE": "Done!",
   "TID_TOO_MANY_FILES": "You sent too many files ({files_count})\nThe maximum number of files: {maximum_count}"
