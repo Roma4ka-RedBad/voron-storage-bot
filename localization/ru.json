@@ -5,9 +5,10 @@
     ["start", "\uD83D\uDFE5 Главное меню"],
     ["fingers", "\uD83D\uDFE7 Информация о версиях игры"],
     ["download", "\uD83D\uDFE8 Скачать файл из игры"],
-    ["profile", "\uD83D\uDFE9 Профиль в боте"],
-    ["set_name", "\uD83D\uDFE6 Изменить ник в профиле"],
-    ["connect", "\uD83D\uDFEA Привязать этот аккаунт к VK"]
+    ["markets", "\uD83D\uDFE9 Информация об игре"],
+    ["profile", "\uD83D\uDFE6 Профиль в боте"],
+    ["set_name", "\uD83D\uDFEA Изменить ник в профиле"],
+    ["connect", "\uD83D\uDFEB Привязать этот аккаунт к VK"]
   ],
   "TID_SETNAME_TEXT": "{name}, как мне тебя называть?",
   "TID_SETNAME_DONE": "Хорошо, теперь я буду звать тебя {name}!",
@@ -45,5 +46,7 @@
   "TID_FILES_LOADED_VIA_USERAPI": "Файлы загружены таким образом, так как один из них превышает 200МБ",
   "TID_SET_LANGUAGE": "Изменить Язык",
   "TID_DONE": "Готово!",
-  "TID_TOO_MANY_FILES": "Вы отправили слишком много файлов ({files_count})\nМаксимум файлов: {maximum_count}"
+  "TID_TOO_MANY_FILES": "Вы отправили слишком много файлов ({files_count})\nМаксимум файлов: {maximum_count}",
+  "TID_MARKET_TEXT": "{game_title}\nВерсия: {game_version}\nСкачать:\n  App Store: {game_url_apple}\n  Play Market: {game_url_android}\nОбновлено: {game_update_time}\nОписание обновления:\n  {game_update_desc}",
+  "TID_COMMAND_IN_DEVELOPMENT": "Команда находится в разработке!"
 }

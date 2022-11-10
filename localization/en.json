@@ -5,9 +5,10 @@
     ["start", "\uD83D\uDFE5 Main Menu"],
     ["fingers", "\uD83D\uDFE7 Game version information"],
     ["download", "\uD83D\uDFE8 Download game file"],
-    ["profile", "\uD83D\uDFE9 Your profile"],
-    ["set_name", "\uD83D\uDFE6 Change nick in profile"],
-    ["connect", "\uD83D\uDFEA Bind this account to VK"]
+    ["markets", "\uD83D\uDFE9 Information about the game"],
+    ["profile", "\uD83D\uDFE6 Your profile"],
+    ["set_name", "\uD83D\uDFEA Change nick in profile"],
+    ["connect", "\uD83D\uDFEB Bind this account to VK"]
   ],
   "TID_SETNAME_TEXT": "{name}, what should I call you?",
   "TID_SETNAME_DONE": "Okay, now I’ll call you {name}!",
@@ -45,5 +46,7 @@
   "TID_FILES_LOADED_VIA_USERAPI": "Files are uploaded this way because one of them exceeds 200MB",
   "TID_SET_LANGUAGE": "Set Language",
   "TID_DONE": "Done!",
-  "TID_TOO_MANY_FILES": "You sent too many files ({files_count})\nThe maximum number of files: {maximum_count}"
+  "TID_TOO_MANY_FILES": "You sent too many files ({files_count})\nThe maximum number of files: {maximum_count}",
+  "TID_MARKET_TEXT": "{game_title}\nVersion: {game_version}\nDownload:\n  App Store: {game_url_apple}\n  Play Market: {game_url_android}\nUpdated in: {game_update_time}\nDescription of the update:\n  {game_update_desc}",
+  "TID_COMMAND_IN_DEVELOPMENT": "The command is in development!"
 }
