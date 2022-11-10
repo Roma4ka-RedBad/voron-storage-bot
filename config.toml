@@ -7,7 +7,7 @@ path = '../ufs/'
 wait_for_delete_dir = 5 # minutes
 
 [TG]
-token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
+token = '5535097693:AAFTDnpONATM12aoZCk498VwkD7x69f4swA'
 telegraph_token = '5cade08f78e188681bd4306fab11d69ceb1bc202e91cb6d7cf7843aa2809'
 admins_ids = [1225973623]
 
