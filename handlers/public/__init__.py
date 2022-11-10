@@ -17,6 +17,7 @@ from .work.callbacks.convert import work_convert
 from .profile.callbacks.set_language import profile_set_language
 from .fingers.base import command_fingers
 from .markets.base import command_markets
+from .download.base import command_download
 
 from states.user import UserStates
 
@@ -35,6 +36,7 @@ def create_public_router(server: Server, bot: Bot, scheduler: Scheduler, fstorag
     public_router.message.register(command_start, commands=["start"])
     public_router.message.register(command_fingers, commands=["fingers"])
     public_router.message.register(command_markets, commands=["markets"])
+    public_router.message.register(command_download, commands=["download", "connect"])
     public_router.message.register(command_profile, commands=["profile"])
     public_router.callback_query.register(profile_set_language, ProfileCallback.filter(F.action == "set_language"))
     public_router.message.register(command_setname, commands=["set_name"])

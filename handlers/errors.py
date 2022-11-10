@@ -10,14 +10,16 @@ async def error_handler(update: Update, bot: Bot, server_config):
     use_class, message_id = None, None
     if update.message:
         use_class = update.message
+        chat_id = use_class.chat.id
         message_id = use_class.message_id
     elif update.callback_query:
         use_class = update.callback_query
+        chat_id = use_class.message.chat.id
         message_id = use_class.message.message_id
 
     content = f"Дата: {datetime.now()}\n" \
               f"Пользователь: {use_class.from_user.full_name}\n" \
-              f"Чат: {use_class.chat.id} (сообщение: {message_id})\n" \
+              f"Чат: {chat_id} (сообщение: {message_id})\n" \
               f"Traceback:\n{traceback.format_exc()}"
     page = await telegraph.create_page('Traceback Error', content=content)
     await telegraph.close()

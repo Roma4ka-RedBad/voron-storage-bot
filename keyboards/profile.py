@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-class ProfileCallback(CallbackData, prefix="start"):
+class ProfileCallback(CallbackData, prefix="profile"):
     action: str
     language_code: str = None
 
