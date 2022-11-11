@@ -4,26 +4,37 @@ from box import Box
 
 class Server:
     def __init__(self, address: str):
-        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=0))
         self.address = address
         self.messenger = 'TG'
         self.timezone = None
 
+    async def request(self, url: str, return_type: str = 'box', data = None):
+        async with aiohttp.ClientSession() as session:
+            if data:
+                async with session.post(url, json=data) as resp:
+                    if resp.status == 200:
+                        if return_type == 'box':
+                            return Box(await resp.json())
+                        elif return_type == 'json':
+                            return await resp.json()
+                        elif return_type == 'text':
+                            return await resp.text()
+            else:
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        if return_type == 'box':
+                            return Box(await resp.json())
+                        elif return_type == 'json':
+                            return await resp.json()
+                        elif return_type == 'text':
+                            return await resp.text()
+
     async def send_msg(self, endpoint: str, *args, **kwargs):
-        if args:
-            args = args[0]
-
         try:
-            use_method = self.session.get(f'{self.address}/{endpoint}') if not args and not kwargs \
-                else self.session.post(f'{self.address}/{endpoint}', json=args or kwargs)
-
-            async with use_method as request:
-                response = await request.json()
-                response = Box(response)
+            if args:
+                args = args[0]
+            data = await self.request(f'{self.address}/{endpoint}', data=args or kwargs)
         except:
-            response = None
+            data = None
 
-        return response
-
-    async def close(self):
-        await self.session.close()
+        return data

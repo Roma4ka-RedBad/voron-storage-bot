@@ -15,7 +15,7 @@ async def command_markets(message: Message, server: Server, user_data, user_loca
         game_title=markets['1'].trackName,
         game_version=hcode(markets['1'].version),
         game_url_apple=markets['1'].trackViewUrl,
-        game_url_android=markets['1'].trackViewUrl,
+        game_url_android=markets['2'].link,
         game_update_time=hcode(game_date.strftime('%H:%M %d.%m.%Y')),
         game_update_desc=hitalic(markets['1'].releaseNotes)
     ))

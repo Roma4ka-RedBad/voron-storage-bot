@@ -39,7 +39,6 @@ async def main():
         await dp.start_polling(bot)
     finally:
         await storage.close()
-        await server.close()
         scheduler.shutdown()
         await bot.session.close()
 
