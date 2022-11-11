@@ -79,10 +79,11 @@ async def get_markets(language_code: str):
 async def get_fingerprints():
     actual_finger = FingerprintTable.get(FingerprintTable.is_actual)
     new_finger = await game_manager.server_data(actual_finger.major_v, actual_finger.build_v, actual_finger.revision_v)
+    old_finger = FingerprintTable.get_or_none(FingerprintTable.id == (actual_finger.id - 1))
     content = {
         'actual_finger': actual_finger.__data__,
         'new_finger': new_finger,
-        'old_finger': FingerprintTable.get(FingerprintTable.id == (actual_finger.id - 1)).__data__,
+        'old_finger': old_finger.__data__ if old_finger else None,
         'fingerprints': [finger.__data__ for finger in
                          FingerprintTable.select().order_by(-FingerprintTable.major_v,
                                                             -FingerprintTable.build_v).execute()],
@@ -149,7 +150,7 @@ async def main():
     game_tasks = set()
     game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
 
-    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910, use_colors=True)
+    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910, use_colors=True, access_log=True)
     a = uvicorn.Server(server_config)
     await a.serve()
 

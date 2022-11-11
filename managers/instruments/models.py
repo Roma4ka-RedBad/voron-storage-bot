@@ -29,3 +29,5 @@ class Models(Base):
                 return {'converted': True, 'path': self.get_new_filename(to_format, use_any_dir=self.file.path.parent)}
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
+        else:
+            return {'converted': False, 'error': '', 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}

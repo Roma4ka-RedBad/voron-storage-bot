@@ -11,4 +11,4 @@ class Users(BaseModel):
     rank = IntegerField(default=0)
     language_code = CharField(max_length=4, default='ru')
     warns = IntegerField(default=0)
-    created_at = DateTimeField(default=datetime.now())
+    created_at = DateTimeField(default=datetime.now)
