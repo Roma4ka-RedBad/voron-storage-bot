@@ -38,7 +38,7 @@ async def audio_convert_handler(event: MessageEvent, file_storage: FileStorage, 
     user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
     audios = [('audio', i.audio) for i in message.attachments]
-    files = await download_files(message, server, audios, scheduler, file_storage, config)
+    files = await download_files(message, server, audios, scheduler, file_storage, localization, config)
 
     if not files:
         await event.send_message(localization.TID_WORK_DOWNLOAD_AUDIOS_FAILED.format(name=f'[id{user.id}|{nickname}]'))

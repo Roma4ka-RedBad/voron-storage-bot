@@ -12,14 +12,12 @@ from box import Box
 from random import randint
 
 STORAGE = FileStorage()
-# я пробовал создавать его где угодно, из мейн функции тоже. Пусть лежит тут пока
-SCHEDULER = Scheduler(AsyncIOScheduler(), timezone('Europe/Moscow'))
 
 
 class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
     type = 'message'
     server: Server = None
-    # scheduler: Scheduler = None
+    scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     user_api: API
@@ -51,10 +49,10 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
             self.send(
                 {
                     'server': self.__class__.server,
-                    'scheduler': SCHEDULER,
-                    'userdata': userdata.content.__data__,
+                    'scheduler': self.__class__.scheduler,
+                    'userdata': userdata.content,
                     'localization': self.__class__.localizations[
-                        userdata.content.__data__.language_code],
+                        userdata.content.language_code],
                     'config': self.__class__.config,
                     'payload': payload,
                     'user_api': self.__class__.user_api,
@@ -66,7 +64,7 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
 class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
     type = 'callback'
     server: Server = None
-    # scheduler: Scheduler = None
+    scheduler: Scheduler = None
     localizations: dict | Box
     config: dict | Box
     bot: Bot  # callback event не типизирован, поэтому для запросов к вк апи я это необходимо
@@ -97,10 +95,10 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
             self.send(
                 {
                     'server': self.__class__.server,
-                    'scheduler': SCHEDULER,
-                    'userdata': userdata.content.__data__,
+                    'scheduler': self.__class__.scheduler,
+                    'userdata': userdata.content,
                     'localization': self.__class__.localizations[
-                        userdata.content.__data__.language_code],
+                        userdata.content.language_code],
                     'config': self.__class__.config,
                     'payload': Box(event.object.payload),
                     'user_api': self.__class__.user_api,

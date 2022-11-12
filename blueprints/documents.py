@@ -27,9 +27,8 @@ async def documents_handler(message: Message, server: Server, file_storage: File
     if not files:
         return
 
-    files = await download_files(message, server, files, scheduler, file_storage, config)
+    files = await download_files(message, server, files, scheduler, file_storage, localization, config)
     if files is None:
-        await message.answer('Я запрещаю отправлять файлы больше 1ГБ без премиума!')
         return
 
     user = (await bp.api.users.get(user_ids=[message.from_id]))[0]
@@ -57,7 +56,7 @@ async def documents_handler(message: Message, server: Server, file_storage: File
 
 @bp.on.raw_event(GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule({'type': 'doc_convert'}))
 async def convert_documents_handler(event: MessageEvent, user_api: API, server: Server, file_storage: FileStorage,
-                                    userdata, localization, payload, config):
+                                    userdata, localization, payload, config, scheduler):
     await event.edit_message(keep_forward_messages=True,
                              keyboard='[]',
                              message=localization.TID_STARTWORK)
@@ -73,6 +72,7 @@ async def convert_documents_handler(event: MessageEvent, user_api: API, server: 
         await event.send_message(localization.TID_STARTWORK_FILENOTFOUND)
         return
 
+    scheduler.pause_task(task_id=(event.user_id, payload.msg_id)).on(2).minutes()
     result = await server.send_message(endpoint=f'convert/{payload.convert_to}',
                                        file=prepared,
                                        metadata={'compress_to_archive': True,
@@ -91,7 +91,7 @@ async def convert_documents_handler(event: MessageEvent, user_api: API, server: 
         else:
             await event.send_message(text, attachment=done)
     else:
-        await event.send_message(localization.TID_ERROR)
+        await event.send_message(localization[result.error_msg])
 
     await remove_dir_and_file(file_storage, payload.msg_id, event.user_id, config)
 

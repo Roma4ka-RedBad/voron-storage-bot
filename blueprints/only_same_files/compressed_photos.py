@@ -35,7 +35,7 @@ async def convert_photos(event: MessageEvent, user_api: API, file_storage: FileS
     nickname = userdata.nickname or f'{user.first_name} {user.last_name}'
     for photo in message.attachments:
         photos.append(('photo', max(photo.photo.sizes, key=lambda x: (x.height, x.width))))
-    files = await download_files(message, server, photos, scheduler, file_storage, config)
+    files = await download_files(message, server, photos, scheduler, file_storage, localization, config)
     result = await server.send_message(endpoint=f'convert/{payload.convert_to}',
                                        file=[{'path': file.get_dir()} for file in files],
                                        metadata={'compress_to_archive': False})

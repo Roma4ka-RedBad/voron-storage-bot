@@ -13,16 +13,17 @@ async def download_files(message: Message,
                          file_objects: List[Tuple[str, Any]],
                          scheduler: Scheduler,
                          storage: FileStorage,
-                         config) -> list[DownloadedFile]:
+                         localization,
+                         config) -> list[DownloadedFile] | None:
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_id}/{message.conversation_message_id}"
     if not os.path.exists(f"{main_dir}/{user_dir}"):
         os.makedirs(f"{main_dir}/{user_dir}")
-    await scheduler.create_task(
+    scheduler.create_task(
         remove_dir_and_file,
         [storage, message.conversation_message_id, message.from_id, config],
         (message.from_id, message.conversation_message_id),
-        minutes=0.01) # config.UFS.wait_for_delete_dir)
+        minutes=config.UFS.wait_for_delete_dir)
 
     prepared_files = []
     for obj_type, FileObject in file_objects:
@@ -50,11 +51,17 @@ async def download_files(message: Message,
 
         prepared_files.append(file)
 
-    allowed_file_size = await server.send_message(f"limit/{prepared_files[0].ext}")
-    if sum(file.size for file in prepared_files) > allowed_file_size.content:
+    if sum(file.size for file in prepared_files) > 1024*1024*1024:
         return None
 
-    return await get_files(prepared_files)
+    files =  await get_files(prepared_files)
+    count = await server.send_message('check_count', [{'path': file.get_dir()} for file in files])
+    if count.status:
+        return files
+    else:
+        await message.reply(localization[count.error_msg].format(files_count=count.files_count,
+                                                                 maximum_count=count.maximum_count))
+        return None
 
 
 async def remove_dir(user_id: int | str, dir_id: int | str, config):

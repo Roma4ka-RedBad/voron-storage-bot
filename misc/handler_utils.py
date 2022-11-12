@@ -7,5 +7,4 @@ def commands_to_regex(*args) -> str:
     start = f'(({mention})|' + prefixes + ')'
     command = '|'.join(args)
 
-    print(f'{start}({command})')
     return f'{start}({command})'

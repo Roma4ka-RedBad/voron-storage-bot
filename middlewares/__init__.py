@@ -8,13 +8,13 @@ from misc.models.scheduler import Scheduler
 middlewares = [AddArgumentsToMessageEventMiddleware, AddArgumentsToCallbackEventMiddleware]
 
 
-async def registrate_middlewares(dispatcher: Bot, server: Server):
+async def registrate_middlewares(dispatcher: Bot, server: Server, scheduler: Scheduler):
     localizations = await server.send_message('localization/*')
     config = await server.send_message('config')
 
     for middleware in middlewares:
         middleware.server = server
-        # middleware.scheduler = scheduler
+        middleware.scheduler = scheduler
         middleware.localizations = localizations.content
         middleware.bot = dispatcher
         middleware.config = config.content
