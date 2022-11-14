@@ -48,5 +48,11 @@
   "TID_DONE": "Готово!",
   "TID_TOO_MANY_FILES": "Вы отправили слишком много файлов ({files_count})\nМаксимум файлов: {maximum_count}",
   "TID_MARKET_TEXT": "{game_title}\nВерсия: {game_version}\nСкачать:\n  App Store: {game_url_apple}\n  Play Market: {game_url_android}\nОбновлено: {game_update_time}\nОписание обновления:\n  {game_update_desc}",
-  "TID_COMMAND_IN_DEVELOPMENT": "Команда находится в разработке!"
+  "TID_COMMAND_IN_DEVELOPMENT": "Команда находится в разработке!",
+  "TID_VK_FIRST_COMMAND": " Привет, {name}!\nЯ помогу тебе с файлами игры Brawl Stars!\n Через меня можно получить много полезной информации из игры и её сайтов!\n\n⌨ Просто отправь мне файл для начала работы или воспользуйся клавиатурой, которую я тебе отправил!\n\nТы можешь получить список всех команд, написав \"Команды\". Подробнее о командах и боте в этой статье: [типа статья ы]\n❗ Бот всё ещё в разработке!",
+  "TID_VK_COMMANDS": "/команды -- список команд\n/версия -- информация о версиях игры\n/скачать [filename] -- скачать файл из игры\n\t\t  Вы можете написать несколько файлов через запятую!\n/об игре -- информация об игре из Play Market/App Store\n/профиль -- ваш профиль в боте\n\nКоманды профиля:\n/ник <nick> -- изменит ваш ник на <nick>\n/connect <TG id> -- Привязать этот аккаунт к TG",
+  "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, вы должны указать файл, который хотите скачать. Например:\n/скачать skins.csv\n\nВы также можете скачать сразу несколько файлов, написав их через запятую! Например:\n/скачать skins.csv, crow_geo.glb, fingerprint.json\n\nМожно использовать \"/get\" или \"/download\" вместо \"Скачать\":\n/get loading.sc, loading_tex.sc",
+  "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, вы должны указать новый никнейм. Например:\n/ник Воробушек",
+  "VK_COMMANDS_KEYBOARD": {"game_versions": "Версия игры", "download_file": "Скачать файл", "about_game": "Об игре", "profile":
+  "Профиль", "change_nickname": "Изменить ник", "bind_account": "Привязать к TG"}
 }

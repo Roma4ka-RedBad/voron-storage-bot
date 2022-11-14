@@ -44,6 +44,10 @@ class ConvertManager:
         process_dir = raw_files[0].path.parent / f'process_{random.randint(0, 1000000)}/'
         result_dir = raw_files[0].path.parent / 'result'
         files = []
+        raw_files = [file for file in raw_files if file.path.exists()]
+        if not raw_files:
+            return None, None
+
         only_one_archive = [True for obj in raw_files if obj.get_archive()].count(True) == 1
 
         os.makedirs(process_dir)

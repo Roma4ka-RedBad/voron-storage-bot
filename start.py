@@ -26,6 +26,13 @@ async def convert(file: FileObject | List[FileObject], to_format: str, metadata:
 
     metadata = Metadata(metadata)
     result, process_dir = await convert_manager.convert(file, to_format, metadata)
+
+    if result is None and process_dir is None:
+        return await utils.create_response(False, content={
+            'result': [],
+            'process_dir': '',
+            }, error_msg='TID_STARTWORK_FILENOTFOUND')
+
     response_code = True
     error_msg = None
 
@@ -59,7 +66,11 @@ async def get_localization(language_code: str):
 
 @server.post("/user/set")
 async def set_user(data: UserObject):
-    user = UserTable.get(vk_id=data.vk_id, tg_id=data.tg_id)
+    if data.vk_id:
+        user = UserTable.get(vk_id=data.vk_id)
+    elif data.tg_id:
+        user = UserTable.get(tg_id=data.tg_id)
+
     setattr(user, data.set_key, data.set_value)
     user.save()
     return await utils.create_response(True, content=user.__data__)
@@ -94,8 +105,12 @@ async def get_fingerprints():
 
 @server.post("/user/get")
 async def get_user(data: UserObject):
-    return await utils.create_response(
-        True, content=UserTable.get_or_create(vk_id=data.vk_id, tg_id=data.tg_id)[0].__data__)
+    if data.vk_id is not None:
+        user = UserTable.get_or_create(vk_id=data.vk_id)[0].__data__
+    elif data.tg_id is not None:
+        user = UserTable.get_or_create(tg_id=data.tg_id)[0].__data__
+
+    return await utils.create_response(True, content=user)
 
 
 @server.get("/config")
@@ -150,7 +165,7 @@ async def main():
     game_tasks = set()
     game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
 
-    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910, use_colors=True, access_log=True)
+    server_config = uvicorn.Config(server, host='127.0.0.1', port=8911, use_colors=True, access_log=True)
     a = uvicorn.Server(server_config)
     await a.serve()
 
