@@ -1,4 +1,5 @@
 from vkbottle import Keyboard
+from box import Box
 
 
 def compressed_photos_keyboard(message_id: int) -> str:
@@ -119,6 +120,32 @@ def audio_keyboard(message_id: int, localization) -> str:
                         }
 
                     ]
+                ]
+            )
+        .get_json()
+        )
+
+    return keyboard
+
+
+def commands_keyboard(localization) -> str:
+    tids = Box(localization.VK_COMMANDS_KEYBOARD)
+    keyboard = (
+        Keyboard(one_time=False, inline=False)
+        .schema(
+            [
+                [
+                    {'label': tids.game_versions, 'type': 'text', 'color': 'primary'},
+                    {'label': tids.about_game, 'type': 'text', 'color': 'primary'}
+                    ,
+
+                {'label': tids.download_file, 'type': 'text', 'color': 'primary'}],
+                [{'label': tids.profile, 'type': 'text', 'color': 'positive'}],
+                [
+                    {'label': tids.change_nickname, 'type': 'text', 'color': 'secondary'},
+                    {'label': tids.bind_account, 'type': 'text', 'color': 'secondary'}
+                    ],
+
                 ]
             )
         .get_json()

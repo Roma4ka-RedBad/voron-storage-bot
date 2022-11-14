@@ -25,3 +25,11 @@ async def get_files(file_objects: list[FileModel] | FileModel) -> list[Downloade
                 file_models.append(file)
 
     return file_models
+
+
+async def download_raw_file(url):
+    async with ClientSession() as session:
+        async with session.get(url) as response:
+            a = await response.read()
+
+    return a

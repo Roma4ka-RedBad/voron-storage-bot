@@ -31,7 +31,7 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
         # Документация говорит обращаться к аттрибутам класса через self.__class__
         userdata = await self.__class__.server.send_message(
             'user/get',
-            data={'vk_id': self.event.from_id})
+            vk_id=self.event.from_id)
         file_storage = STORAGE
 
         if userdata is None:
@@ -78,7 +78,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
         event = Box(self.event)
         userdata = await self.__class__.server.send_message(
             'user/get',
-            data={'vk_id': event.object.user_id})
+            vk_id = event.object.user_id)
         file_storage = STORAGE
 
         if userdata is None:
