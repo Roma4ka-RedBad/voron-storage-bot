@@ -1,7 +1,9 @@
-from vkbottle.bot import Blueprint, Message
+from vkbottle import GroupEventType
+from vkbottle.bot import Blueprint, Message, MessageEvent
 from misc.handler_utils import commands_to_regex, get_nickname
 from misc.models import Server
-from misc.custom_rules import StartFromRule
+from misc.custom_rules import StartFromRule, PayloadRule
+from keyboard import change_language_keyboard
 
 
 bp = Blueprint('profile commands')
@@ -12,18 +14,19 @@ bp.labeler.vbml_ignore_case = True
 @bp.on.message(regexp=commands_to_regex('profile', 'профиль'))
 async def profile_handler(message: Message, server: Server, userdata, localization):
     user = await message.get_user()
-    nickname = userdata.nickname or user.first_name
 
-    await message.reply(localization.TID_PROFILE_TEXT.format(**{
-        'name': f'[id{user.id}|{user.first_name}]',
-        'nickname': await get_nickname(userdata, bp.api),
-        'bot_id': userdata.id,
-        'platform': server.messenger,
-        'platform_id': message.from_id,
-        'rank': userdata.rank,
-        'warnings': userdata.warns,
-        'bind': userdata.tg_id or localization.TID_FAIL
-        }))
+    await message.reply(
+        message=localization.TID_PROFILE_TEXT.format(**{
+            'name': f'[id{user.id}|{user.first_name}]',
+            'nickname': await get_nickname(userdata, bp.api),
+            'bot_id': userdata.id,
+            'platform': server.messenger,
+            'platform_id': message.from_id,
+            'rank': userdata.rank,
+            'warnings': userdata.warns,
+            'bind': userdata.tg_id or localization.TID_FAIL
+        }),
+        keyboard=change_language_keyboard(localization))
 
 
 @bp.on.message(StartFromRule(regex_pattern=commands_to_regex('Изменить ник', 'Change nick', 'ник', 'nick')))
@@ -46,3 +49,25 @@ async def change_nickname_handler(message: Message, localization, server, userda
 @bp.on.message(regexp=commands_to_regex('Изменить ник', 'Bind to TG'))
 async def binding_without_arguments_handler(message: Message, localization):
     await message.reply(localization.TID_COMMAND_IN_DEVELOPMENT)
+
+
+@bp.on.raw_event(GroupEventType.MESSAGE_EVENT, MessageEvent, PayloadRule({'command': 'change_language'}))
+async def hello_callback_handler(event: MessageEvent, userdata, server):
+    user = (await bp.api.users.get(user_ids=[event.user_id]))[0]
+    lg_code = {'ru': 'en', 'en': 'ru'}[userdata.language_code]
+    userdata = (await server.send_message('user/set', vk_id=event.user_id, set_key='language_code',
+                                          set_value=lg_code)).content
+    localization = (await server.send_message(f'localization/{lg_code}')).content
+    await event.edit_message(
+        message=localization.TID_PROFILE_TEXT.format(**{
+            'name': f'[id{user.id}|{user.first_name}]',
+            'nickname': await get_nickname(userdata, bp.api),
+            'bot_id': userdata.id,
+            'platform': server.messenger,
+            'platform_id': event.user_id,
+            'rank': userdata.rank,
+            'warnings': userdata.warns,
+            'bind': userdata.tg_id or localization.TID_FAIL
+            }),
+        keyboard=change_language_keyboard(localization))
+
