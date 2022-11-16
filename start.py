@@ -9,7 +9,7 @@ from box import Box
 from database import UserTable, FingerprintTable
 from localization import languages
 from typing import List, Dict, Any
-from logic_objects import FileObject, UserObject, Metadata
+from logic_objects import FileObject, UserObject, Metadata, GameData
 
 from managers.game import GameManager
 from managers.convert import ConvertManager
@@ -31,7 +31,7 @@ async def convert(file: FileObject | List[FileObject], to_format: str, metadata:
         return await utils.create_response(False, content={
             'result': [],
             'process_dir': '',
-            }, error_msg='TID_STARTWORK_FILENOTFOUND')
+        }, error_msg='TID_STARTWORK_FILENOTFOUND')
 
     response_code = True
     error_msg = None
@@ -57,6 +57,24 @@ async def convert(file: FileObject | List[FileObject], to_format: str, metadata:
     }, error_msg=error_msg)
 
 
+@server.post("/search_files")
+async def search_files(game_data: GameData):
+    fingerprint = FingerprintTable.get_or_none(FingerprintTable.major_v == game_data.major_v,
+                                               FingerprintTable.build_v == game_data.build_v,
+                                               FingerprintTable.revision_v == game_data.revision_v)
+    if not fingerprint:
+        fingerprint = FingerprintTable.get(FingerprintTable.is_actual)
+
+    content = {
+        'files': await game_manager.search_files(game_data.search_query, fingerprint.sha),
+        'version': f"{fingerprint.major_v}.{fingerprint.build_v}.{fingerprint.revision_v}"
+    }
+    if not content['files']:
+        return await utils.create_response(False, error_msg="")
+    else:
+        return await utils.create_response(True, content=content)
+
+
 @server.get("/localization/{language_code}")
 async def get_localization(language_code: str):
     if language_code == '*':
@@ -66,6 +84,7 @@ async def get_localization(language_code: str):
 
 @server.post("/user/set")
 async def set_user(data: UserObject):
+    user = None
     if data.vk_id:
         user = UserTable.get(vk_id=data.vk_id)
     elif data.tg_id:
@@ -105,6 +124,7 @@ async def get_fingerprints():
 
 @server.post("/user/get")
 async def get_user(data: UserObject):
+    user = None
     if data.vk_id is not None:
         user = UserTable.get_or_create(vk_id=data.vk_id)[0].__data__
     elif data.tg_id is not None:
@@ -162,10 +182,11 @@ async def main():
     for core in convert_manager.queue.cores:
         asyncio.create_task(core)
 
+    await game_manager._init()
     game_tasks = set()
     game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
 
-    server_config = uvicorn.Config(server, host='127.0.0.1', port=8911, use_colors=True, access_log=True)
+    server_config = uvicorn.Config(server, host='127.0.0.1', port=8910, use_colors=True, access_log=True)
     a = uvicorn.Server(server_config)
     await a.serve()
 

@@ -3,7 +3,7 @@ import json
 
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
-from utils import async_reqget
+from utils import async_req
 
 
 class WebsiteMappings:
@@ -76,7 +76,7 @@ class MarketScraper:
             country=country
         )
 
-        request_result = await async_reqget(url, 'text')
+        request_result = await async_req(url, 'text')
 
         app = {
             'id': app_id,
@@ -117,7 +117,7 @@ class MarketScraper:
 
         url = "https://itunes.apple.com/lookup?%s=%s&country=%s&entity=software" % (id_field, app_id, country)
 
-        result = await async_reqget(url, 'text')
+        result = await async_req(url, 'text')
         if result:
             result = json.loads(result)
             app = result["results"][0]

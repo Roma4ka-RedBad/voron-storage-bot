@@ -49,17 +49,29 @@ async def compress_to_archive(archive_path: str, config: object,
     return archive.close()
 
 
-async def async_reqget(url: str, return_type: str, headers: dict = None):
-    async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.get(url) as resp:
-            if return_type == 'text':
-                return await resp.text()
+async def async_req(url: str, return_type: str, data=None):
+    async with aiohttp.ClientSession() as session:
+        if data:
+            async with session.post(url, json=data) as resp:
+                if resp.status == 200:
+                    if return_type == 'bytes':
+                        return resp.content
+                    elif return_type == 'json':
+                        return await resp.json()
+                    elif return_type == 'text':
+                        return await resp.text()
+        else:
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    if return_type == 'bytes':
+                        return resp.content
+                    elif return_type == 'json':
+                        return await resp.json()
+                    elif return_type == 'text':
+                        return await resp.text()
 
-            if return_type == 'json':
-                return await resp.json()
 
-
-async def create_response(status: bool, content=None, error_msg: str | dict = None):
+async def create_response(status: bool, content = None, error_msg = None):
     response = {
         "status": status
     }
