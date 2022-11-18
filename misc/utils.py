@@ -55,6 +55,25 @@ async def array_to_pages(array: dict, count: int = 6) -> dict:
     return pages
 
 
+async def safe_split_text(text: str, length: int = 4096, split_separator: str = ' ') -> list:
+    temp_text = text
+    parts = []
+    while temp_text:
+        if len(temp_text) > length:
+            try:
+                split_pos = temp_text[:length].rindex(split_separator)
+            except ValueError:
+                split_pos = length
+            if split_pos < length // 4 * 3:
+                split_pos = length
+            parts.append(temp_text[:split_pos])
+            temp_text = temp_text[split_pos:].lstrip()
+        else:
+            parts.append(temp_text)
+            break
+    return parts
+
+
 async def delete_message_with_dir(file_id: int, fstorage: FilesStorage, bot: Bot):
     try:
         file = await fstorage.get(file_id)
