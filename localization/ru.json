@@ -10,6 +10,14 @@
     ["set_name", "\uD83D\uDFEA Изменить ник в профиле"],
     ["connect", "\uD83D\uDFEB Привязать этот аккаунт к VK"]
   ],
+  "VK_COMMANDS_KEYBOARD": {
+    "game_versions": "Версия игры",
+    "download_file": "Скачать файл",
+    "about_game": "Об игре",
+    "profile": "Профиль",
+    "change_nickname": "Изменить ник",
+    "bind_account": "Привязать к TG"
+  },
   "TID_SETNAME_TEXT": "{name}, как мне тебя называть?",
   "TID_SETNAME_DONE": "Хорошо, теперь я буду звать тебя {name}!",
   "TID_FINGERS_TEXT": "Прошлая версия ( {old_version} ):\n   {old_sha}\n\nТекущая версия ( {actual_version} ):\n   {actual_sha}\n\nСерверная версия ( {new_version} ):\n   {new_sha}\n\n\nВсе сохранённые версии: {versions}",
@@ -53,6 +61,7 @@
   "TID_VK_COMMANDS": "/команды -- список команд\n/версия -- информация о версиях игры\n/скачать [filename] -- скачать файл из игры\n\t\t  Вы можете написать несколько файлов через запятую!\n/об игре -- информация об игре из Play Market/App Store\n/профиль -- ваш профиль в боте\n\nКоманды профиля:\n/ник <nick> -- изменит ваш ник на <nick>\n/connect <TG id> -- Привязать этот аккаунт к TG",
   "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, вы должны указать файл, который хотите скачать. Например:\n/скачать skins.csv\n\nВы также можете скачать сразу несколько файлов, написав их через запятую! Например:\n/скачать skins.csv, crow_geo.glb, fingerprint.json\n\nМожно использовать \"/get\" или \"/download\" вместо \"Скачать\":\n/get loading.sc, loading_tex.sc",
   "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, вы должны указать новый никнейм. Например:\n/ник Воробушек",
-  "VK_COMMANDS_KEYBOARD": {"game_versions": "Версия игры", "download_file": "Скачать файл", "about_game": "Об игре", "profile":
-  "Профиль", "change_nickname": "Изменить ник", "bind_account": "Привязать к TG"}
+  "TID_DOWNLOADFILES_TEXT": "Удалось найти {files_count} файл(-ов) из {game_version} версии:{files_name}",
+  "TID_DOWNLOADFILES_NOTFOUND": "Файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
+  "TID_DOWNLOADFILES_QUERYMISSING": "Поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения если хотите!"
 }

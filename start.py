@@ -70,7 +70,7 @@ async def search_files(game_data: GameData):
         'version': f"{fingerprint.major_v}.{fingerprint.build_v}.{fingerprint.revision_v}"
     }
     if not content['files']:
-        return await utils.create_response(False, error_msg="")
+        return await utils.create_response(False, error_msg="TID_DOWNLOADFILES_NOTFOUND")
     else:
         return await utils.create_response(True, content=content)
 
