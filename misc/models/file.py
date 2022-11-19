@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from aiogram.types.message import Message
 from misc.models.server import Server
@@ -6,7 +7,7 @@ from zipfile import is_zipfile
 from rarfile import is_rarfile
 
 
-class DownloadedFile:
+class DFile:
     def __init__(self, path, message: Message):
         self.path = Path(path)
         self.message = message
@@ -32,3 +33,32 @@ class DownloadedFile:
     def get_target_filename_by_index(self, index: int):
         if index is not None:
             return self.target_files[index]
+
+
+class IFile:
+    def __init__(self, path, message: Message, server_response):
+        self.path = Path(path)
+        self.message = message
+        self.server_response = server_response
+
+    async def get_text_file(self):
+        os.makedirs(self.path.absolute(), exist_ok=True)
+        file_path = (self.path / f'files_{self.server_response.version}.txt').absolute()
+        with open(file_path, 'w') as file:
+            file.write('\n'.join(self.server_response.files))
+            file.close()
+        return file_path
+
+    async def download(self, server: Server):
+        os.makedirs(self.path.absolute(), exist_ok=True)
+        version = self.server_response.version.split('.')
+        file = await server.send_msg('download_files', game_data={
+            'path': str(self.path),
+            'search_query': '|'.join(self.server_response.files),
+            'major_v': version[0],
+            'build_v': version[1],
+            'revision_v': version[2]
+        }, metadata={'compress_to_archive': True if len(self.server_response.files) > 1 else False})
+        if file:
+            if file.status:
+                return file.content if len(self.server_response.files) > 1 else file.content[0]

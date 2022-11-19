@@ -18,11 +18,13 @@ from .profile.callbacks.set_language import profile_set_language
 from .fingers.base import command_fingers
 from .markets.base import command_markets
 from .download.base import command_download
+from .download.callbacks.download_archive import download_archive
 
 from states.user import UserStates
 
 from keyboards.work import WorkCallback
 from keyboards.profile import ProfileCallback
+from keyboards.download import DownloadCallback
 
 
 def create_public_router(server: Server, bot: Bot, scheduler: Scheduler, fstorage: FilesStorage) -> Router:
@@ -36,7 +38,8 @@ def create_public_router(server: Server, bot: Bot, scheduler: Scheduler, fstorag
     public_router.message.register(command_start, commands=["start"])
     public_router.message.register(command_fingers, commands=["fingers"])
     public_router.message.register(command_markets, commands=["markets"])
-    public_router.message.register(command_download, commands=["download", "connect"])
+    public_router.message.register(command_download, commands=["download"])
+    public_router.callback_query.register(download_archive, DownloadCallback.filter(F.action == "archive"))
     public_router.message.register(command_profile, commands=["profile"])
     public_router.callback_query.register(profile_set_language, ProfileCallback.filter(F.action == "set_language"))
     public_router.message.register(command_setname, commands=["set_name"])

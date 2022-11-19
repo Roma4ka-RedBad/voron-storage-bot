@@ -11,12 +11,12 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
     if not server_config:
         return await cbq.message.answer(text='Подключение к серверу отсутствует!')
 
+    await scheduler.pause_task(callback_data.file_id)
     file = await fstorage.get(callback_data.file_id)
     if not file:
         return await cbq.answer(user_localization.TID_STARTWORK_FILENOTFOUND)
 
     await cbq.answer(user_localization.TID_STARTWORK)
-    await scheduler.pause_task(callback_data.file_id)
     convert_id = await fstorage.put_convert(callback_data.file_id)
 
     result = await server.send_msg(f'convert/{callback_data.to_format}', file={

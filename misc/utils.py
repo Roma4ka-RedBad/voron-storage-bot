@@ -4,7 +4,7 @@ import shutil
 from aiogram import Bot
 from aiogram.types import BotCommand, Message, BotCommandScopeChat
 
-from misc.models import Server, DownloadedFile, FilesStorage
+from misc.models import Server, DFile, FilesStorage, IFile
 
 
 async def download_file(message: Message, bot: Bot, server: Server, config):
@@ -20,9 +20,15 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
 
         file = await bot.get_file(document.file_id)
         shutil.copy(file.file_path, f"{main_dir}/{user_dir}/{document.file_name}")
-        file = DownloadedFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
+        file = DFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
         data = await server.send_msg("check_count", [{'path': str(file.path)}])
         return data.status, file, getattr(data, 'error_msg', None), data.content
+
+
+async def create_ifile(message: Message, server: Server, config, server_response):
+    main_dir = f"{config.UFS.path}{server.messenger}"
+    user_dir = f"{message.from_user.id}/{message.message_id}"
+    return IFile(f"{main_dir}/{user_dir}", message, server_response)
 
 
 async def set_commands(bot: Bot, localization, chat_id: int):
@@ -83,3 +89,9 @@ async def delete_message_with_dir(file_id: int, fstorage: FilesStorage, bot: Bot
         await bot.delete_message(file.message.chat.id, file.message.message_id)
     except:
         pass
+
+
+async def delete_ifile(file_id: int, fstorage: FilesStorage):
+    file = await fstorage.get(file_id)
+    await fstorage.delete(file_id)
+    shutil.rmtree(file.path, ignore_errors=True)

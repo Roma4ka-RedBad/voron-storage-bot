@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from misc.models import DownloadedFile
+from misc.models import DFile
 
 
 class WorkCallback(CallbackData, prefix="work"):
@@ -23,7 +23,7 @@ async def construct_convert_buttons(converts, file_id: int, subfile_id: int = No
     return buttons
 
 
-async def work_converts_keyb(file_converts, file: DownloadedFile, file_id: int, localization, by_archive: bool = False,
+async def work_converts_keyb(file_converts, file: DFile, file_id: int, localization, by_archive: bool = False,
                              page_index: int = 0):
     kb_obj = InlineKeyboardBuilder()
 

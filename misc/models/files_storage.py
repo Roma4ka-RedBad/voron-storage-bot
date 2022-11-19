@@ -1,4 +1,4 @@
-from .file import DownloadedFile
+from .file import DFile, IFile
 from datetime import datetime
 
 
@@ -7,7 +7,7 @@ class FilesStorage:
         self.storage = {}
         self.active_converts = []
 
-    async def put(self, file: DownloadedFile):
+    async def put(self, file: DFile | IFile):
         last_id = 0
         if len(list(self.storage)) > 0:
             last_id = list(self.storage)[-1] + 1
@@ -20,7 +20,7 @@ class FilesStorage:
         self.active_converts.append(key_id)
         return key_id
 
-    async def get(self, key_id: int) -> DownloadedFile:
+    async def get(self, key_id: int) -> DFile | IFile:
         try:
             return self.storage[key_id]
         except:
