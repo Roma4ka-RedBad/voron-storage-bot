@@ -75,6 +75,25 @@ async def search_files(game_data: GameData):
         return await utils.create_response(True, content=content)
 
 
+@server.post("/download_files")
+async def download_files(game_data: GameData, metadata: Dict[Any, Any] = None):
+    metadata = Metadata(metadata)
+    fingerprint = FingerprintTable.get_or_none(FingerprintTable.major_v == game_data.major_v,
+                                               FingerprintTable.build_v == game_data.build_v,
+                                               FingerprintTable.revision_v == game_data.revision_v)
+    if not fingerprint:
+        fingerprint = FingerprintTable.get(FingerprintTable.is_actual)
+    files = await game_manager.search_files(game_data.search_query, fingerprint.sha)
+    result = []
+    for file in files:
+        result.append(await game_manager.download_file(fingerprint.sha, file, result_path=game_data.path))
+
+    if metadata.compress_to_archive:
+        result = await utils.compress_to_archive(game_data.path / 'archive.zip', config, file_paths=result)
+
+    return await utils.create_response(True, content=result)
+
+
 @server.get("/localization/{language_code}")
 async def get_localization(language_code: str):
     if language_code == '*':

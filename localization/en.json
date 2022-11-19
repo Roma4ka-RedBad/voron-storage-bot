@@ -61,7 +61,11 @@
   "TID_VK_COMMANDS": "/commands -- list of commands\n/version -- game version information\n/download [filename] -- download game file\n\tYou can write several files separated by commas!\n/about -- info about the game from  Play Market/App Store\n/profile -- your profile\n\n/commands to work with your profile:\n/nick <nick> -- change your nick in profile to <nick>\n/bind <TG id> -- Bind this account to TG",
   "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, you should write a file to download. For example:\n/download skins.csv\n\nYou also can download several files. Just write it separating by commas! For example:\n/download skins.csv, crow_geo.glb, fingerprint.json\n\nYou can use \"get\" instead \"download\":\n/get loading.sc, loading_tex.sc",
   "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, you should enter a new nickname. For example:\n/nick Birdy",
-  "TID_DOWNLOADFILES_TEXT": "Удалось найти {files_count} файл(-ов) из {game_version} версии:{files_name}",
-  "TID_DOWNLOADFILES_NOTFOUND": "Файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
-  "TID_DOWNLOADFILES_QUERYMISSING": "Поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения если хотите!"
+  "TID_DOWNLOADFILES_TEXT": "{name}, could find {files_count} file(s) from {game_version} version:{files_name}\n\nYou can download the archive with these files by clicking on the button at the bottom.",
+  "TID_DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Download",
+  "TID_DOWNLOADFILES_START": "\uD83D\uDD52 Downloading files...",
+  "TID_DOWNLOADFILES_FILE": "Name: {file_name}\nVersion: {game_version}",
+  "TID_DOWNLOADFILES_FILES": "{name}, could find {files_count} file(s) from {game_version} version.\n\nThe search results were uploaded to a file.",
+  "TID_DOWNLOADFILES_NOTFOUND": "{name}, file(s) not found(-s)!\nTry changing the search query or game version!",
+  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, no search query found!\nYou can search for regular expressions if you want!"
 }

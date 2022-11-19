@@ -61,7 +61,11 @@
   "TID_VK_COMMANDS": "/команды -- список команд\n/версия -- информация о версиях игры\n/скачать [filename] -- скачать файл из игры\n\t\t  Вы можете написать несколько файлов через запятую!\n/об игре -- информация об игре из Play Market/App Store\n/профиль -- ваш профиль в боте\n\nКоманды профиля:\n/ник <nick> -- изменит ваш ник на <nick>\n/connect <TG id> -- Привязать этот аккаунт к TG",
   "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, вы должны указать файл, который хотите скачать. Например:\n/скачать skins.csv\n\nВы также можете скачать сразу несколько файлов, написав их через запятую! Например:\n/скачать skins.csv, crow_geo.glb, fingerprint.json\n\nМожно использовать \"/get\" или \"/download\" вместо \"Скачать\":\n/get loading.sc, loading_tex.sc",
   "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, вы должны указать новый никнейм. Например:\n/ник Воробушек",
-  "TID_DOWNLOADFILES_TEXT": "Удалось найти {files_count} файл(-ов) из {game_version} версии:{files_name}",
-  "TID_DOWNLOADFILES_NOTFOUND": "Файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
-  "TID_DOWNLOADFILES_QUERYMISSING": "Поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения если хотите!"
+  "TID_DOWNLOADFILES_TEXT": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии:{files_name}\n\nВы можете скачать архив с этими файлами нажав на кнопку снизу.",
+  "TID_DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Скачать",
+  "TID_DOWNLOADFILES_START": "\uD83D\uDD52 Загружаю файлы...",
+  "TID_DOWNLOADFILES_FILE": "Название: {file_name}\nВерсия: {game_version}",
+  "TID_DOWNLOADFILES_FILES": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии.\n\nРезультаты поиска загружены в файл.",
+  "TID_DOWNLOADFILES_NOTFOUND": "{name}, файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
+  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения если хотите!"
 }

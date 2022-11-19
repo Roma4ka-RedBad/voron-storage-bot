@@ -4,6 +4,7 @@ import traceback
 
 from box import Box
 from json import loads
+from pathlib import Path
 from database import FingerprintTable
 
 from utils import async_req
@@ -86,19 +87,21 @@ class GameManager:
 
             await asyncio.sleep(3)
 
-    async def download_file(self, fingerprint_sha: str, name: str):
-        if 'fingerprint' in name:
-            return_type = 'json'
+    async def download_file(self, fingerprint_sha: str, file_name: str, result_path: Path = None, return_type='bytes'):
+        request = await async_req(f"{self.assets_url}/{fingerprint_sha}/{file_name}", return_type)
+        if result_path:
+            result_path = (result_path / file_name.split('/')[-1]).absolute()
+            with open(result_path, 'wb') as file:
+                file.write(request)
+                file.close()
+            return result_path
         else:
-            return_type = 'bytes'
-
-        request = await async_req(f"{self.assets_url}/{fingerprint_sha}/{name}", return_type)
-        return request
+            return request
 
     async def search_files(self, search_query: str, fingerprint_sha: str):
-        fingerprint = await self.download_file(fingerprint_sha, 'fingerprint.json')
+        fingerprint = await self.download_file(fingerprint_sha, 'fingerprint.json', return_type='json')
         result = []
-        if 'fingerprint' in search_query:
+        if re.search(search_query, 'fingerprint.json') :
             result.append('fingerprint.json')
         for file in fingerprint['files']:
             try:

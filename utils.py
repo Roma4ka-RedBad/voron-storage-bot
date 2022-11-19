@@ -1,5 +1,6 @@
 from logic_objects import FileObject, ArchiveObject
 from typing import List
+from pathlib import Path
 import os
 import aiohttp
 
@@ -24,7 +25,7 @@ async def get_converts_by_file(file: FileObject):
         return file.get_available_converts()
 
 
-async def compress_to_archive(archive_path: str, config: object,
+async def compress_to_archive(archive_path: str | Path, config: object,
                               files_objects: List[FileObject] = None,
                               file_paths: list = None):
     archive = ArchiveObject(FileObject.create(archive_path, config), "w", "zip", compresslevel=10)
@@ -55,7 +56,7 @@ async def async_req(url: str, return_type: str, data=None):
             async with session.post(url, json=data) as resp:
                 if resp.status == 200:
                     if return_type == 'bytes':
-                        return resp.content
+                        return await resp.content.read()
                     elif return_type == 'json':
                         return await resp.json()
                     elif return_type == 'text':
@@ -64,7 +65,7 @@ async def async_req(url: str, return_type: str, data=None):
             async with session.get(url) as resp:
                 if resp.status == 200:
                     if return_type == 'bytes':
-                        return resp.content
+                        return await resp.content.read()
                     elif return_type == 'json':
                         return await resp.json()
                     elif return_type == 'text':

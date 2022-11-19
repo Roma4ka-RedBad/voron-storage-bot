@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from pathlib import Path
 
 
 class GameData(BaseModel):
@@ -6,3 +7,4 @@ class GameData(BaseModel):
     build_v: int = None
     revision_v: int = 1
     search_query: str = ''
+    path: Path = None
