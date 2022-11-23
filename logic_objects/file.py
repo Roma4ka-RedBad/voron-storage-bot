@@ -4,17 +4,14 @@ from zipfile import ZipFile, ZipInfo, is_zipfile
 from rarfile import RarFile, RarInfo, is_rarfile
 
 from pydantic import BaseModel
-from box import Box
 from copy import copy
+
+from logic_objects.config import Config
 
 
 class FileObject(BaseModel):
     path: Path
     target_file: str = None
-    config: Box = None
-
-    def set_config(self, config):
-        self.config = config
 
     def copy_to(self, filepath):
         if self.path.parent != Path(filepath):
@@ -22,22 +19,22 @@ class FileObject(BaseModel):
         else:
             filepath = self.path
 
-        return FileObject(path=filepath, config=self.config)
+        return FileObject(path=filepath)
 
     def open(self, mode):
         return open(self.path, mode)
 
     @staticmethod
-    def create(filepath, config, buffer: bytes = None):
+    def create(filepath, buffer: bytes = None):
         file = open(filepath, 'wb')
         if buffer:
             file.write(buffer)
         file.close()
-        return FileObject(path=filepath, config=config)
+        return FileObject(path=filepath)
 
     def get_available_converts(self):
-        converts = [copy(self.config.CONVERTS[group]) for group in self.config.CONVERTS if
-                    self.path.suffix[1:] in self.config.CONVERTS[group]]
+        converts = [copy(Config.CONVERTS[group]) for group in Config.CONVERTS if
+                    self.path.suffix[1:] in Config.CONVERTS[group]]
         if converts:
             converts = converts[0]
             converts.remove(self.path.suffix[1:])
@@ -78,11 +75,11 @@ class ArchiveFile:
         return self.origin.file_size / 1024 / 1024
 
     def extract(self, path):
-        return FileObject(path=self.archive_object.extract(self.origin, path), config=self.archive_file.config)
+        return FileObject(path=self.archive_object.extract(self.origin, path))
 
     def get_available_converts(self):
-        converts = [copy(self.archive_file.config.CONVERTS[group]) for group in self.archive_file.config.CONVERTS if
-                    self.get_format() in self.archive_file.config.CONVERTS[group]]
+        converts = [copy(Config.CONVERTS[group]) for group in Config.CONVERTS if
+                    self.get_format() in Config.CONVERTS[group]]
         if converts:
             converts = converts[0]
             converts.remove(self.get_format())

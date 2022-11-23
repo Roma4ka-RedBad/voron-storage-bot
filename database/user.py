@@ -1,7 +1,8 @@
 from datetime import datetime
-from peewee import IntegerField, TextField, DateTimeField, CharField
+from peewee import IntegerField, TextField, DateTimeField, CharField, ForeignKeyField
 
 from .base import BaseModel
+from .metadata import Metadata
 
 
 class Users(BaseModel):
@@ -12,3 +13,4 @@ class Users(BaseModel):
     language_code = CharField(max_length=4, default='ru')
     warns = IntegerField(default=0)
     created_at = DateTimeField(default=datetime.now)
+    metadata = ForeignKeyField(Metadata, backref='user', default=Metadata.create)

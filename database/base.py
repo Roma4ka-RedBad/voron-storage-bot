@@ -1,4 +1,4 @@
-from peewee import SqliteDatabase, Model
+from peewee import SqliteDatabase, Model, MySQLDatabase
 
 database = SqliteDatabase("database.db")
 

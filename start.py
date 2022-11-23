@@ -1,15 +1,13 @@
-import toml
 import utils
 import asyncio
 import uvicorn
 from fastapi import FastAPI
 import colorama
 
-from box import Box
 from database import UserTable, FingerprintTable
 from localization import languages
 from typing import List, Dict, Any
-from logic_objects import FileObject, UserObject, Metadata, GameData
+from logic_objects import FileObject, UserObject, Metadata, GameData, Config
 
 from managers.game import GameManager
 from managers.convert import ConvertManager
@@ -21,8 +19,6 @@ server = FastAPI()
 async def convert(file: FileObject | List[FileObject], to_format: str, metadata: Dict[Any, Any] = None):
     if isinstance(file, FileObject):
         file = [file]
-    for _file in file:
-        _file.set_config(config)
 
     metadata = Metadata(metadata)
     result, process_dir = await convert_manager.convert(file, to_format, metadata)
@@ -39,10 +35,10 @@ async def convert(file: FileObject | List[FileObject], to_format: str, metadata:
     if metadata.compress_to_archive:
         paths = [obj['path'] for obj in result if obj['path']]
         if metadata.archive_only:
-            result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=paths)
+            result = await utils.compress_to_archive(process_dir / 'archive.zip', file_paths=paths)
         else:
             if len(paths) > 1:
-                result = await utils.compress_to_archive(process_dir / 'archive.zip', config, file_paths=paths)
+                result = await utils.compress_to_archive(process_dir / 'archive.zip', file_paths=paths)
                 result = [{'path': result, 'tid': None}]
 
     if metadata.return_one_file:
@@ -89,7 +85,7 @@ async def download_files(game_data: GameData, metadata: Dict[Any, Any] = None):
         result.append(await game_manager.download_file(fingerprint.sha, file, result_path=game_data.path))
 
     if metadata.compress_to_archive:
-        result = await utils.compress_to_archive(game_data.path / 'archive.zip', config, file_paths=result)
+        result = await utils.compress_to_archive(game_data.path / 'archive.zip', file_paths=result)
 
     return await utils.create_response(True, content=result)
 
@@ -109,8 +105,15 @@ async def set_user(data: UserObject):
     elif data.tg_id:
         user = UserTable.get(tg_id=data.tg_id)
 
-    setattr(user, data.set_key, data.set_value)
-    user.save()
+    if '.' not in data.set_key:
+        setattr(user, data.set_key, data.set_value)
+        user.save()
+    else:
+        user_object = getattr(user, data.set_key.split('.')[0])
+        setattr(user_object, data.set_key.split('.')[-1], data.set_value)
+        user_object.save()
+
+    user.__data__['metadata'] = user.metadata.__data__
     return await utils.create_response(True, content=user.__data__)
 
 
@@ -145,16 +148,17 @@ async def get_fingerprints():
 async def get_user(data: UserObject):
     user = None
     if data.vk_id is not None:
-        user = UserTable.get_or_create(vk_id=data.vk_id)[0].__data__
+        user = UserTable.get_or_create(vk_id=data.vk_id)
     elif data.tg_id is not None:
-        user = UserTable.get_or_create(tg_id=data.tg_id)[0].__data__
+        user = UserTable.get_or_create(tg_id=data.tg_id)
 
-    return await utils.create_response(True, content=user)
+    user[0].__data__['metadata'] = user[0].metadata.__data__
+    return await utils.create_response(True, content=user[0].__data__)
 
 
 @server.get("/config")
 async def get_config():
-    return await utils.create_response(True, content=config)
+    return await utils.create_response(True, content=Config)
 
 
 @server.post("/check_count")
@@ -164,7 +168,7 @@ async def check_count(files: List[FileObject]):
 
     result = {
         'files_count': 0,
-        'maximum_count': config.FILE_LIMITS.default_count
+        'maximum_count': Config.LIMITS.default_count
     }
 
     for file in files:
@@ -184,7 +188,6 @@ async def check_count(files: List[FileObject]):
 async def get_converts(files: List[FileObject]):
     content = []
     for file in files:
-        file.set_config(config)
         file_converts = await utils.get_converts_by_file(file)
         if file_converts:
             content.append({
@@ -211,8 +214,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    config = Box(toml.load('config.toml'))
-    convert_manager = ConvertManager(config)
+    convert_manager = ConvertManager()
     game_manager = GameManager(("game.brawlstarsgame.com", 9339))
 
     colorama.init()

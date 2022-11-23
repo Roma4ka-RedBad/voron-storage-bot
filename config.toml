@@ -1,8 +1,3 @@
-[FILE_LIMITS]
-default_size = 1024
-default_count = 100
-default_download_count = 100
-
 [UFS]
 path = '../ufs/'
 wait_for_delete_dir = 30 # minutes

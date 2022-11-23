@@ -25,10 +25,10 @@ async def get_converts_by_file(file: FileObject):
         return file.get_available_converts()
 
 
-async def compress_to_archive(archive_path: str | Path, config: object,
+async def compress_to_archive(archive_path: str | Path,
                               files_objects: List[FileObject] = None,
                               file_paths: list = None):
-    archive = ArchiveObject(FileObject.create(archive_path, config), "w", "zip", compresslevel=10)
+    archive = ArchiveObject(FileObject.create(archive_path), "w", "zip", compresslevel=10)
 
     if files_objects:
         for file in files_objects:

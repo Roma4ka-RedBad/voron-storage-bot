@@ -3,6 +3,7 @@ from .metadata import Metadata
 from .database import UserObject
 from .queue_file import QueueFileObject
 from .game_data import GameData
+from .config import Config
 
 __all__ = (
     "FileObject",
@@ -10,5 +11,6 @@ __all__ = (
     "UserObject",
     "Metadata",
     "QueueFileObject",
-    "GameData"
+    "GameData",
+    "Config"
 )
