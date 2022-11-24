@@ -11,6 +11,7 @@ from logic_objects import FileObject, UserObject, Metadata, GameData, Config
 
 from managers.game import GameManager
 from managers.convert import ConvertManager
+from managers.messengers import MessengersManager
 
 server = FastAPI()
 
@@ -215,6 +216,7 @@ async def main():
 
 if __name__ == '__main__':
     convert_manager = ConvertManager()
+    messengers_manager = MessengersManager()
     game_manager = GameManager(("game.brawlstarsgame.com", 9339))
 
     colorama.init()
