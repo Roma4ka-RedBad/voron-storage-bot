@@ -11,6 +11,13 @@ admins_ids = [1225973623]
 bot_token = 'vk1.a.DI9yXZSFf1FrqZ35rdX-gimXHgg-UissgBOF1YY32Rz7n9eUXgeZw218dzUB5v5wXwbfaGAnZTodVHt7icH_xZlOzIxsE4HDd6lMkMCBWqHdLDvU1k648gNfsNRc4_gFqpf12sVwrzSpj-jt-_DQvd7yRiFlug9CgFZdNLKI4E29xSfWfkeC2rjyXAM0conIl1LL4CsPQ3w4gXbFx4Ke5g'
 user_token = 'vk1.a.n5JFyo07vJ9p8VKvh50v5xuuj7dq-szd6sCb0uZ6mQIL5M6A_RGOI1IwQlhDuwZtPnKMxtrrmUg-8cywyjnDmlHhhBhDrSYSWan0AcVzkcs6w1mX7xGeIJL6oT0iAfgtjBaXZEDhZHeg3AekXW8yiEv65MYoYjOFLJDKolASAflE3lRKqI_up4F5DQhwEivv'
 
+[MYSQL]
+host = '145.239.59.167'
+port = 3306
+username = 'root'
+password = 'SevaRoma12321'
+database='voronstorage_test'
+
 [CONVERTS]
 3D = ['scw', 'glb', 'dae', 'obj', 'fbx', 'update']
 2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']

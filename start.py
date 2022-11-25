@@ -6,7 +6,7 @@ import colorama
 
 from database import UserTable, FingerprintTable
 from localization import languages
-from typing import List, Dict, Any
+from typing import List
 from logic_objects import FileObject, UserObject, Metadata, GameData, Config
 
 from managers.game import GameManager
@@ -17,11 +17,10 @@ server = FastAPI()
 
 
 @server.post("/convert/{to_format}")
-async def convert(file: FileObject | List[FileObject], to_format: str, metadata: Dict[Any, Any] = None):
+async def convert(file: FileObject | List[FileObject], to_format: str, metadata: Metadata = None):
     if isinstance(file, FileObject):
         file = [file]
 
-    metadata = Metadata(metadata)
     result, process_dir = await convert_manager.convert(file, to_format, metadata)
 
     if result is None and process_dir is None:
@@ -73,8 +72,7 @@ async def search_files(game_data: GameData):
 
 
 @server.post("/download_files")
-async def download_files(game_data: GameData, metadata: Dict[Any, Any] = None):
-    metadata = Metadata(metadata)
+async def download_files(game_data: GameData, metadata: Metadata = None):
     fingerprint = FingerprintTable.get_or_none(FingerprintTable.major_v == game_data.major_v,
                                                FingerprintTable.build_v == game_data.build_v,
                                                FingerprintTable.revision_v == game_data.revision_v)
@@ -163,13 +161,13 @@ async def get_config():
 
 
 @server.post("/check_count")
-async def check_count(files: List[FileObject]):
+async def check_count(files: List[FileObject], metadata: Metadata):
     response_code = True
     error_msg = None
 
     result = {
         'files_count': 0,
-        'maximum_count': Config.LIMITS.default_count
+        'maximum_count': metadata.files_count_limit
     }
 
     for file in files:

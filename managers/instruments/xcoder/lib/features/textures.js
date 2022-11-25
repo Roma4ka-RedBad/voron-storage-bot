@@ -10,29 +10,30 @@ const utils_1 = require("./utils");
 const PNG = require("fast-png");
 const image_js_1 = require("image-js");
 const config_1 = require("../config");
+const console_1 = require("../console");
+const locale_1 = require("../locale");
 function texturesDecode(options = { inPath: undefined, outPath: undefined, output: true }) {
     if (!options.inPath || !options.outPath) {
         throw new Error('Path not specified!');
     }
-    const dir = fs.readdirSync(options.inPath);
-    for (const file of dir) {
-        if (file.endsWith('_tex.sc')) {
-            const startTime = (0, process_1.hrtime)();
-            const folder = `${options.outPath}/${path.parse(file).name}`;
-            if (fs.existsSync(folder)) {
-                fs.rmSync(folder, { recursive: true, force: true });
-            }
-            fs.mkdirSync(folder);
-            const infoFile = [];
-            const swf = (0, utils_1.createSWF)(options.output).loadExternalTexture(`${options.inPath}/${file}`);
-            (0, console_1.trace)(locale_1.locale.imageSaving, { textColor: console_1.colors.green });
-            for (let i = 0; swf.textures.length > i; i++) {
-                const texture = swf.textures[i];
-                fs.writeFileSync(`${folder}/${path.parse(file).name}${'_'.repeat(i)}.png`, texture.image.toBuffer());
-                infoFile.push(texture.toJSON());
-            }
-            fs.writeFileSync(`${folder}/${path.parse(file).name}.json`, JSON.stringify(infoFile, null, 2));
+    const file = options.inPath;
+    console.log(file);
+    if (file.endsWith('_tex.sc')) {
+        const startTime = (0, process_1.hrtime)();
+        const folder = `${options.outPath}/${path.parse(file).name}`;
+        if (fs.existsSync(folder)) {
+            fs.rmSync(folder, { recursive: true, force: true });
         }
+        fs.mkdirSync(folder);
+        const infoFile = [];
+        const swf = (0, utils_1.createSWF)(options.output).loadExternalTexture(file);
+        (0, console_1.trace)(locale_1.locale.imageSaving, { textColor: console_1.colors.green });
+        for (let i = 0; swf.textures.length > i; i++) {
+            const texture = swf.textures[i];
+            fs.writeFileSync(`${folder}/${path.parse(file).name}${'_'.repeat(i)}.png`, texture.image.toBuffer());
+            infoFile.push(texture.toJSON());
+        }
+        fs.writeFileSync(`${folder}/${path.parse(file).name}.json`, JSON.stringify(infoFile, null, 2));
     }
 }
 exports.texturesDecode = texturesDecode;

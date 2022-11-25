@@ -1,6 +1,14 @@
-from peewee import SqliteDatabase, Model, MySQLDatabase
+from peewee import Model, MySQLDatabase
+from logic_objects import Config
 
-database = SqliteDatabase("database.db")
+
+database = MySQLDatabase(
+    Config.MYSQL.database,
+    host=Config.MYSQL.host,
+    port=Config.MYSQL.port,
+    user=Config.MYSQL.username,
+    password=Config.MYSQL.password
+)
 
 
 class BaseModel(Model):
