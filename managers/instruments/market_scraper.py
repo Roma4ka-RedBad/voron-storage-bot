@@ -3,7 +3,7 @@ import json
 
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
-from utils import async_req
+from misc.utils import async_req
 
 
 class WebsiteMappings:

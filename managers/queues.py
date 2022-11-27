@@ -12,12 +12,10 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 class QueueManager:
-    def __init__(self, auto_set_cores=True):
+    def __init__(self):
         self._queue = OrderedDict()
         self.count = 0
         self.cores = set()
-        if auto_set_cores:
-            asyncio.run(self._init())
 
     async def _init(self):
         cores = cpu_count()
@@ -40,8 +38,7 @@ class QueueManager:
                 self.add_core(lambda x: (-self._queue[x].priory[0], self._queue[x].priory[1]))
             cores -= cores_count
 
-        # Добор свободных ядер. На моем сервере их 6
-        # ядра, которые просто берут задачи по-порядку
+        # Добор свободных ядер.
         for _ in range(cores):
             self.add_core()
 
@@ -97,7 +94,6 @@ class QueueManager:
                 else:
                     tasks[num].error = answer['error']
                     tasks[num].tid = answer['TID']
-                print(answer)
 
     @staticmethod
     def start_process(pipe: Pipe, objects: list[QueueFileObject]):

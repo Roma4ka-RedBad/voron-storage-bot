@@ -8,12 +8,11 @@ from managers.instruments.textures import Textures
 from managers.instruments.audios import Audios
 from managers.instruments.csv import Csv
 from managers.instruments.models import Models
-from managers.queues import QueueManager
 
 
 class ConvertManager:
-    def __init__(self):
-        self.queue = QueueManager()
+    def __init__(self, queue_manager):
+        self.queue = queue_manager
 
     async def select_tool(self, files: List[FileObject], result_dir, to_format: str, metadata: Metadata):
         result = []

@@ -3,9 +3,9 @@ import platform
 from pathlib import Path
 from subprocess import run, STDOUT, PIPE
 from random import randint
-from utils import compress_to_archive
+from misc.utils import compress_to_archive
 
-from logic_objects.file import FileObject, Config
+from logic_objects.file import FileObject
 from managers.instruments.base import Base
 
 
@@ -22,28 +22,36 @@ class Textures(Base):
             'jpg': '{pvrtextool} -i {file_name} -f R8G8B8 -d {out_file} -o {temp_pvr_file}',
             'pvr': '{pvrtextool} -i {file_name} -f PVRTC2_4,UBN,lRGB -q pvrtcnormal -pot + -o {out_file}',
             'ktx': '{pvrtextool} -i {file_name} -f ETC1,UBN,lRGB -q etcfast -o {out_file}',
-            'sc_png': 'node {xcoder} decode {input_name} {output_path}',
-            'png_sc': 'node {xcoder} encode {input_path} {output_name}'
+            'sc': 'node {xcoder} {mode} {input_name} {output_path}'
         }
+
         if 'sc' in self.file.path.suffix:
             output = run(
-                methods['sc_png'].format(
+                methods['sc'].format(
                     xcoder=self.xcoder,
+                    mode="decode",
                     input_name=str(self.file.path),
                     output_path=self.result_dir
                 ).split(), stdout=PIPE, stderr=STDOUT, text=True
             )
+
             if output.returncode == 0:
                 result_path = os.path.join(self.result_dir, self.file.path.stem)
-                new_result_path = []
-                for file in os.listdir(result_path):
-                    process = await Textures(FileObject(path=os.path.join(result_path, file)), self.result_dir).convert_to(to_format)
-                    if process['converted']:
-                        new_result_path.append(process['path'])
+                if to_format != 'png':
+                    new_result_path = []
+                    for file in os.listdir(result_path):
+                        process = await Textures(FileObject(path=os.path.join(result_path, file)), self.result_dir).convert_to(to_format)
+                        if process['converted']:
+                            new_result_path.append(process['path'])
+                        else:
+                            new_result_path.append(os.path.join(result_path, file))
+                else:
+                    new_result_path = [result_path]
                 archive = await compress_to_archive(result_path + '.zip', file_paths=new_result_path)
                 return {'converted': True, 'path': archive}
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
+
         elif to_format in ['png', 'jpg', 'ktx', 'pvr']:
             work_dir = self.file.path.parent / f'work{randint(1234, 56789)}/'
             work_dir.mkdir(parents=True, exist_ok=True)
@@ -64,5 +72,6 @@ class Textures(Base):
                 return {'converted': True, 'path': self.get_new_filename(to_format)}
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
+
         elif to_format == 'sc':
             return {'converted': False, 'error': '', 'TID': "TID_SNACKBAR_METHOD_IS_UNAVAILABLE"}

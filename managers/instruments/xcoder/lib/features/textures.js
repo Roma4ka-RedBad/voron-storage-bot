@@ -17,7 +17,6 @@ function texturesDecode(options = { inPath: undefined, outPath: undefined, outpu
         throw new Error('Path not specified!');
     }
     const file = options.inPath;
-    console.log(file);
     if (file.endsWith('_tex.sc')) {
         const startTime = (0, process_1.hrtime)();
         const folder = `${options.outPath}/${path.parse(file).name}`;
@@ -34,6 +33,8 @@ function texturesDecode(options = { inPath: undefined, outPath: undefined, outpu
             infoFile.push(texture.toJSON());
         }
         fs.writeFileSync(`${folder}/${path.parse(file).name}.json`, JSON.stringify(infoFile, null, 2));
+    } else {
+        throw new Error('File is not texture!');
     }
 }
 exports.texturesDecode = texturesDecode;

@@ -7,7 +7,7 @@ from json import loads
 from pathlib import Path
 from database import FingerprintTable
 
-from utils import async_req
+from misc.utils import async_req
 from managers.instruments.supercell_server import SupercellServer
 from managers.instruments.market_scraper import MarketScraper
 

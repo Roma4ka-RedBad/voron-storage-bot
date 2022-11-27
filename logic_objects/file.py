@@ -41,6 +41,8 @@ class FileObject(BaseModel):
             
             if self.path.suffix[1:] != 'scw' and 'update' in converts:
                 converts.remove('update')
+            elif self.path.suffix[1:] == 'sc':
+                converts = ['png']
 
         return converts
 
@@ -86,6 +88,8 @@ class ArchiveFile:
 
             if self.get_format() != 'scw' and 'update' in converts:
                 converts.remove('update')
+            elif self.get_format() == 'sc':
+                converts = ['png']
 
         return converts
 

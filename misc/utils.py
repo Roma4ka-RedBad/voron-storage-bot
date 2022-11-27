@@ -1,8 +1,20 @@
-from logic_objects import FileObject, ArchiveObject
-from typing import List
-from pathlib import Path
 import os
 import aiohttp
+
+from database import UserTable
+from typing import List
+from pathlib import Path
+from logic_objects import FileObject, ArchiveObject, UserObject
+
+
+async def get_user_db(data: UserObject) -> UserTable:
+    user = None
+    if data.vk_id is not None:
+        user = UserTable.get_or_create(vk_id=data.vk_id)
+    elif data.tg_id is not None:
+        user = UserTable.get_or_create(tg_id=data.tg_id)
+
+    return user
 
 
 async def get_converts_by_file(file: FileObject):
