@@ -12,7 +12,7 @@ files_router = APIRouter(
 
 
 @files_router.post("/convert/{to_format}")
-async def convert(request: Request, file: FileObject | List[FileObject], to_format: str, metadata: Metadata = None):
+async def convert(request: Request, file: FileObject | List[FileObject], to_format: str, metadata: Metadata):
     if isinstance(file, FileObject):
         file = [file]
 

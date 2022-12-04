@@ -3,15 +3,16 @@ import platform
 from pathlib import Path
 from subprocess import run, STDOUT, PIPE
 from random import randint
+from typing import List
 from misc.utils import compress_to_archive
 
-from logic_objects.file import FileObject
+from logic_objects import FileObject, Config
 from managers.instruments.base import Base
 
 
 class Textures(Base):
-    def __init__(self, file: FileObject, result_dir: str):
-        super().__init__(file, result_dir)
+    def __init__(self, files: FileObject | List[FileObject], result_dir: str):
+        super().__init__(files, result_dir)
         self.pvrtextool = Path("managers/instruments/pvrtextools/" + 'pvrtextool.exe'
                                if platform.system() == 'Windows' else 'pvrtextool').absolute()
         self.xcoder = Path("managers/instruments/xcoder/index.js").absolute()
@@ -52,7 +53,7 @@ class Textures(Base):
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
 
-        elif to_format in ['png', 'jpg', 'ktx', 'pvr']:
+        elif to_format in Config.IMAGES:
             work_dir = self.file.path.parent / f'work{randint(1234, 56789)}/'
             work_dir.mkdir(parents=True, exist_ok=True)
             input_name = self.file.path.replace(

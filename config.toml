@@ -18,12 +18,5 @@ username = 'root'
 password = 'SevaRoma12321'
 database='voronstorage_test'
 
-[CONVERTS]
-3D = ['scw', 'glb', 'dae', 'obj', 'fbx', 'update']
-2D = ['ktx', 'pvr', 'png', 'jpg', 'sc']
-2D_ANIM = ['sc', 'fla']
-CSV = ['compress', 'decompress', 'csv']
-AUDIO = ['mp3', 'ogg', 'wav', 'flac', 'ape', 'aiff', 'swa', 'psf', 'aac', 'alac', 'dsd']
-
 [SERVER]
 timezone = 'Europe/Moscow'

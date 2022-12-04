@@ -1,11 +1,9 @@
 import shutil
 from pathlib import Path
+from pydantic import BaseModel
+
 from zipfile import ZipFile, ZipInfo, is_zipfile
 from rarfile import RarFile, RarInfo, is_rarfile
-
-from pydantic import BaseModel
-from copy import copy
-
 from logic_objects.config import Config
 
 
@@ -33,18 +31,8 @@ class FileObject(BaseModel):
         return FileObject(path=filepath)
 
     def get_available_converts(self):
-        converts = [copy(Config.CONVERTS[group]) for group in Config.CONVERTS if
-                    self.path.suffix[1:] in Config.CONVERTS[group]]
-        if converts:
-            converts = converts[0]
-            converts.remove(self.path.suffix[1:])
-            
-            if self.path.suffix[1:] != 'scw' and 'update' in converts:
-                converts.remove('update')
-            elif self.path.suffix[1:] == 'sc':
-                converts = ['png']
-
-        return converts
+        converts = Config.get_converts()
+        return converts.get(self.path.suffix[1:], None)
 
     def get_archive(self):
         archive_type = None
@@ -80,18 +68,8 @@ class ArchiveFile:
         return FileObject(path=self.archive_object.extract(self.origin, path))
 
     def get_available_converts(self):
-        converts = [copy(Config.CONVERTS[group]) for group in Config.CONVERTS if
-                    self.get_format() in Config.CONVERTS[group]]
-        if converts:
-            converts = converts[0]
-            converts.remove(self.get_format())
-
-            if self.get_format() != 'scw' and 'update' in converts:
-                converts.remove('update')
-            elif self.get_format() == 'sc':
-                converts = ['png']
-
-        return converts
+        converts = Config.get_converts()
+        return converts.get(self.get_format(), None)
 
 
 class ArchiveObject:
