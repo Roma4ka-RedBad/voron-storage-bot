@@ -39,5 +39,5 @@ class MessengersManager:
             return await self.tgbot.send_message(chat_id, text=text, **kwargs)
 
     async def send_vk_message(self):
-        # Сам сделаешь
+        # Ну сделаю, как будет необходимость
         await self.vkbot.api.messages.send()

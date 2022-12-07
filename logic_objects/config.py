@@ -3,7 +3,6 @@ from box import Box
 
 
 class Config(Box):
-
     IMAGES = ['ktx', 'pvr', 'png', 'jpg']
     AUDIO = ['mp3', 'ogg', 'wav', 'flac', 'ape', 'aiff', 'swa', 'psf', 'aac', 'alac', 'dsd']
     MODELS = ['scw', 'glb', 'dae', 'obj', 'fbx']
