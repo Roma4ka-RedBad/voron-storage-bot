@@ -17,14 +17,14 @@ async def main():
     queue_manager = QueueManager()
     convert_manager = ConvertManager(queue_manager)
     messengers_manager = MessengersManager()
-    game_manager = GameManager(("game.brawlstarsgame.com", 9339))
-    game_tasks = set()
+    game_manager = GameManager(("game.brawlstarsgame.com", 9339), messengers_manager)
 
     await queue_manager._init()
     await game_manager._init()
     for core in convert_manager.queue.cores:
         asyncio.create_task(core)
-    game_tasks.add(asyncio.create_task(game_manager.init_prod_handler()))
+    for handler in game_manager.handlers.handlers:
+        asyncio.create_task(handler)
 
     app.add_middleware(VoronStorageMiddleware, queue_manager=queue_manager, convert_manager=convert_manager,
                        game_manager=game_manager, messengers_manager=messengers_manager)

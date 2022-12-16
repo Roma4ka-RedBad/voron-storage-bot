@@ -5,16 +5,17 @@ import traceback
 from box import Box
 from json import loads
 from pathlib import Path
-from database import FingerprintTable
 
 from misc.utils import async_req
+from misc.handlers import Handlers
 from managers.instruments.supercell_server import SupercellServer
 from managers.instruments.market_scraper import MarketScraper
 
 
 class GameManager:
-    def __init__(self, server_connection: tuple):
+    def __init__(self, server_connection: tuple, messengers_manager):
         self.server = SupercellServer(*server_connection)
+        self.handlers = Handlers(self, messengers_manager)
 
         self.assets_url = None
         self.appstore_url = None
@@ -32,26 +33,7 @@ class GameManager:
         if game_data.server_code == 7:
             self.assets_url = game_data.assets_link
 
-    async def init_prod_handler(self):
-        version = FingerprintTable.get_or_none(is_actual=True)
-        if version:
-            version = f"{version.major_v}.{version.build_v}.{version.revision_v}"
-        else:
-            version = (await self.get_market_data(1)).version
-
-        async for game_data in self.handle_server_update(version):
-            if game_data.server_code == 7:
-                raw_version = game_data.fingerprint.version.split('.')
-                if actual_sha := FingerprintTable.get_or_none(is_actual=True):
-                    actual_sha = actual_sha.sha
-
-                if actual_sha != game_data.fingerprint.sha:
-                    FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual).execute()
-                    FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
-                                                   build_v=raw_version[1], revision_v=raw_version[2])
-
-            elif game_data.server_code == 10:
-                print(f'Start maintenance! Time: {game_data.maintenance_end_time}')
+        self.handlers.init_handlers()
 
     async def server_data(self, *args, **kwargs):
         message = self.server.encode_client_message(*args, **kwargs)
@@ -67,7 +49,7 @@ class GameManager:
 
         while True:
             try:
-                game_data = await self.server_data(int(version[0]), int(version[1]), 1)
+                game_data = await self.server_data(version[0], version[1], 1)
                 if game_data.server_code == 10 and not maintenance_started:
                     maintenance_started = True
                     yield game_data

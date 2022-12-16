@@ -70,9 +70,9 @@ class SupercellServer:
         message.write_int(0, 32, False)  # protocol version
         message.write_int(11, 32, False)  # key version
 
-        message.write_int(major_v, 32, False)
-        message.write_int(revision_v, 32, False)
-        message.write_int(build_v, 32, False)
+        message.write_int(int(major_v), 32, False)
+        message.write_int(int(revision_v), 32, False)
+        message.write_int(int(build_v), 32, False)
 
         message.write_string(content_hash, 32)  # content hash
         message.write_int(market_type, 32, False)  # device type
