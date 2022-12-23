@@ -5,6 +5,7 @@ import traceback
 from box import Box
 from json import loads
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 from misc.utils import async_req
 from misc.handlers import Handlers
@@ -52,10 +53,14 @@ class GameManager:
                 game_data = await self.server_data(version[0], version[1], 1)
                 if game_data.server_code == 10 and not maintenance_started:
                     maintenance_started = True
+                    game_data.maintenance_end = False
                     yield game_data
 
                 if maintenance_started and game_data.server_code != 10:
                     maintenance_started = False
+                    game_data.maintenance_end = True
+                    game_data.server_code = 10
+                    yield game_data
 
                 if game_data.server_code == 7:
                     if game_data.fingerprint.version != actual_version:
@@ -63,11 +68,19 @@ class GameManager:
                         yield game_data
 
                 if game_data.server_code == 8:
+                    yield game_data
                     version = (await self.get_market_data(1)).version.split('.')
             except:
                 print(f'Ошибка в хендлере версий! Traceback: {traceback.format_exc()}')
 
             await asyncio.sleep(3)
+
+    async def get_release_notes(self):
+        request = await async_req("https://blog.brawlstars.com/blog/", "text")
+        soup = BeautifulSoup(request, 'lxml')
+        links = [block.find_next("a", {"data-category": "Home"}).attrs['href'] for block in
+                 soup.find_all("div", {"class": "home-news-primary-item-holder"})]
+        return links
 
     async def download_file(self, fingerprint_sha: str, file_name: str, result_path: Path = None, return_type='bytes'):
         request = await async_req(f"{self.assets_url}/{fingerprint_sha}/{file_name}", return_type)
@@ -83,7 +96,7 @@ class GameManager:
     async def search_files(self, search_query: str, fingerprint_sha: str):
         fingerprint = await self.download_file(fingerprint_sha, 'fingerprint.json', return_type='json')
         result = []
-        if re.search(search_query, 'fingerprint.json') :
+        if re.search(search_query, 'fingerprint.json'):
             result.append('fingerprint.json')
         for file in fingerprint['files']:
             try:

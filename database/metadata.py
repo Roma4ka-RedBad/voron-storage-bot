@@ -1,15 +1,5 @@
-from json import loads
-from peewee import IntegerField, TextField
-
-from .base import BaseModel
-
-
-class ArrayField(TextField):
-    def db_value(self, value):
-        return super().db_value(str(value))
-
-    def python_value(self, value):
-        return loads(super().python_value(value))
+from peewee import IntegerField
+from .base import BaseModel, ArrayField
 
 
 class Metadata(BaseModel):

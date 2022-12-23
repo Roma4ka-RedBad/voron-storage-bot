@@ -84,7 +84,7 @@ async def async_req(url: str, return_type: str, data=None):
                         return await resp.text()
 
 
-async def create_response(status: bool, content = None, error_msg = None):
+async def create_response(status: bool, content=None, error_msg=None):
     response = {
         "status": status
     }

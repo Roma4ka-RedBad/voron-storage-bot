@@ -98,7 +98,7 @@ class MarketScraper:
             except IndexError:
                 pass
 
-        soup = BeautifulSoup(request_result, 'html.parser')
+        soup = BeautifulSoup(request_result, 'lxml')
         list_of_categories = ', '.join(
             [', '.join([category.text for category in element.find_all('span')]) for element in
              soup.find_all('div', {'class': 'Uc6QCc'})])

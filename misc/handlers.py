@@ -1,10 +1,9 @@
-from database import FingerprintTable
+from database import FingerprintTable, ChannelTable
 from managers.messengers import MessengersManager
-from managers.game import GameManager
 
 
 class Handlers:
-    def __init__(self, game_manager: GameManager, messengers_manager: MessengersManager):
+    def __init__(self, game_manager, messengers_manager: MessengersManager):
         self.gm = game_manager
         self.mm = messengers_manager
         self.handlers = set()
@@ -13,6 +12,7 @@ class Handlers:
         self.handlers.add(self.prod_handler())
 
     async def prod_handler(self):
+        await self.gm.get_release_notes()
         version = FingerprintTable.get_or_none(is_actual=True)
         if version:
             version = f"{version.major_v}.{version.build_v}.{version.revision_v}"
@@ -31,4 +31,20 @@ class Handlers:
                                                    build_v=raw_version[1], revision_v=raw_version[2])
 
             elif game_data.server_code == 10:
-                print(f'Start maintenance! Time: {game_data.maintenance_end_time}')
+                channels = ChannelTable.get_list_or_none(ChannelTable.prod_maintenance_mailing == True)
+                for channel in channels:
+                    if game_data.maintenance_end:
+                        await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
+                                                   text=channel.mailing_data.prod_maintenance_end.text,
+                                                   documents=channel.mailing_data.prod_maintenance_end.attachment_link)
+                    else:
+                        await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
+                                                   text=channel.mailing_data.prod_maintenance_start.text,
+                                                   documents=channel.mailing_data.prod_maintenance_start.attachment_link)
+
+            elif game_data.server_code == 8:
+                channels = ChannelTable.get_list_or_none(ChannelTable.prod_update_mailing == True)
+                for channel in channels:
+                    await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
+                                               text=channel.mailing_data.prod_update.text,
+                                               documents=channel.mailing_data.prod_update.attachment_link)
