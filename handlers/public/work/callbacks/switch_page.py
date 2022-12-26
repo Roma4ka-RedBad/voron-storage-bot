@@ -2,13 +2,13 @@ from aiogram.types import CallbackQuery
 
 from keyboards.work import WorkCallback, work_converts_keyb
 from misc.models import FilesStorage
-from misc.utils import array_to_pages
+from misc.utils import array_to_pages, check_server
 
 
 async def work_switch_page(cbq: CallbackQuery, callback_data: WorkCallback, fstorage: FilesStorage,
-                           server_config, user_data, user_localization):
-    if not server_config:
-        return await cbq.message.answer(text='Подключение к серверу отсутствует!')
+                           user_data, user_localization):
+    if not await check_server(cbq.message, user_localization):
+        return
 
     if callback_data.page_index < 0:
         return await cbq.answer(user_localization.TID_IS_START_PAGE)

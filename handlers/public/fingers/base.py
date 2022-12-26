@@ -2,14 +2,14 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode, hbold
 
 from misc.models import Server
-from misc.utils import safe_split_text
+from misc.utils import safe_split_text, check_server
 
 
 async def command_fingers(message: Message, server: Server, user_localization):
-    if not user_localization:
-        return await message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(message, user_localization):
+        return
 
-    fingers = (await server.send_msg('fingerprints')).content
+    fingers = (await server.send_msg('cmddata/fingerprints')).content
     new_version, new_sha, old_version, old_sha = None, None, None, None
     if fingers.new_finger.server_code == 7:
         new_version = fingers.new_finger.fingerprint.version

@@ -19,7 +19,7 @@ class DFile:
         return is_zipfile(self.path) or is_rarfile(self.path)
 
     async def get_converts(self, server: Server):
-        self.converts = await server.send_msg('converts', [{
+        self.converts = await server.send_msg('files/converts', [{
             'path': str(self.path)
         }])
         if self.is_archive():
@@ -52,7 +52,7 @@ class IFile:
     async def download(self, server: Server):
         os.makedirs(self.path.absolute(), exist_ok=True)
         version = self.server_response.version.split('.')
-        file = await server.send_msg('download_files', game_data={
+        file = await server.send_msg('files/downloading', game_data={
             'path': str(self.path),
             'search_query': '|'.join(self.server_response.files),
             'major_v': version[0],

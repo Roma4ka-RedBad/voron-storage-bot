@@ -2,16 +2,16 @@ from aiogram import Bot
 from aiogram.types import Message
 
 from misc.models import Server, Scheduler, FilesStorage
-from misc.utils import download_file, delete_message_with_dir, array_to_pages
+from misc.utils import download_file, delete_message_with_dir, array_to_pages, check_server
 from keyboards.work import work_converts_keyb
 
 
 async def command_work(message: Message, server: Server, bot: Bot, scheduler: Scheduler, server_config,
                        user_data, user_localization, fstorage: FilesStorage):
-    if not server_config:
-        return await message.reply(text='Подключение к серверу отсутствует!')
+    if not await check_server(message, user_localization):
+        return
 
-    file = await download_file(message, bot, server, server_config)
+    file = await download_file(message, bot, server, server_config, user_data)
     if not file[0]:
         return await message.reply(user_localization[file[2]].format(**file[3]))
     file = file[1]

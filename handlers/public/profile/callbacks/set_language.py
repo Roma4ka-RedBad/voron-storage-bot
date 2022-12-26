@@ -3,17 +3,18 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hcode, hbold
 
 from misc.models import Server
-from misc.utils import set_commands
+from misc.utils import set_commands, check_server
 from keyboards.profile import ProfileCallback, profile_kb
 
 
 async def profile_set_language(cbq: CallbackQuery, bot: Bot, server: Server, callback_data: ProfileCallback):
     user_data = await server.send_msg('user/set', tg_id=cbq.from_user.id, set_key='language_code',
                                  set_value=callback_data.language_code)
-    if not user_data:
-        return await cbq.message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(cbq.message, user_data):
+        return
+
     user_data = user_data.content
-    user_localization = (await server.send_msg(f'localization/{callback_data.language_code}')).content
+    user_localization = (await server.send_msg(f'user/localization/{callback_data.language_code}')).content
 
     if user_data.language_code == 'ru':
         user_data.language_code = 'en'

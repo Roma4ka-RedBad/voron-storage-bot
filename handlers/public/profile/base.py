@@ -2,12 +2,13 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode, hbold
 
 from misc.models import Server
+from misc.utils import check_server
 from keyboards.profile import profile_kb
 
 
 async def command_profile(message: Message, server: Server, user_data, user_localization):
-    if not user_data:
-        return await message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(message, user_localization):
+        return
 
     if user_data.language_code == 'ru':
         user_data.language_code = 'en'

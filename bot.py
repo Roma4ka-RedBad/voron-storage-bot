@@ -22,7 +22,7 @@ async def main():
     logger.info("Starting app")
 
     server = Server('http://127.0.0.1:8910')
-    config = await server.send_msg('config')
+    config = await server.send_msg('config', timeout=0)
     server.timezone = timezone(config.content.SERVER.timezone)
     scheduler = AsyncIOScheduler()
     storage = MemoryStorage()

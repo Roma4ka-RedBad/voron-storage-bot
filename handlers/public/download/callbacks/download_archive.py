@@ -1,13 +1,14 @@
 from aiogram.types import CallbackQuery, FSInputFile
 
 from misc.models import Server, FilesStorage, Scheduler
+from misc.utils import check_server
 from keyboards.download import DownloadCallback
 
 
 async def download_archive(cbq: CallbackQuery, server: Server, callback_data: DownloadCallback, user_localization,
                            user_data, fstorage: FilesStorage, scheduler: Scheduler):
-    if not user_localization:
-        return await cbq.message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(cbq.message, user_localization):
+        return
 
     await cbq.message.edit_reply_markup(None)
     await scheduler.pause_task(callback_data.file_id)
@@ -22,6 +23,6 @@ async def download_archive(cbq: CallbackQuery, server: Server, callback_data: Do
 
     await message.delete()
     await cbq.message.answer_document(FSInputFile(file), caption=user_localization.TID_STARTWORK_DONE.format(
-        name=user_data.nickname or message.from_user.first_name
+        name=user_data.nickname or cbq.from_user.first_name
     ))
     await scheduler.resume_task(callback_data.file_id)

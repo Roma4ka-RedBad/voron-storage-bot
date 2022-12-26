@@ -7,7 +7,7 @@ import traceback
 
 async def error_handler(update: Update, bot: Bot, server_config):
     telegraph = Telegraph(server_config.TG.telegraph_token)
-    use_class, message_id = None, None
+    use_class, message_id, chat_id = None, None, None
     if update.message:
         use_class = update.message
         chat_id = use_class.chat.id

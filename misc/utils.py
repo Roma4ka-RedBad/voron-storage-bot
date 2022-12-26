@@ -3,16 +3,15 @@ import shutil
 
 from aiogram import Bot
 from aiogram.types import BotCommand, Message, BotCommandScopeChat
-
 from misc.models import Server, DFile, FilesStorage, IFile
 
 
-async def download_file(message: Message, bot: Bot, server: Server, config):
+async def download_file(message: Message, bot: Bot, server: Server, config, user_data):
     document = message.document
     if message.audio:
         document = message.audio
 
-    if document.file_size < config.FILE_LIMITS.default_size * 1024 * 1024:
+    if document.file_size < user_data.metadata.size_limit * 1024 * 1024:
         main_dir = f"{config.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"
         if not os.path.exists(f"{main_dir}/{user_dir}"):
@@ -21,7 +20,7 @@ async def download_file(message: Message, bot: Bot, server: Server, config):
         file = await bot.get_file(document.file_id)
         shutil.copy(file.file_path, f"{main_dir}/{user_dir}/{document.file_name}")
         file = DFile(f"{main_dir}/{user_dir}/{document.file_name}", message)
-        data = await server.send_msg("check_count", [{'path': str(file.path)}])
+        data = await server.send_msg("files/counting", files=[{'path': str(file.path)}], metadata=user_data.metadata)
         return data.status, file, getattr(data, 'error_msg', None), data.content
 
 
@@ -29,6 +28,16 @@ async def create_ifile(message: Message, server: Server, config, server_response
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_user.id}/{message.message_id}"
     return IFile(f"{main_dir}/{user_dir}", message, server_response)
+
+
+async def check_server(message: Message, *args):
+    if not args[0]:
+        if message.from_user.language_code == 'ru':
+            await message.answer("Отсутствует подключение к серверу!")
+        else:
+            await message.answer("No connection to the server!")
+    else:
+        return True
 
 
 async def set_commands(bot: Bot, localization, chat_id: int):

@@ -1,15 +1,15 @@
 import shutil
-
 from aiogram.types import CallbackQuery, FSInputFile
 from keyboards.work import WorkCallback
 
 from misc.models import Server, Scheduler, FilesStorage
+from misc.utils import check_server
 
 
 async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCallback, scheduler: Scheduler,
                        fstorage: FilesStorage, server_config, user_data, user_localization):
-    if not server_config:
-        return await cbq.message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(cbq, user_localization):
+        return
 
     await scheduler.pause_task(callback_data.file_id)
     file = await fstorage.get(callback_data.file_id)
@@ -19,7 +19,7 @@ async def work_convert(cbq: CallbackQuery, server: Server, callback_data: WorkCa
     await cbq.answer(user_localization.TID_STARTWORK)
     convert_id = await fstorage.put_convert(callback_data.file_id)
 
-    result = await server.send_msg(f'convert/{callback_data.to_format}', file={
+    result = await server.send_msg(f'files/convert/{callback_data.to_format}', timeout=0, file={
         'path': str(file.path),
         'target_file': file.get_target_filename_by_index(callback_data.subfile_id)
     }, metadata={'compress_to_archive': True, 'return_one_file': True})

@@ -3,14 +3,14 @@ from aiogram.types import Message, FSInputFile
 from aiogram.utils.markdown import hcode, hbold
 
 from misc.models import Server, FilesStorage, Scheduler
-from misc.utils import safe_split_text, create_ifile, delete_ifile
+from misc.utils import safe_split_text, create_ifile, delete_ifile, check_server
 from keyboards.download import download_kb
 
 
 async def command_download(message: Message, server: Server, server_config, user_localization, user_data,
                            fstorage: FilesStorage, scheduler: Scheduler):
-    if not server_config:
-        return await message.answer(text='Подключение к серверу отсутствует!')
+    if not await check_server(message, user_localization):
+        return
 
     raw_text = message.text.split()
     raw_text.pop(0)
@@ -27,13 +27,13 @@ async def command_download(message: Message, server: Server, server_config, user
             build_v = version[1]
             revision_v = version[2] if len(version) > 2 else 1
 
-        searching_files = await server.send_msg("search_files", search_query=''.join(raw_text), major_v=major_v,
+        searching_files = await server.send_msg("files/searching", search_query=''.join(raw_text), major_v=major_v,
                                                 build_v=build_v, revision_v=revision_v)
         if searching_files.status:
             file = await create_ifile(message, server, server_config, searching_files.content)
             file_id = await fstorage.put(file)
 
-            if len(searching_files.content.files) > server_config.FILE_LIMITS.default_download_count:
+            if len(searching_files.content.files) > user_data.metadata.download_count_limit:
                 await message.answer_document(FSInputFile(await file.get_text_file()),
                                               caption=hbold(user_localization.TID_DOWNLOADFILES_FILES).format(
                                                   name=user_data.nickname or message.from_user.first_name,

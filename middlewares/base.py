@@ -32,7 +32,7 @@ class Middleware(BaseMiddleware):
             if user := await data['server'].send_msg('user/get', tg_id=from_user.id):
                 data['user_data'] = user.content
                 data['user_localization'] = (
-                    await data['server'].send_msg(f'localization/{data["user_data"].language_code}')
+                    await data['server'].send_msg(f'user/localization/{data["user_data"].language_code}')
                 ).content
 
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
