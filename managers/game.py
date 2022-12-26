@@ -51,14 +51,16 @@ class GameManager:
         while True:
             try:
                 game_data = await self.server_data(version[0], version[1], 1)
+                game_data.server_code = 10
+                game_data.maintenance_end_time = 1000
                 if game_data.server_code == 10 and not maintenance_started:
                     maintenance_started = True
-                    game_data.maintenance_end = False
+                    game_data.maintenance_is_end = False
                     yield game_data
 
                 if maintenance_started and game_data.server_code != 10:
                     maintenance_started = False
-                    game_data.maintenance_end = True
+                    game_data.maintenance_is_end = True
                     game_data.server_code = 10
                     yield game_data
 
@@ -76,10 +78,14 @@ class GameManager:
             await asyncio.sleep(3)
 
     async def get_release_notes(self):
-        request = await async_req("https://blog.brawlstars.com/blog/", "text")
-        soup = BeautifulSoup(request, 'lxml')
-        links = [block.find_next("a", {"data-category": "Home"}).attrs['href'] for block in
-                 soup.find_all("div", {"class": "home-news-primary-item-holder"})]
+        request_ru = await async_req("https://blog.brawlstars.com/ru/blog/", "text")
+        request_en = await async_req("https://blog.brawlstars.com/blog/", "text")
+        links = {
+            'en': [block.find_next("a", {"data-category": "Home"}).attrs['href'] for block in
+                   BeautifulSoup(request_en, 'lxml').find_all("div", {"class": "home-news-primary-item-holder"})],
+            'ru': [block.find_next("a", {"data-category": "Home"}).attrs['href'] for block in
+                   BeautifulSoup(request_ru, 'lxml').find_all("div", {"class": "home-news-primary-item-holder"})]
+        }
         return links
 
     async def download_file(self, fingerprint_sha: str, file_name: str, result_path: Path = None, return_type='bytes'):

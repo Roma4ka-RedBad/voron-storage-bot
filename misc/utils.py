@@ -2,6 +2,7 @@ import os
 import aiohttp
 
 from database import UserTable
+from pyformatting import optional_format
 from typing import List
 from pathlib import Path
 from logic_objects import FileObject, ArchiveObject, UserObject
@@ -15,6 +16,13 @@ async def get_user_db(data: UserObject) -> UserTable:
         user = UserTable.get_or_create(tg_id=data.tg_id)
 
     return user
+
+
+def safe_format(string: str, *args, **kwargs):
+    try:
+        return optional_format(string, *args, **kwargs)
+    except:
+        return string
 
 
 async def get_converts_by_file(file: FileObject):

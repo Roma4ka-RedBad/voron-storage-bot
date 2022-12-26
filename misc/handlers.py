@@ -1,3 +1,4 @@
+from misc.utils import safe_format
 from database import FingerprintTable, ChannelTable
 from managers.messengers import MessengersManager
 
@@ -12,7 +13,6 @@ class Handlers:
         self.handlers.add(self.prod_handler())
 
     async def prod_handler(self):
-        await self.gm.get_release_notes()
         version = FingerprintTable.get_or_none(is_actual=True)
         if version:
             version = f"{version.major_v}.{version.build_v}.{version.revision_v}"
@@ -20,6 +20,7 @@ class Handlers:
             version = (await self.gm.get_market_data(1)).version
 
         async for game_data in self.gm.handle_server_update(version):
+            game_data['blog_links'] = await self.gm.get_release_notes()
             if game_data.server_code == 7:
                 raw_version = game_data.fingerprint.version.split('.')
                 if actual_sha := FingerprintTable.get_or_none(is_actual=True):
@@ -32,19 +33,22 @@ class Handlers:
 
             elif game_data.server_code == 10:
                 channels = ChannelTable.get_list_or_none(ChannelTable.prod_maintenance_mailing == True)
+                game_data.fingerprint = None
                 for channel in channels:
-                    if game_data.maintenance_end:
-                        await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
-                                                   text=channel.mailing_data.prod_maintenance_end.text,
-                                                   documents=channel.mailing_data.prod_maintenance_end.attachment_link)
+                    if game_data.maintenance_is_end:
+                        await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
+                                                   text=safe_format(channel.mailing_data.prod_maintenance_end.text,
+                                                                    **game_data),
+                                                   documents=[channel.mailing_data.prod_maintenance_end.attachment_link])
                     else:
-                        await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
-                                                   text=channel.mailing_data.prod_maintenance_start.text,
-                                                   documents=channel.mailing_data.prod_maintenance_start.attachment_link)
+                        await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
+                                                   text=safe_format(channel.mailing_data.prod_maintenance_start.text,
+                                                                    **game_data),
+                                                   documents=[channel.mailing_data.prod_maintenance_start.attachment_link])
 
             elif game_data.server_code == 8:
                 channels = ChannelTable.get_list_or_none(ChannelTable.prod_update_mailing == True)
                 for channel in channels:
-                    await self.mm.send_message(channel.platform_name, True, chat_ids=channel.channel_id,
-                                               text=channel.mailing_data.prod_update.text,
-                                               documents=channel.mailing_data.prod_update.attachment_link)
+                    await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
+                                               text=safe_format(channel.mailing_data.prod_update.text, **game_data),
+                                               documents=[channel.mailing_data.prod_update.attachment_link])

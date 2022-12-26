@@ -18,10 +18,10 @@ class MessengersManager:
         self.vkbot = VkBot(Config.VK.bot_token)
 
     @staticmethod
-    async def create_media_group(files: List[str] | List[FileObject], is_url=False):
+    async def create_media_group(files: List[str] | List[FileObject]):
         media_group = []
         for file in files:
-            if is_url:
+            if "http" in file:
                 media_group.append(URLInputFile(url=file))
             else:
                 media_group.append(InputMediaDocument(
@@ -33,8 +33,8 @@ class MessengersManager:
         try:
             if platform_name == 'tg':
                 if 'documents' in kwargs:
-                    kwargs['documents'] = await self.create_media_group(kwargs['documents'], *args)
-                return await self.send_telegram_message(**kwargs)
+                    kwargs['documents'] = await self.create_media_group(kwargs['documents'])
+                return await self.send_telegram_message(*args, **kwargs)
             elif platform_name == 'vk':
                 return await self.send_vk_message()
         except:
