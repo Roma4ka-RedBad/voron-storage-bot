@@ -1,16 +1,15 @@
 from json import loads, dumps
 from box import Box
-from peewee import Model, SqliteDatabase, TextField
+from peewee import Model, MySQLDatabase, TextField
 from logic_objects import Config
 
-'''database = MySQLDatabase(
+database = MySQLDatabase(
     Config.MYSQL.database,
     host=Config.MYSQL.host,
     port=Config.MYSQL.port,
     user=Config.MYSQL.username,
     password=Config.MYSQL.password
-)'''
-database = SqliteDatabase('database.db')
+)
 
 
 class BaseModel(Model):
