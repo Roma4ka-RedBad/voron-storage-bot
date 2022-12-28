@@ -62,10 +62,13 @@
   "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, you should write a file to download. For example:\n/download skins.csv\n\nYou also can download several files. Just write it separating by commas! For example:\n/download skins.csv, crow_geo.glb, fingerprint.json\n\nYou can use \"get\" instead \"download\":\n/get loading.sc, loading_tex.sc",
   "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, you should enter a new nickname. For example:\n/nick Birdy",
   "TID_DOWNLOADFILES_TEXT": "{name}, could find {files_count} file(s) from {game_version} version:{files_name}\n\nYou can download the archive with these files by clicking on the button at the bottom.",
+  "TID_COMPACT_DOWNLOADFILES_TEXT": "{name}, found {files_count} file(s) from {game_version} version:{files_name}\n\n{number} of them are shown, the full list is written in the file.\n\nYou can download the archive with these files by clicking on the button at the bottom.",
   "TID_DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Download",
   "TID_DOWNLOADFILES_START": "\uD83D\uDD52 Downloading files...",
+  "TID_DOWNLOADFILES_REMOVE_PARENTS": "Remove filepaths",
   "TID_DOWNLOADFILES_FILE": "Name: {file_name}\nVersion: {game_version}",
   "TID_DOWNLOADFILES_FILES": "{name}, could find {files_count} file(s) from {game_version} version.\n\nThe search results were uploaded to a file.",
   "TID_DOWNLOADFILES_NOTFOUND": "{name}, file(s) not found(-s)!\nTry changing the search query or game version!",
-  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, no search query found!\nYou can search for regular expressions if you want!"
+  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, no search query found!\nYou can search for regular expressions if you want!",
+  "TID_DOWNLOAD_FILES_WITHIN_LIMIT": "{name}, you can only download {limit} files at a same time! The first {limit} files will be downloaded (from {files_count)"
 }

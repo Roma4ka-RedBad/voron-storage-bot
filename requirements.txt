@@ -1,6 +1,6 @@
 aiohttp~=3.8.3
 fastapi~=0.88.0
-starlette~=0.23.0
+starlette~=0.22.0
 uvicorn~=0.20.0
 colorama~=0.4.6
 peewee~=3.15.4
@@ -12,6 +12,9 @@ vkbottle~=4.3.12
 pydantic~=1.10.2
 rarfile~=4.0
 toml~=0.10.2
+sc-compression==0.6.1
 pymysql
 python-box
-sc_compression
+cryptography
+pyformatting
+lxml

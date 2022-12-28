@@ -59,13 +59,16 @@
   "TID_COMMAND_IN_DEVELOPMENT": "Команда находится в разработке!",
   "TID_VK_FIRST_COMMAND": " Привет, {name}!\nЯ помогу тебе с файлами игры Brawl Stars!\n Через меня можно получить много полезной информации из игры и её сайтов!\n\n⌨ Просто отправь мне файл для начала работы или воспользуйся клавиатурой, которую я тебе отправил!\n\nТы можешь получить список всех команд, написав \"Команды\". Подробнее о командах и боте в этой статье: [типа статья ы]\n❗ Бот всё ещё в разработке!",
   "TID_VK_COMMANDS": "/команды -- список команд\n/версия -- информация о версиях игры\n/скачать [filename] -- скачать файл из игры\n\t\t  Вы можете написать несколько файлов через запятую!\n/об игре -- информация об игре из Play Market/App Store\n/профиль -- ваш профиль в боте\n\nКоманды профиля:\n/ник <nick> -- изменит ваш ник на <nick>\n/connect <TG id> -- Привязать этот аккаунт к TG",
-  "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, вы должны указать файл, который хотите скачать. Например:\n/скачать skins.csv\n\nВы также можете скачать сразу несколько файлов, написав их через запятую! Например:\n/скачать skins.csv, crow_geo.glb, fingerprint.json\n\nМожно использовать \"/get\" или \"/download\" вместо \"Скачать\":\n/get loading.sc, loading_tex.sc",
+  "TID_DOWNLOAD_FILES_WITHOUT_ARGS": "{name}, вы должны указать файл, который хотите скачать. Например:\n/скачать skins.csv\n\nВы также можете скачать сразу несколько файлов, написав их через пробел или в столбик друг за другом! Например:\n/скачать skins.csv crow_geo.glb fingerprint.json\n\nМожно использовать \"/get\" или \"/download\" вместо \"Скачать\":\n/get loading.sc loading_tex.sc",
   "TID_CHANGE_NICK_WITHOUT_ARGS": "{name}, вы должны указать новый никнейм. Например:\n/ник Воробушек",
-  "TID_DOWNLOADFILES_TEXT": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии:{files_name}\n\nВы можете скачать архив с этими файлами нажав на кнопку снизу.",
+  "TID_DOWNLOADFILES_TEXT": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии:\n{files_name}\n\nВы можете скачать архив с этими файлами, нажав на кнопку снизу",
+  "TID_COMPACT_DOWNLOADFILES_TEXT": "{name}, найдено {files_count} файл(-ов) из {game_version} версии:\n{files_name}\n\nПоказаны {number} из них, полный список записан в файл.\nВы можете скачать архив с этими файлами, нажав на кнопку снизу",
   "TID_DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Скачать",
   "TID_DOWNLOADFILES_START": "\uD83D\uDD52 Загружаю файлы...",
+  "TID_DOWNLOADFILES_REMOVE_PARENTS": "Убрать пути файлов",
   "TID_DOWNLOADFILES_FILE": "Название: {file_name}\nВерсия: {game_version}",
   "TID_DOWNLOADFILES_FILES": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии.\n\nРезультаты поиска загружены в файл.",
   "TID_DOWNLOADFILES_NOTFOUND": "{name}, файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
-  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения если хотите!"
+  "TID_DOWNLOADFILES_QUERYMISSING": "{name}, поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения, если хотите!",
+  "TID_DOWNLOAD_FILES_WITHIN_LIMIT": "{name}, вы можете скачать только {limit} файлов одновременно! Будут скачаны первые {limit} файлов (из {files_count)"
 }
