@@ -1,8 +1,9 @@
-from vkbottle import API, Bot, BotBlueprint
-from vkbottle_types.objects import MessagesForward
-from aiohttp import ClientSession
 from pathlib import Path
 from random import randint
+
+from aiohttp import ClientSession
+from vkbottle import API
+from vkbottle_types.objects import MessagesForward
 
 
 def get_valid_link(response):
@@ -13,17 +14,23 @@ def get_valid_link(response):
     return f'doc{owner}_{doc_id}{("_" + access_key) if access_key else ""}'
 
 
-async def upload(docs: list[Path], user_api: API, bot: Bot | BotBlueprint,
-                 localization, peer_id, rename: bool = False
-                 ) -> tuple[list[str], bool]:
+async def upload(
+        docs: list[Path],
+        user_api: API,
+        bot_api: API,
+        localization,
+        peer_id,
+        rename: bool = False
+) -> tuple[list[str], bool]:
+
     have_big_file = any(file.stat().st_size > 220 * 1024 * 1024 for file in docs)
     files = []
     if have_big_file:
         server = await user_api.docs.get_upload_server()
         api = user_api
     else:
-        server = await bot.api.docs.get_messages_upload_server(type='doc', peer_id=peer_id)
-        api = bot.api
+        server = await bot_api.docs.get_messages_upload_server(type='doc', peer_id=peer_id)
+        api = bot_api
 
     async with ClientSession() as session:
         for filepath in docs:

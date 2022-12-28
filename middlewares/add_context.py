@@ -1,15 +1,13 @@
+from json import loads
+from random import randint
+
+from box import Box
 from vkbottle import BaseMiddleware, API
 from vkbottle.bot import Message, Bot
-from pytz import timezone
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from misc.models.scheduler import Scheduler
 from misc.models.server import Server
 from misc.models.storage import FileStorage
-from misc.models.scheduler import Scheduler
-
-from json import loads
-from box import Box
-from random import randint
 
 STORAGE = FileStorage()
 
@@ -51,14 +49,13 @@ class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
                     'server': self.__class__.server,
                     'scheduler': self.__class__.scheduler,
                     'userdata': userdata.content,
-                    'localization': self.__class__.localizations[
-                        userdata.content.language_code],
+                    'localization': self.__class__.localizations[userdata.content.language_code],
                     'config': self.__class__.config,
                     'payload': payload,
                     'user_api': self.__class__.user_api,
                     'bot': self.__class__.bot,
                     'file_storage': file_storage
-                    })
+                })
 
 
 class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
@@ -78,7 +75,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
         event = Box(self.event)
         userdata = await self.__class__.server.send_message(
             'user/get',
-            vk_id = event.object.user_id)
+            vk_id=event.object.user_id)
         file_storage = STORAGE
 
         if userdata is None:
@@ -104,7 +101,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
                     'user_api': self.__class__.user_api,
                     'bot': self.__class__.bot,
                     'file_storage': file_storage
-                    })
+                })
 
     async def answer(self, text: str):
         await self.bot.api.messages.send(

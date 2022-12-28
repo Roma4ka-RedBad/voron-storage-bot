@@ -16,8 +16,8 @@ def compressed_photos_keyboard(message_id: int) -> str:
                             'msg_id': message_id,
                             'type': 'convert',
                             'convert_to': 'png'
-                            }
-                        },
+                        }
+                    },
                     {
                         'label': 'JPG',
                         'type': 'callback',
@@ -26,9 +26,9 @@ def compressed_photos_keyboard(message_id: int) -> str:
                             'msg_id': message_id,
                             'type': 'convert',
                             'convert_to': 'jpg'
-                            }
                         }
-                    ],
+                    }
+                ],
                 [
                     {
                         'label': 'KTX',
@@ -37,8 +37,8 @@ def compressed_photos_keyboard(message_id: int) -> str:
                         'payload': {
                             'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
                             'type': 'show_snackbar'
-                            }
-                        },
+                        }
+                    },
                     {
                         'label': 'PVR',
                         'type': 'callback',
@@ -46,8 +46,8 @@ def compressed_photos_keyboard(message_id: int) -> str:
                         'payload': {
                             'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
                             'type': 'show_snackbar'
-                            }
-                        },
+                        }
+                    },
                     {
                         'label': 'SC',
                         'type': 'callback',
@@ -55,13 +55,13 @@ def compressed_photos_keyboard(message_id: int) -> str:
                         'payload': {
                             'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
                             'type': 'show_snackbar'
-                            }
                         }
-                    ]
+                    }
                 ]
-            )
-        .get_json()
+            ]
         )
+        .get_json()
+    )
 
     return keyboard
 
@@ -81,8 +81,8 @@ def audio_keyboard(message_id: int, localization) -> str:
                             'type': 'audio_convert',
                             'convert_to': 'mp3',
                             'compress': False
-                            }
-                        },
+                        }
+                    },
                     {
                         'label': localization.TID_CONVERT_TO.format(format='ogg'),
                         'type': 'callback',
@@ -92,9 +92,9 @@ def audio_keyboard(message_id: int, localization) -> str:
                             'type': 'audio_convert',
                             'convert_to': 'ogg',
                             'compress': False
-                            }
                         }
-                    ],
+                    }
+                ],
                 [
                     {
                         'label': localization.TID_CONVERT_AND_COMPRESS.format(format='mp3'),
@@ -105,8 +105,8 @@ def audio_keyboard(message_id: int, localization) -> str:
                             'type': 'audio_convert',
                             'convert_to': 'mp3',
                             'compress': True
-                            }
-                        },
+                        }
+                    },
                     {
                         'label': localization.TID_CONVERT_AND_COMPRESS.format(format='ogg'),
                         'type': 'callback',
@@ -116,14 +116,14 @@ def audio_keyboard(message_id: int, localization) -> str:
                             'type': 'audio_convert',
                             'convert_to': 'ogg',
                             'compress': True
-                            }
                         }
+                    }
 
-                    ]
                 ]
-            )
-        .get_json()
+            ]
         )
+        .get_json()
+    )
 
     return keyboard
 
@@ -138,17 +138,17 @@ def commands_keyboard(localization) -> str:
                     {'label': tids.game_versions, 'type': 'text', 'color': 'primary'},
                     {'label': tids.about_game, 'type': 'text', 'color': 'primary'},
                     {'label': tids.download_file, 'type': 'text', 'color': 'primary'}
-                    ],
+                ],
                 [{'label': tids.profile, 'type': 'text', 'color': 'positive'}],
                 [
                     {'label': tids.change_nickname, 'type': 'text', 'color': 'secondary'},
                     {'label': tids.bind_account, 'type': 'text', 'color': 'secondary'}
-                    ],
+                ],
 
-                ]
-            )
-        .get_json()
+            ]
         )
+        .get_json()
+    )
 
     return keyboard
 
@@ -161,8 +161,43 @@ def change_language_keyboard(localization):
                 'label': localization.TID_SET_LANGUAGE,
                 'type': 'callback',
                 'payload': {'command': 'change_language'}}]
-            ])
+        ])
         .get_json()
-        )
+    )
 
     return keyboard
+
+
+def server_downloads_keyboard(localization, message_id):
+    keyboard = (
+        Keyboard(one_time=False, inline=True)
+        .schema([
+            [{
+                'label': localization.TID_DOWNLOADFILES_BUTTON,
+                'type': 'callback',
+                'payload': {'command': 'download_all_files', 'msg_id': message_id}}],
+            [{
+                'label': localization.TID_DOWNLOADFILES_REMOVE_PARENTS,
+                'type': 'callback',
+                'payload': {'command': 'remove_paths'}}]
+        ])
+        .get_json()
+    )
+
+    return keyboard
+
+
+def archive_with_all_files_keyboard(localization, message_id):
+    keyboard = (
+        Keyboard(one_time=False, inline=True)
+        .schema([
+            [{
+                'label': localization.TID_DOWNLOADFILES_BUTTON,
+                'type': 'callback',
+                'payload': {'command': 'download_all_files', 'msg_id': message_id}}]
+        ])
+        .get_json()
+    )
+
+    return keyboard
+

@@ -1,13 +1,14 @@
 from aiohttp import ClientSession
-from misc.models import FileModel
+
 from misc.models import DownloadedFile
+from misc.models import FileModel
 
 
 async def download_and_save_file(session: ClientSession, file_object: FileModel) -> DownloadedFile:
     path = f'{file_object.main_dir}/{file_object.user_dir}/{file_object.name}'
     async with session.get(file_object.url) as resp:
         with open(path, 'wb') as file:
-            async for chunk in resp.content.iter_chunked(1024*1024*10):
+            async for chunk in resp.content.iter_chunked(1024 * 1024 * 10):
                 file.write(chunk)
 
     return DownloadedFile(file_object.main_dir, file_object.user_dir, file_object.name)

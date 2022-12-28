@@ -1,4 +1,5 @@
 import os
+
 from misc.models.server import Server
 
 
@@ -9,7 +10,7 @@ class DownloadedFile:
         self.name = file_name
 
     def get_dir(self, full=False, with_name=True):
-        return(os.path.abspath(f"{self.main_dir}/{self.user_dir}/{self.name}"))
+        return os.path.abspath(f"{self.main_dir}/{self.user_dir}/{self.name}")
         # return f"{self.main_dir + '/' if full else ''}{self.user_dir}/" \
         #        f"{self.name if with_name else ''}"
 
@@ -21,8 +22,8 @@ class DownloadedFile:
 
     @classmethod
     async def get_file_by_index_or_name(
-                cls, message, server: Server, file_index: int = None,
-                file_name: str = None):
+            cls, message, server: Server, file_index: int = None,
+            file_name: str = None):
         config = await server.send_message('config')
         main_dir = f"{config.content.UFS.path}{server.messenger}"
         user_dir = f"{message.from_user.id}/{message.message_id}"

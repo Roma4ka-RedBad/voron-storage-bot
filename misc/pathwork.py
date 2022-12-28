@@ -1,6 +1,7 @@
 import os
 import shutil
 from typing import List, Tuple, Any
+
 from vkbottle.bot import Message
 
 from misc.connection.downloads import get_files
@@ -8,13 +9,16 @@ from misc.models import Scheduler, DownloadedFile, Server, FileModel, FileStorag
 from misc.tools import remove_dir_and_file
 
 
-async def download_files(message: Message,
-                         server: Server,
-                         file_objects: List[Tuple[str, Any]],
-                         scheduler: Scheduler,
-                         storage: FileStorage,
-                         localization,
-                         config) -> list[DownloadedFile] | None:
+async def download_files(
+        message: Message,
+        server: Server,
+        file_objects: List[Tuple[str, Any]],
+        scheduler: Scheduler,
+        storage: FileStorage,
+        localization,
+        config,
+        userdata) -> list[DownloadedFile] | None:
+
     main_dir = f"{config.UFS.path}{server.messenger}"
     user_dir = f"{message.from_id}/{message.conversation_message_id}"
     if not os.path.exists(f"{main_dir}/{user_dir}"):
@@ -51,16 +55,20 @@ async def download_files(message: Message,
 
         prepared_files.append(file)
 
-    if sum(file.size for file in prepared_files) > 1024*1024*1024:
+    if sum(file.size for file in prepared_files) > 1024 * 1024 * 1024:
         return None
 
-    files =  await get_files(prepared_files)
-    count = await server.send_message('check_count', [{'path': file.get_dir()} for file in files])
+    files = await get_files(prepared_files)
+    count = await server.send_message(
+        'files/counting',
+        files=[{'path': file.get_dir()} for file in files],
+        metadata=dict(userdata.metadata))
     if count.status:
         return files
     else:
-        await message.reply(localization[count.error_msg].format(files_count=count.files_count,
-                                                                 maximum_count=count.maximum_count))
+        await message.reply(localization[count.error_msg]
+                            .format(files_count=count.files_count,
+                                    maximum_count=count.maximum_count))
         return None
 
 

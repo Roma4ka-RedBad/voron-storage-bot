@@ -1,5 +1,6 @@
-from vkbottle import Keyboard, Callback, KeyboardButtonColor
 from typing import List, Tuple
+
+from vkbottle import Keyboard, Callback, KeyboardButtonColor
 
 
 class Colors:

@@ -1,0 +1,7 @@
+aiohttp~=3.8.3
+pydantic~=1.10.2
+loguru~=0.6.0
+vkbottle~=4.3.12
+pytz~=2022.6
+apscheduler
+python-dateutil

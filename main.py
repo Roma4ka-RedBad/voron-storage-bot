@@ -1,37 +1,36 @@
-from vkbottle import load_blueprints_from_package
-from vkbottle.bot import Bot
-from loguru import logger
-from pytz import timezone
-
-from misc.models.server import Server
-from misc.models.scheduler import Scheduler
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from middlewares import registrate_middlewares
-
 import asyncio
 import sys
+
+from loguru import logger
+from vkbottle import Bot
+
+from blueprints import labelers
+from config import bot_config
+from middlewares import registrate_middlewares
+from misc.models.scheduler import Scheduler
+
+labelers = labelers
 
 
 async def main():
     logger.remove()
     logger.add(sys.stderr, level='INFO')
-    server = Server('http://127.0.0.1:8911')
-    config = await server.send_message('config')
-    server.timezone = timezone(config.content.SERVER.timezone)
+    bot = Bot(api=bot_config.api, state_dispenser=bot_config.state_dispenser)
+    for labeler in bot_config.labelers.__all__():
+        bot.labeler.load(labeler)
 
-    scheduler = AsyncIOScheduler()
-    bot = Bot(token=config.content.VK.bot_token)
-    await registrate_middlewares(bot, server, Scheduler(scheduler, timezone(config.content.SERVER.timezone)))
-    for blueprint in load_blueprints_from_package('blueprints'):
-        blueprint.load(bot)
+    await registrate_middlewares(
+        bot,
+        bot_config.server,
+        Scheduler(bot_config.scheduler, bot_config.server.timezone))
 
     try:
-        scheduler.start()
+        bot_config.scheduler.start()
         await bot.run_polling()
     except (SystemExit, KeyboardInterrupt):
-        scheduler.shutdown()
+        bot_config.scheduler.shutdown()
         print('Бот остановлен')
- 
+        raise SystemExit
 
-if __name__ == '__main__':
-    asyncio.run(main())
+
+asyncio.run(main())

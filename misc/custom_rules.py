@@ -1,6 +1,7 @@
+import re
+
 from vkbottle.dispatch.rules import ABCRule
 from vkbottle.tools.dev.mini_types.base import BaseMessageMin
-import re
 
 
 class PayloadRule(ABCRule):
@@ -24,7 +25,7 @@ class PayloadRule(ABCRule):
 
 
 class StartFromRule(ABCRule):
-    def __init__(self, *patterns: str, regex_pattern = None, ignore_case: bool = True, args_must_be: bool = True):
+    def __init__(self, *patterns: str, regex_pattern=None, ignore_case: bool = True, args_must_be: bool = True):
         self.regex_pattern = regex_pattern
         self.patterns = list(patterns)
         self.ignore_case = ignore_case

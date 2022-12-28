@@ -8,7 +8,7 @@ class Server:
         self.messenger = 'VK'
         self.timezone = None
 
-    async def request(self, url: str, return_type: str = 'box', data = None):
+    async def request(self, url: str, return_type: str = 'box', data=None):
         async with aiohttp.ClientSession() as session:
             if data:
                 async with session.post(url, json=data) as resp:
@@ -34,7 +34,9 @@ class Server:
             if args:
                 args = args[0]
             data = await self.request(f'{self.address}/{endpoint}', data=args or kwargs)
-        except:
+
+        except None:
             data = None
 
         return data
+
