@@ -51,8 +51,6 @@ class GameManager:
         while True:
             try:
                 game_data = await self.server_data(version[0], version[1], 1)
-                game_data.server_code = 10
-                game_data.maintenance_end_time = 1000
                 if game_data.server_code == 10 and not maintenance_started:
                     maintenance_started = True
                     game_data.maintenance_is_end = False
