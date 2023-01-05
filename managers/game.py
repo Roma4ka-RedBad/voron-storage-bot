@@ -100,14 +100,16 @@ class GameManager:
     async def search_files(self, search_query: str, fingerprint_sha: str):
         fingerprint = await self.download_file(fingerprint_sha, 'fingerprint.json', return_type='json')
         result = []
-        if re.search(search_query, 'fingerprint.json'):
-            result.append('fingerprint.json')
-        for file in fingerprint['files']:
-            try:
-                if re.search(search_query, file['file']):
-                    result.append(file['file'])
-            except re.error:
-                break
+        if fingerprint:
+            if re.findall(search_query, 'fingerprint.json'):
+                result.append('fingerprint.json')
+
+            for file in fingerprint['files']:
+                try:
+                    if re.findall(search_query, file['file']):
+                        result.append(file['file'])
+                except re.error:
+                    break
 
         return result
 

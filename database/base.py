@@ -2,8 +2,14 @@ from json import loads, dumps
 from box import Box
 from peewee import Model, MySQLDatabase, TextField
 from logic_objects import Config
+from playhouse.shortcuts import ReconnectMixin
 
-database = MySQLDatabase(
+
+class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
+    pass
+
+
+database = ReconnectMySQLDatabase(
     Config.MYSQL.database,
     host=Config.MYSQL.host,
     port=Config.MYSQL.port,

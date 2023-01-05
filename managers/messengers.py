@@ -6,7 +6,7 @@ from logic_objects import Config, FileObject
 from aiogram import Bot as TgBot
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
-from aiogram.types import InputMediaDocument, FSInputFile, URLInputFile
+from aiogram.types import InputMediaDocument, FSInputFile
 from vkbottle.bot import Bot as VkBot
 
 
@@ -21,24 +21,23 @@ class MessengersManager:
     async def create_media_group(files: List[str] | List[FileObject]):
         media_group = []
         for file in files:
-            if "http" in file:
-                media_group.append(URLInputFile(url=file))
-            else:
+            if file:
                 media_group.append(InputMediaDocument(
                     media=FSInputFile(file.path if isinstance(file, FileObject) else file)
                 ))
         return media_group
 
     async def send_message(self, platform_name: str, *args, **kwargs):
-        try:
-            if platform_name == 'tg':
-                if 'documents' in kwargs:
-                    kwargs['documents'] = await self.create_media_group(kwargs['documents'])
-                return await self.send_telegram_message(*args, **kwargs)
-            elif platform_name == 'vk':
-                return await self.send_vk_message()
-        except:
-            print(f'Ошибка в отправке сообщения! Traceback: {traceback.format_exc()}')
+        if kwargs['text']:
+            try:
+                if platform_name == 'tg':
+                    if 'documents' in kwargs:
+                        kwargs['documents'] = await self.create_media_group(kwargs['documents'])
+                    return await self.send_telegram_message(*args, **kwargs)
+                elif platform_name == 'vk':
+                    return await self.send_vk_message()
+            except:
+                print(f'Ошибка в отправке сообщения! Traceback: {traceback.format_exc()}')
 
     async def send_telegram_message(self, chat_ids: int | list, text: str, documents: List[InputMediaDocument] = None,
                                     **kwargs):

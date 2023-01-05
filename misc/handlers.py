@@ -33,22 +33,18 @@ class Handlers:
 
             elif game_data.server_code == 10:
                 channels = ChannelTable.get_list_or_none(ChannelTable.prod_maintenance_mailing == True)
-                game_data.fingerprint = None
                 for channel in channels:
                     if game_data.maintenance_is_end:
                         await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
                                                    text=safe_format(channel.mailing_data.prod_maintenance_end.text,
-                                                                    **game_data),
-                                                   documents=[channel.mailing_data.prod_maintenance_end.attachment_link])
+                                                                    **game_data))
                     else:
                         await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
                                                    text=safe_format(channel.mailing_data.prod_maintenance_start.text,
-                                                                    **game_data),
-                                                   documents=[channel.mailing_data.prod_maintenance_start.attachment_link])
+                                                                    **game_data))
 
             elif game_data.server_code == 8:
                 channels = ChannelTable.get_list_or_none(ChannelTable.prod_update_mailing == True)
                 for channel in channels:
                     await self.mm.send_message(channel.platform_name, chat_ids=channel.channel_id,
-                                               text=safe_format(channel.mailing_data.prod_update.text, **game_data),
-                                               documents=[channel.mailing_data.prod_update.attachment_link])
+                                               text=safe_format(channel.mailing_data.prod_update.text, **game_data))

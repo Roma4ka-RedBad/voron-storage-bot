@@ -18,14 +18,14 @@ class ConvertManager:
         result = []
 
         for file in files:
-            if to_format in Config.IMAGES and file.path.suffix[1:] in Config.IMAGES:
-                process = Textures(file, result_dir)
-                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
-
-            elif to_format == 'sc' and file.path.suffix[1:] == 'png':
+            if to_format == 'sc' and file.path.suffix[1:] == 'png':
                 process = Textures(files, result_dir)
                 result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
                 break
+
+            elif to_format in Config.IMAGES and file.path.suffix[1:] in Config.IMAGES:
+                process = Textures(file, result_dir)
+                result.append(QueueFileObject(target=process.convert_to, arguments=(to_format,)))
 
             elif to_format in Config.AUDIO and file.path.suffix[1:] in Config.AUDIO:
                 process = Audios(file, result_dir, metadata)

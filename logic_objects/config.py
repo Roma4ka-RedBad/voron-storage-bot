@@ -10,7 +10,7 @@ def _add_list_converts(main_obj, obj: list):
 
 
 class Config(Box):
-    IMAGES = ['ktx', 'pvr', 'png', 'jpg']
+    IMAGES = ['ktx', 'pvr', 'png', 'jpg', 'sc']
     AUDIO = ['mp3', 'ogg', 'wav', 'flac', 'ape', 'aiff', 'swa', 'psf', 'aac', 'alac', 'dsd']
     MODELS = ['scw', 'glb', 'dae', 'obj', 'fbx']
     CSV = ['decompress', 'compress']
@@ -23,12 +23,14 @@ class Config(Box):
         converts = Box()
 
         _add_list_converts(converts, cls.AUDIO)
-        _add_list_converts(converts, cls.IMAGES)
         _add_list_converts(converts, cls.MODELS)
 
         converts.csv = cls.CSV
         converts.sc = ['png']
-        converts.png.append('sc')
+        converts.png = ['jpg', 'ktx', 'pvr', 'sc']
+        converts.jpg = ['png', 'ktx', 'pvr']
+        converts.ktx = ['jpg', 'png', 'pvr']
+        converts.pvr = ['jpg', 'png', 'ktx']
         converts.scw.append('update')
 
         return converts

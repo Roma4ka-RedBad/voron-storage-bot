@@ -15,7 +15,6 @@ class Textures(Base):
         super().__init__(files, result_dir)
         self.pvrtextool = Path("managers/instruments/pvrtextools/" + 'pvrtextool.exe'
                                if platform.system() == 'Windows' else 'pvrtextool').absolute()
-        self.xcoder = Path("managers/instruments/xcoder/index.js").absolute()
 
     async def convert_to(self, to_format: str):
         methods = {
@@ -23,32 +22,22 @@ class Textures(Base):
             'jpg': '{pvrtextool} -i {file_name} -f R8G8B8 -d {out_file} -o {temp_pvr_file}',
             'pvr': '{pvrtextool} -i {file_name} -f PVRTC2_4,UBN,lRGB -q pvrtcnormal -pot + -o {out_file}',
             'ktx': '{pvrtextool} -i {file_name} -f ETC1,UBN,lRGB -q etcfast -o {out_file}',
-            'sc': 'node {xcoder} {mode} {input_name} {output_path}'
+            'sc': '{tool} -i {input_name} -o {output_name}'
         }
 
         if 'sc' in self.file.path.suffix:
             output = run(
                 methods['sc'].format(
-                    xcoder=self.xcoder,
-                    mode="decode",
-                    input_name=str(self.file.path),
-                    output_path=self.result_dir
+                    tool="sc2tex",
+                    input_name=str(self.file.path.absolute()),
+                    output_name=self.result_dir
                 ).split(), stdout=PIPE, stderr=STDOUT, text=True
             )
+            print(self.result_dir, output, output.returncode, output.stderr, output.stdout)
 
             if output.returncode == 0:
                 result_path = os.path.join(self.result_dir, self.file.path.stem)
-                if to_format != 'png':
-                    new_result_path = []
-                    for file in os.listdir(result_path):
-                        process = await Textures(FileObject(path=os.path.join(result_path, file)), self.result_dir).convert_to(to_format)
-                        if process['converted']:
-                            new_result_path.append(process['path'])
-                        else:
-                            new_result_path.append(os.path.join(result_path, file))
-                else:
-                    new_result_path = [result_path]
-                archive = await compress_to_archive(result_path + '.zip', file_paths=new_result_path)
+                archive = await compress_to_archive(result_path + '.zip', file_paths=[result_path])
                 return {'converted': True, 'path': archive}
             else:
                 return {'converted': False, 'error': output.stdout, 'TID': "TID_ERROR"}
