@@ -60,7 +60,7 @@ class EventsHandler(asyncio.Protocol):
     def get_transport_id(self) -> int:
         return getattr(self, "transport_id", None)
 
-    def get_config_data(self):
+    async def get_config_data(self):
         return getattr(self, "config_data", None)
 
 
@@ -112,7 +112,7 @@ class ServerConnection:
     async def get_bot_token(self) -> str:
         while True:
             if await self.is_connected():
-                if data := self.events_handler.get_config_data():
+                if data := await self.events_handler.get_config_data():
                     return data.config.TG.token
 
             await asyncio.sleep(self.reconnect_timeout)

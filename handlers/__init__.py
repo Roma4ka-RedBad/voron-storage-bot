@@ -1,51 +1,28 @@
-from aiogram import Router, Bot
-from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, Message, CallbackQuery
-from typing import Callable, Dict, Any, Awaitable
-from packets.base import Packet
+from aiogram import Router, Bot, F
+from misc.middleware import Middleware
 
 from .start import command_start
 from .set_name import command_setname
-from .actions_msg import command_sendmsg, command_editmsg
+from .set_name.wait_name import state_waitname
+from .profile import command_profile
+from .profile.set_lang_callback import profile_set_language
+from .working.compressed_photos import compressed_photo
 
-
-class Middleware(BaseMiddleware):
-    def __init__(self, bot: Bot, server):
-        self.bot = bot
-        self.server = server
-        super().__init__()
-
-    def client_data(self, data: Dict[str, Any]):
-        data["bot"] = self.bot
-        data["server"] = self.server
-
-    async def server_data(self, data: Dict[str, Any], obj: TelegramObject):
-        message = obj if isinstance(obj, Message) else obj.message if isinstance(obj, CallbackQuery) else None
-        if message:
-            config_data = self.server.events_handler.get_config_data()
-            if await self.server.is_connected():
-                data["user_data"] = await self.server.send(Packet(11100, tg_id=message.from_user.id))
-                data["user_data"] = data["user_data"].payload
-                data["localization"] = config_data.localization[data["user_data"].language_code]
-                return True
-            else:
-                language_code = "ru" if message.from_user.language_code == "ru" else "en"
-                await message.answer(config_data.localization[language_code].TID_NO_CONNECTION)
-
-    async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]], obj: TelegramObject,
-                       data: Dict[str, Any]):
-        self.client_data(data)
-        if await self.server_data(data, obj):
-            await handler(obj, data)
+from misc.states import UserStates
+from keyboards.profile import ProfileCallback
 
 
 def create_public_router(bot: Bot, server) -> Router:
     public_router: Router = Router(name="public_router")
+    middleware = Middleware(bot, server)
 
-    public_router.message.middleware(Middleware(bot, server))
+    public_router.message.middleware(middleware)
+    public_router.callback_query.middleware(middleware)
     public_router.message.register(command_start, commands=["start"])
-    public_router.message.register(command_sendmsg, commands=["send"])
-    public_router.message.register(command_editmsg, commands=["down"])
-    public_router.message.register(command_setname, commands=["name"])
+    public_router.message.register(command_setname, commands=["set_name"])
+    public_router.message.register(state_waitname, UserStates.wait_name)
+    public_router.message.register(command_profile, commands=["profile"])
+    public_router.callback_query.register(profile_set_language, ProfileCallback.filter(F.action == "set_language"))
+    public_router.message.register(compressed_photo, content_types=['photo'])
 
     return public_router
