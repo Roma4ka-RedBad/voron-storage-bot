@@ -27,10 +27,10 @@ class ConnectionsManager:
         self.connections.append(connection)
         return connection
         
-    def remove(self, transport: asyncio.Transport):
-       for connection in self.connections:
-           if connection.transport == transport:
-               self.connections.remove(connection)
+    def remove(self, connection: Connection = None, transport: asyncio.Transport = None):
+        for _connection in self.connections:
+            if _connection.transport == transport or _connection == connection:
+                self.connections.remove(_connection)
        
     async def get(self, transport: asyncio.Transport = None, transport_id: int = None):
         for connection in self.connections:

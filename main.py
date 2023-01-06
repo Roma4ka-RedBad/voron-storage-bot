@@ -1,13 +1,18 @@
 import asyncio
 import inspect
 from loguru import logger
-from logic_objects.connections import ConnectionsManager
+
+from managers.connections import ConnectionsManager
+from managers.game import GameManager
+
 from packets import packets
 from packets.base import Packet
 
 
 class Server(asyncio.Protocol):
-    connections = ConnectionsManager()
+    def __init__(self, connections_manager: ConnectionsManager, game_manager: GameManager):
+        self.connections = connections_manager
+        self.game_manager = game_manager
 
     def connection_made(self, transport: asyncio.Transport):
         self.client_connection = self.connections.register(transport)
@@ -43,7 +48,14 @@ class Server(asyncio.Protocol):
 
 async def main():
     loop = asyncio.get_running_loop()
-    server = await loop.create_server(lambda: Server(), '127.0.0.1', 8888)
+
+    connections_manager = ConnectionsManager()
+    game_manager = GameManager(("game.brawlstarsgame.com", 9339), connections_manager)
+    await game_manager._init()
+    for handler in game_manager.handlers.handlers:
+        loop.create_task(handler)
+
+    server = await loop.create_server(lambda: Server(connections_manager, game_manager), '127.0.0.1', 8888)
 
     logger.info("Server running!")
     async with server:

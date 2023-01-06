@@ -1,5 +1,4 @@
-from typing import List
-from peewee import IntegerField, CharField, BooleanField
+from peewee import BigIntegerField, CharField, BooleanField
 from .base import BaseModel, JSONField
 
 
@@ -8,15 +7,14 @@ def get_mailing_data(mailing_types: list):
     for mailing_type in mailing_types:
         result.update({
             mailing_type: {
-                'text': "",
-                'attachment_link': ""
+                'text': ""
             }
         })
     return result
 
 
 class Channels(BaseModel):
-    channel_id = IntegerField(null=False)
+    channel_id = BigIntegerField(null=False)
     platform_name = CharField(max_length=2, null=False)
     prod_update_mailing = BooleanField(default=False)
     prod_maintenance_mailing = BooleanField(default=False)
