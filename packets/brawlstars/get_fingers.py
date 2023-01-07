@@ -5,8 +5,11 @@ from database import FingerprintTable
 
 async def brawlstars_get_fingers(instance, packet: Packet, game_manager: GameManager):
     actual_finger = await FingerprintTable.get(is_actual=True)
-    new_finger = await game_manager.server_data(actual_finger.major_v, actual_finger.build_v, actual_finger.revision_v)
+    new_finger = await game_manager.server_data(actual_finger.major_v, actual_finger.build_v, actual_finger.revision_v,
+                                                use_sync=True)
     old_finger = await FingerprintTable.get_or_none(FingerprintTable.id == (actual_finger.id - 1))
+    new_finger.fingerprint = {"version": new_finger.fingerprint.version,
+                              "sha": new_finger.fingerprint.sha} if getattr(new_finger, 'fingerprint', None) else None
     await instance.client_connection.send(
         Packet(packet.pid,
                actual_finger=actual_finger.__data__,

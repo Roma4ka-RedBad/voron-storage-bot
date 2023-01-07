@@ -4,15 +4,17 @@ from loguru import logger
 
 from managers.connections import ConnectionsManager
 from managers.game import GameManager
+from managers.file_storage import FileManager
 
 from packets import packets
 from packets.base import Packet
 
 
 class Server(asyncio.Protocol):
-    def __init__(self, connections_manager: ConnectionsManager, game_manager: GameManager):
+    def __init__(self, connections_manager: ConnectionsManager, game_manager: GameManager, file_manager: FileManager):
         self.connections = connections_manager
         self.game_manager = game_manager
+        self.file_manager = file_manager
 
     def connection_made(self, transport: asyncio.Transport):
         self.client_connection = self.connections.register(transport)
@@ -26,7 +28,8 @@ class Server(asyncio.Protocol):
                 asyncio.create_task(self._start_task(packets[packet.pid],
                                                      packet=packet,
                                                      game_manager=self.game_manager,
-                                                     connections_manager=self.connections))
+                                                     connections_manager=self.connections,
+                                                     file_manager=self.file_manager))
 
     async def _start_task(self, func, **kwargs):
         func_args = inspect.getfullargspec(func)
@@ -53,12 +56,14 @@ async def main():
     loop = asyncio.get_running_loop()
 
     connections_manager = ConnectionsManager()
+    file_manager = FileManager(connections_manager)
     game_manager = GameManager(("game.brawlstarsgame.com", 9339), connections_manager)
+    file_manager.scheduler.start()
     await game_manager._init()
     for handler in game_manager.handlers.handlers:
         loop.create_task(handler)
 
-    server = await loop.create_server(lambda: Server(connections_manager, game_manager), '127.0.0.1', 8888)
+    server = await loop.create_server(lambda: Server(connections_manager, game_manager, file_manager), '127.0.0.1', 8888)
 
     logger.info("Server running!")
     async with server:

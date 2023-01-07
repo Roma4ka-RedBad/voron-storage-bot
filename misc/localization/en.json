@@ -66,7 +66,7 @@
   "DOWNLOADFILES_BODY": "{name}, could find {files_count} file(s) from {game_version} version:{files_name}\n\nYou can download the archive with these files by clicking on the button at the bottom.",
   "DOWNLOADFILES_COMPACT_BODY": "{name}, found {files_count} file(s) from {game_version} version:{files_name}\n\n{number} of them are shown, the full list is written in the file.\n\nYou can download the archive with these files by clicking on the button at the bottom.",
   "DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Download",
-  "DOWNLOADFILES_START": "\uD83D\uDD52 Downloading files...",
+  "DOWNLOADFILES_START": "[{total_files_count}/{max_files_count}] \uD83D\uDD52 Downloading files...",
   "DOWNLOADFILES_REMOVE_PARENTS": "Remove filepaths",
   "DOWNLOADFILES_FILE": "Name: {file_name}\nVersion: {game_version}",
   "DOWNLOADFILES_FILES": "{name}, could find {files_count} file(s) from {game_version} version.\n\nThe search results were uploaded to a file.",

@@ -1,9 +1,9 @@
 import re
 import asyncio
-from loguru import logger
 
+from loguru import logger
+from bson import json_util
 from box import Box
-from json import loads
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -33,12 +33,15 @@ class GameManager:
 
         self.handlers.init_handlers()
 
-    async def server_data(self, *args, **kwargs):
-        message = self.server.encode_client_message(*args, **kwargs)
-        message = await self.server.send_message(message)
-        game_data = self.server.decode_server_message(message)
+    async def server_data(self, *args, use_sync: bool = True, **kwargs):
+        message = await self.server.encode_client_message(*args, **kwargs)
+        if use_sync:
+            message = await asyncio.to_thread(self.server.send_message_sync, message)
+        else:
+            message = await self.server.send_message(message)
+        game_data = await self.server.decode_server_message(message)
         if game_data.server_code == 7:
-            game_data.fingerprint = loads(game_data.fingerprint)
+            game_data.fingerprint = json_util.loads(game_data.fingerprint)
         return game_data
 
     async def handle_server_update(self, actual_version: str = None):
@@ -60,6 +63,7 @@ class GameManager:
                     yield game_data
 
                 if game_data.server_code == 7:
+                    pass
                     if game_data.fingerprint.version != actual_version:
                         actual_version = game_data.fingerprint.version
                         yield game_data
@@ -67,9 +71,10 @@ class GameManager:
                 if game_data.server_code == 8:
                     yield game_data
                     version = (await self.get_market_data(1)).version.split('.')
+            except GeneratorExit as e:
+                raise e
             except:
-                #logger.opt(exception=True).error("Handler of versions error!")
-                pas
+                logger.opt(exception=True).error("Handler of versions error!")
 
             await asyncio.sleep(3)
 
@@ -87,7 +92,7 @@ class GameManager:
     async def download_file(self, fingerprint_sha: str, file_name: str, result_path: Path = None, return_type="bytes"):
         request = await async_request(f"{self.data.assets_url}/{fingerprint_sha}/{file_name}", return_type)
         if result_path:
-            result_path = str((result_path / file_name.split('/')[-1]).absolute())
+            result_path = str((result_path / file_name.split('/')[-1]).resolve())
             return await asyncio.to_thread(file_writer, result_path, request)
         else:
             return request

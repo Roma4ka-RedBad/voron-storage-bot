@@ -66,7 +66,7 @@
   "DOWNLOADFILES_BODY": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии:\n{files_name}\n\nВы можете скачать архив с этими файлами, нажав на кнопку снизу",
   "DOWNLOADFILES_COMPACT_BODY": "{name}, найдено {files_count} файл(-ов) из {game_version} версии:\n{files_name}\n\nПоказаны {number} из них, полный список записан в файл.\nВы можете скачать архив с этими файлами, нажав на кнопку снизу",
   "DOWNLOADFILES_BUTTON": "\uD83D\uDCE5 Скачать",
-  "DOWNLOADFILES_START": "\uD83D\uDD52 Загружаю файлы...",
+  "DOWNLOADFILES_START": "[{total_files_count}/{max_files_count}] \uD83D\uDD52 Загружаю файлы...",
   "DOWNLOADFILES_REMOVE_PARENTS": "Убрать пути файлов",
   "DOWNLOADFILES_FILE": "Название: {file_name}\nВерсия: {game_version}",
   "DOWNLOADFILES_FILES": "{name}, удалось найти {files_count} файл(-ов) из {game_version} версии.\n\nРезультаты поиска загружены в файл.",

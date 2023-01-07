@@ -1,4 +1,5 @@
 import asyncio
+import socket
 
 from box import Box
 from managers.instruments.bytestream import Reader, Writer
@@ -8,6 +9,21 @@ class SupercellServer:
     def __init__(self, ip_host: str, ip_port: int):
         self.ip_host = ip_host
         self.ip_port = ip_port
+
+    def send_message_sync(self, message):
+        sock = socket.create_connection((self.ip_host, self.ip_port))
+        sock.send(message.buffer)
+        header = sock.recv(7)
+        packet_length = int.from_bytes(header[2:5], 'big')
+        received_data = b''
+        while packet_length > 0:
+            data = sock.recv(packet_length)
+            if not data:
+                break
+            received_data += data
+            packet_length -= len(data)
+        sock.close()
+        return received_data
 
     async def send_message(self, message):
         receiver, sender = await asyncio.open_connection(self.ip_host, self.ip_port)
@@ -37,7 +53,7 @@ class SupercellServer:
         return message
 
     @staticmethod
-    def decode_server_message(message: bytes):
+    async def decode_server_message(message: bytes):
         reader = Reader(message)
         data = Box()
 
@@ -63,7 +79,7 @@ class SupercellServer:
 
         return data
 
-    def encode_client_message(self, major_v: int, build_v: int, revision_v: int, content_hash: str = '',
+    async def encode_client_message(self, major_v: int, build_v: int, revision_v: int, content_hash: str = '',
                               market_type: int = 2, with_pcode: bool = True):
         message = Writer()
 
