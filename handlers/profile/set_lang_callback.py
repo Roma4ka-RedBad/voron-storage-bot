@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hcode, hbold
 
 from packets.base import Packet
-from misc.utils import easy_format
+from misc.utils import FormString
 from keyboards import set_commands
 from keyboards.profile import ProfileCallback, profile_kb
 
@@ -21,7 +21,7 @@ async def profile_set_language(cbq: CallbackQuery, bot: Bot, server, callback_da
         else:
             packet.payload.language_code = 'ru'
 
-        await cbq.message.edit_text(text=easy_format(localization.PROFILE_BODY,
+        await cbq.message.edit_text(text=FormString.paste_args(localization.PROFILE_BODY,
             name=cbq.from_user.first_name,
             nickname=hbold(packet.payload.nickname or localization.MISSING_ERROR),
             bot_id=hcode(packet.payload.id),

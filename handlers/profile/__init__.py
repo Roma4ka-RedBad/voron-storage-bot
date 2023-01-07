@@ -1,6 +1,6 @@
 from aiogram.types import Message
 from aiogram.utils.markdown import hcode, hbold
-from misc.utils import easy_format
+from misc.utils import FormString
 from keyboards.profile import profile_kb
 
 
@@ -10,7 +10,7 @@ async def command_profile(message: Message, user_data, localization):
     else:
         user_data.language_code = 'ru'
 
-    await message.answer(text=easy_format(localization.PROFILE_BODY,
+    await message.answer(text=FormString.paste_args(localization.PROFILE_BODY,
         name=message.from_user.first_name,
         nickname=hbold(user_data.nickname or localization.MISSING_ERROR),
         bot_id=hcode(user_data.id),
