@@ -68,7 +68,8 @@ class GameManager:
                     yield game_data
                     version = (await self.get_market_data(1)).version.split('.')
             except:
-                logger.opt(exception=True).error("Handler of versions error!")
+                #logger.opt(exception=True).error("Handler of versions error!")
+                pas
 
             await asyncio.sleep(3)
 

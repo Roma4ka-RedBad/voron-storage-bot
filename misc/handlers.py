@@ -1,9 +1,9 @@
 from database import FingerprintTable
-from managers import game, connections
+from managers import connections
 
 
 class Handlers:
-    def __init__(self, game_manager: game.GameManager, connections_manager: connections.ConnectionsManager):
+    def __init__(self, game_manager, connections_manager: connections.ConnectionsManager):
         self.gm = game_manager
         self.cm = connections_manager
         self.handlers = set()

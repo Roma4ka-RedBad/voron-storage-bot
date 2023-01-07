@@ -23,7 +23,10 @@ class Server(asyncio.Protocol):
             if raw_packet:
                 packet = Packet.decode(raw_packet)
                 logger.debug(f"[{packet.pid}] Received packet!")
-                asyncio.create_task(self._start_task(packets[packet.pid], packet=packet))
+                asyncio.create_task(self._start_task(packets[packet.pid],
+                                                     packet=packet,
+                                                     game_manager=self.game_manager,
+                                                     connections_manager=self.connections))
 
     async def _start_task(self, func, **kwargs):
         func_args = inspect.getfullargspec(func)

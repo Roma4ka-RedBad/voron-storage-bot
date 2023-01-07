@@ -3,7 +3,7 @@ from json import loads, dumps
 from box import Box
 
 from peewee import Model, TextField
-from peewee_async import MySQLDatabase, Manager
+from peewee_async import Manager, MySQLDatabase
 from playhouse.shortcuts import ReconnectMixin
 
 
@@ -25,6 +25,16 @@ class MyManager(Manager):
 
 
 class BaseModel(Model):
+    @classmethod
+    async def execute(cls, query):
+        objects = MyManager()
+        return await objects.execute(query)
+
+    @classmethod
+    async def get(cls, *query, **filters):
+        objects = MyManager()
+        return await objects.get(cls, *query, **filters)
+
     @classmethod
     async def get_by_id(cls, pk):
         objects = MyManager()
