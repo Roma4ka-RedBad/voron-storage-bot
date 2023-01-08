@@ -8,6 +8,7 @@ from misc.utils import FormString, get_version_and_query_by_string
 
 async def command_download(message: Message, user_data, localization, server):
     searching_data = await get_version_and_query_by_string(message.text)
+    bot_messages = []
     if searching_data:
         packet = await server.send(
             Packet(13102, major_v=searching_data[1], build_v=searching_data[2], revision_v=searching_data[3],
@@ -19,7 +20,8 @@ async def command_download(message: Message, user_data, localization, server):
                                                            name=user_data.nickname or message.from_user.first_name))
             elif packet.payload.get("file", None):
                 await message.answer_document(FSInputFile(packet.payload.file),
-                                              caption=FormString(localization.DOWNLOADFILES_FILES).get_form_string(
+                                              caption=FormString(
+                                                  localization.DOWNLOADFILES_FILES).get_form_string(
                                                   set_style="bold",
                                                   name=user_data.nickname or message.from_user.first_name,
                                                   files_count=packet.payload.files_count,
@@ -27,7 +29,8 @@ async def command_download(message: Message, user_data, localization, server):
                                               ))
             elif packet.payload.get("downloaded_file", None):
                 await message.answer_document(FSInputFile(packet.payload.downloaded_file),
-                                              caption=FormString(localization.DOWNLOADFILES_FILE).get_form_string(
+                                              caption=FormString(
+                                                  localization.DOWNLOADFILES_FILE).get_form_string(
                                                   set_style="bold",
                                                   file_name=packet.payload.file_name,
                                                   game_version=packet.payload.version
@@ -40,14 +43,19 @@ async def command_download(message: Message, user_data, localization, server):
                     name=user_data.nickname or message.from_user.first_name,
                     files_count=packet.payload.files_count,
                     game_version=packet.payload.version,
-                    files_name=''.join([f"\n  {hcode(file)}" for file in packet.payload.files])
+                    files_name='\n'.join([f"  {hcode(file)}" for file in packet.payload.files])
                 )
 
                 reply_markup = None
                 for part in parts:
                     if parts[-1] == part:
                         reply_markup = download_kb(localization, packet.payload.object_id, packet.payload.files_count)
-                    await message.answer(part, reply_markup=reply_markup)
+                    bot_messages.append(await message.answer(part, reply_markup=reply_markup))
+
+            if bot_messages:
+                await server.send(
+                    Packet(10102, object_id=packet.payload.object_id,
+                           message_ids=[message.message_id for message in bot_messages]), no_answer=True)
     else:
         await message.answer(FormString.paste_args(localization.DOWNLOADFILES_QUERY_MISSING_ERROR,
                                                    name=user_data.nickname or message.from_user.first_name))

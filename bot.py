@@ -2,6 +2,8 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from misc.my_logger import LoguruHandler
 from client import ServerConnection
 from handlers import create_public_router
@@ -16,7 +18,8 @@ async def main():
 
     server = ServerConnection('127.0.0.1', 8888)
     await server.connect()
-    bot = Bot(token=await server.get_bot_token(), parse_mode='HTML')
+    bot = Bot(token=await server.get_bot_token(), parse_mode='HTML',
+              session=AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8080", is_local=True)))
     dp = Dispatcher()
     dp.include_router(create_public_router(bot, server))
 
