@@ -1,10 +1,9 @@
 from ..base import Packet
 from managers.game import GameManager
-from managers.file_storage import FileManager
 from database import FingerprintTable
 
 
-async def brawlstars_search_files_query(instance, packet: Packet, game_manager: GameManager, file_manager: FileManager):
+async def brawlstars_search_files_query(instance, packet: Packet, game_manager: GameManager, file_manager):
     fingerprint = await FingerprintTable.get_or_none(FingerprintTable.major_v == packet.payload.major_v,
                                                      FingerprintTable.build_v == packet.payload.build_v,
                                                      FingerprintTable.revision_v == packet.payload.revision_v)
@@ -14,8 +13,8 @@ async def brawlstars_search_files_query(instance, packet: Packet, game_manager: 
     files = await game_manager.search_files(packet.payload.search_query, fingerprint.sha)
     _object = await file_manager.register("query", major_v=fingerprint.major_v, build_v=fingerprint.build_v,
                                           revision_v=fingerprint.revision_v, text_query=packet.payload.search_query,
-                                          bind_message_id=packet.payload.message_id,
-                                          bind_chat_id=packet.payload.chat_id,
+                                          user_message_id=packet.payload.message_id,
+                                          chat_id=packet.payload.chat_id,
                                           platform_name=packet.payload.platform_name)
     if not files:
         await file_manager.remove(_object=_object, forcibly_remove_job=True)

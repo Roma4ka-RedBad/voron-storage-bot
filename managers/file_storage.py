@@ -11,22 +11,24 @@ from datetime import datetime, timedelta
 from managers.connections import ConnectionsManager
 from logic_objects.config import Config
 from misc.utils import file_writer
+from packets.base import Packet
 
 
 class SearchingQuery:
-    def __init__(self, major_v: int, build_v: int, revision_v: int, text_query: str, bind_message_id: int,
-                 bind_chat_id: int, platform_name: str):
+    def __init__(self, major_v: int, build_v: int, revision_v: int, text_query: str, user_message_id: int,
+                 chat_id: int, platform_name: str):
         self.major_v = major_v
         self.build_v = build_v
         self.revision_v = revision_v
         self.text_query = text_query
 
-        self.bind_message_id = bind_message_id
-        self.bind_chat_id = bind_chat_id
+        self.user_message_id = user_message_id
+        self.bot_message_ids = []
+        self.chat_id = chat_id
         self.platform_name = platform_name
 
         self.object_id = random.randint(0, 10000000)
-        self.path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.bind_chat_id}/{self.bind_message_id}")
+        self.path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
 
     def __repr__(self):
         return f"<SearchingQuery id={self.object_id} query={self.text_query}>"
@@ -74,6 +76,10 @@ class FileManager:
                 await __object.object_deleter()
                 if forcibly_remove_job:
                     self.scheduler.get_job(str(__object.object_id)).remove()
+                await self.cm.send_by_handlers(
+                    Packet(22102, platform_name=__object.platform_name,
+                           message_ids=[__object.user_message_id] + __object.bot_message_ids,
+                           chat_id=__object.chat_id))
                 self.objects.remove(__object)
 
     async def get(self, object_id: int) -> SearchingQuery:
@@ -86,8 +92,7 @@ class FileManager:
             object_task.reschedule(DateTrigger(
                 datetime.now(tz=timezone(Config.SERVER.timezone)) + timedelta(minutes=Config.UFS.wait_for_delete_dir),
                 timezone=timezone(Config.SERVER.timezone)
-            ))
-            object_task.resume()
+            )).resume()
 
     async def stop_task(self, object_id: int):
         if object_task := self.scheduler.get_job(str(object_id)):

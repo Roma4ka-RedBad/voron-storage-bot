@@ -1,14 +1,13 @@
 import asyncio
 from ..base import Packet
 from managers.game import GameManager
-from managers.file_storage import FileManager
 from managers.connections import ConnectionsManager
 from database import FingerprintTable
 from misc.utils import compress_to_archive
 
 
 async def brawlstars_download_files_query(instance, packet: Packet, game_manager: GameManager,
-                                          file_manager: FileManager, connections_manager: ConnectionsManager):
+                                          file_manager, connections_manager: ConnectionsManager):
     _object = await file_manager.get(packet.payload.object_id)
     if _object:
         await file_manager.stop_task(_object.object_id)
@@ -25,8 +24,8 @@ async def brawlstars_download_files_query(instance, packet: Packet, game_manager
             results.append(await game_manager.download_file(fingerprint.sha, file, result_path=_object.path))
             if len(results) % 3 == 0:
                 await connections_manager.send_by_handlers(
-                    Packet(12101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
-                           chat_id=_object.bind_chat_id, tid="DOWNLOADFILES_START", language_code=packet.payload.language_code,
+                    Packet(22101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
+                           chat_id=_object.chat_id, tid="DOWNLOADFILES_START", language_code=packet.payload.language_code,
                            form_args={'total_files_count': len(results), 'max_files_count': len(files)}))
 
         if packet.payload.get("compress_to_archive", None):
