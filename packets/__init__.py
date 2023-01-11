@@ -4,7 +4,7 @@ from .delete_message import delete_message
 
 
 packets = {
-    22100: send_message,
-    22101: edit_message,
-    22102: delete_message
+    20100: send_message,
+    20101: edit_message,
+    20102: delete_message
 }

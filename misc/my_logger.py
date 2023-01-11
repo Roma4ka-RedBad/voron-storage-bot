@@ -17,4 +17,3 @@ class LoguruHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         logger_opt = logger.opt(depth=6, exception=record.exc_info)
         logger_opt.log(self._get_level(record), record.getMessage())
-
