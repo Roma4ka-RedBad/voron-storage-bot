@@ -23,7 +23,7 @@ async def brawlstars_download_files_query(instance, packet: Packet, game_manager
             results.append(await game_manager.download_file(fingerprint.sha, file, result_path=_object.path))
             if len(results) % 3 == 0:
                 await connections_manager.send_by_handlers(
-                    Packet(22101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
+                    Packet(20101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
                            chat_id=_object.chat_id, tid="DOWNLOADFILES_START",
                            language_code=packet.payload.language_code,
                            form_args={'total_files_count': len(results), 'max_files_count': len(files)}))

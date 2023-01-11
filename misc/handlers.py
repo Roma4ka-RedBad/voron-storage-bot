@@ -34,7 +34,7 @@ class Handlers:
             elif game_data.server_code == 8:
                 channels = await ChannelTable.get_list(ChannelTable.prod_update_mailing == True)
                 for channel in channels:
-                    await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                    await self.cm.send_by_handlers(Packet(20100, platform_name=channel.platform_name,
                                                           chat_id=channel.channel_id,
                                                           text=channel.mailing_data.prod_update.text,
                                                           form_args=game_data))
@@ -43,12 +43,12 @@ class Handlers:
                 channels = await ChannelTable.get_list(ChannelTable.prod_maintenance_mailing == True)
                 for channel in channels:
                     if game_data.maintenance_is_end:
-                        await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                        await self.cm.send_by_handlers(Packet(20100, platform_name=channel.platform_name,
                                                               chat_id=channel.channel_id,
                                                               text=channel.mailing_data.prod_maintenance_end.text,
                                                               form_args=game_data))
                     else:
-                        await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                        await self.cm.send_by_handlers(Packet(20100, platform_name=channel.platform_name,
                                                               chat_id=channel.channel_id,
                                                               text=channel.mailing_data.prod_maintenance_start.text,
                                                               form_args=game_data))

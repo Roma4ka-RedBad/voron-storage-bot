@@ -77,7 +77,7 @@ class FileManager:
                 if forcibly_remove_job:
                     self.scheduler.get_job(str(__object.object_id)).remove()
                 await self.cm.send_by_handlers(
-                    Packet(22102, platform_name=__object.platform_name,
+                    Packet(20102, platform_name=__object.platform_name,
                            message_ids=[__object.user_message_id] + __object.bot_message_ids,
                            chat_id=__object.chat_id))
                 self.objects.remove(__object)
