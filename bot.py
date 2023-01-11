@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 from misc.my_logger import LoguruHandler
-from client import ServerConnection
+from misc.connections import ServerConnection
 from handlers import create_public_router
 
 

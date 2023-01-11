@@ -1,5 +1,8 @@
 from box import Box
+from peewee import Model
 from bson import json_util
+from pathlib import Path, WindowsPath
+from misc.bytestream import Writer
 
 
 class Packet:
@@ -29,13 +32,22 @@ class Packet:
         self.buffer.payload = value
 
     @property
-    def str_payload(self):
-        return json_util.dumps(self.buffer.payload)
+    def str_payload(self) -> str:
+        encode_payload = self.buffer.payload.copy()
+        for key, value in encode_payload.items():
+            if isinstance(value, Model):
+                encode_payload[key] = value.__data__
+            if isinstance(value, (Path, WindowsPath)):
+                encode_payload[key] = str(value.resolve())
+        return json_util.dumps(encode_payload)
 
     def encode(self):
-        return f"{self.pid}::{self.str_payload}#".encode()
-
-    @classmethod
-    def decode(cls, data: str):
-        data = data.split("::")
-        return Packet(data[0], data[1])
+        writer = Writer()
+        writer.write_string(self.str_payload, 32)
+        encoded_string = writer.buffer
+        writer.buffer = b""
+        writer.write_int(self.pid, 16, False)
+        writer.buffer += len(encoded_string).to_bytes(3, 'big')
+        writer.write_int(0, 16, False)
+        writer.buffer += encoded_string
+        return writer.get_compressed_data()

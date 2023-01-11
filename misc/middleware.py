@@ -17,7 +17,7 @@ class Middleware(BaseMiddleware):
     async def server_data(self, data: Dict[str, Any], obj: TelegramObject):
         message = obj if isinstance(obj, Message) else obj.message if isinstance(obj, CallbackQuery) else None
         if message:
-            data["config_data"] = await self.server.events_handler.get_config_data()
+            data["config_data"] = self.server.events_handler.config_data
             if user_data := await self.server.send(Packet(11100, tg_id=message.from_user.id)):
                 data["user_data"] = user_data.payload
                 data["localization"] = data["config_data"].localization[user_data.payload.language_code]
