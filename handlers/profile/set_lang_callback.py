@@ -21,6 +21,7 @@ async def profile_set_language(cbq: CallbackQuery, bot: Bot, server, callback_da
         else:
             packet.payload.language_code = 'ru'
 
+        await set_commands(bot, localization, cbq.message.chat.id)
         await cbq.message.edit_text(text=FormString.paste_args(localization.PROFILE_BODY,
             name=cbq.from_user.first_name,
             nickname=hbold(packet.payload.nickname or localization.MISSING_ERROR),
@@ -30,4 +31,3 @@ async def profile_set_language(cbq: CallbackQuery, bot: Bot, server, callback_da
             warnings=hbold(packet.payload.warns),
             bind=hcode(packet.payload.vk_id or localization.MISSING_ERROR)
         ), reply_markup=profile_kb(packet.payload.language_code, localization))
-        await set_commands(bot, localization, cbq.message.chat.id)

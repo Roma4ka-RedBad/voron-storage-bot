@@ -11,6 +11,7 @@ from .markets import command_markets
 from .download import command_download
 from .download.download_archive_callback import download_archive
 from .working.compressed_photos import compressed_photo
+from .error import error_handler
 
 from misc.states import UserStates
 from keyboards.profile import ProfileCallback
@@ -23,6 +24,9 @@ def create_public_router(bot: Bot, server) -> Router:
 
     public_router.message.middleware(middleware)
     public_router.callback_query.middleware(middleware)
+    public_router.errors.middleware(middleware)
+    public_router.errors.register(error_handler)
+
     public_router.message.register(command_start, commands=["start"])
     public_router.message.register(command_setname, commands=["set_name"])
     public_router.message.register(state_waitname, UserStates.wait_name)
