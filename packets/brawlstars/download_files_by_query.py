@@ -1,12 +1,11 @@
 import asyncio
 from ..base import Packet
-from managers.game import GameManager
 from managers.connections import ConnectionsManager
 from database import FingerprintTable
 from misc.utils import compress_to_archive
 
 
-async def brawlstars_download_files_query(instance, packet: Packet, game_manager: GameManager,
+async def brawlstars_download_files_query(instance, packet: Packet, game_manager,
                                           file_manager, connections_manager: ConnectionsManager):
     _object = await file_manager.get(packet.payload.object_id)
     if _object:
@@ -25,11 +24,13 @@ async def brawlstars_download_files_query(instance, packet: Packet, game_manager
             if len(results) % 3 == 0:
                 await connections_manager.send_by_handlers(
                     Packet(22101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
-                           chat_id=_object.chat_id, tid="DOWNLOADFILES_START", language_code=packet.payload.language_code,
+                           chat_id=_object.chat_id, tid="DOWNLOADFILES_START",
+                           language_code=packet.payload.language_code,
                            form_args={'total_files_count': len(results), 'max_files_count': len(files)}))
 
         if packet.payload.get("compress_to_archive", None):
-            results = await (await asyncio.to_thread(compress_to_archive, str(_object.path / 'files.zip'), file_paths=results))
+            results = await (
+                await asyncio.to_thread(compress_to_archive, str(_object.path / 'files.zip'), file_paths=results))
 
         await instance.client_connection.send(
             Packet(packet.pid, result=results)

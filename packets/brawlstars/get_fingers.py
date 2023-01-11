@@ -1,9 +1,8 @@
 from ..base import Packet
-from managers.game import GameManager
 from database import FingerprintTable
 
 
-async def brawlstars_get_fingers(instance, packet: Packet, game_manager: GameManager):
+async def brawlstars_get_fingers(instance, packet: Packet, game_manager):
     actual_finger = await FingerprintTable.get(is_actual=True)
     new_finger = await game_manager.server_data(actual_finger.major_v, actual_finger.build_v, actual_finger.revision_v,
                                                 use_sync=True)

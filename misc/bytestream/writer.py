@@ -1,3 +1,4 @@
+import lzma
 from struct import pack
 
 
@@ -20,3 +21,6 @@ class Writer:
             self.write_int(1, 8, False)
         else:
             self.write_int(0, 8, False)
+
+    def get_compressed_data(self):
+        return lzma.compress(self.buffer)

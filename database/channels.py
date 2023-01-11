@@ -26,5 +26,5 @@ class Channels(BaseModel):
     ))
 
     @classmethod
-    def get_list_or_none(cls, *args):
-        return list(super().select().where(*args).execute())
+    async def get_list(cls, *args) -> list:
+        return list(await cls.execute(super().select().where(*args)))

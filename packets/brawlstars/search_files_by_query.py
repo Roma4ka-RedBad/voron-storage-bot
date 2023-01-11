@@ -1,9 +1,8 @@
 from ..base import Packet
-from managers.game import GameManager
 from database import FingerprintTable
 
 
-async def brawlstars_search_files_query(instance, packet: Packet, game_manager: GameManager, file_manager):
+async def brawlstars_search_files_query(instance, packet: Packet, game_manager, file_manager):
     fingerprint = await FingerprintTable.get_or_none(FingerprintTable.major_v == packet.payload.major_v,
                                                      FingerprintTable.build_v == packet.payload.build_v,
                                                      FingerprintTable.revision_v == packet.payload.revision_v)

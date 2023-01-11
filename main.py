@@ -5,6 +5,7 @@ from loguru import logger
 from managers.connections import ConnectionsManager
 from managers.game import GameManager
 from managers.file_storage import FileManager
+from misc.bytestream import Reader
 
 from packets import packets
 from packets.base import Packet
@@ -19,15 +20,22 @@ class Server(asyncio.Protocol):
     def connection_made(self, transport: asyncio.Transport):
         self.client_connection = self.connections.register(transport)
 
+    def decode_packets(self, data: bytes):
+        data = Reader.decompress_data(data)
+        while len(data) > 0:
+            reader = Reader(data)
+            header = reader.read(7)
+            packet_id = int.from_bytes(header[:2], 'big')
+            packet_length = int.from_bytes(header[2:5], 'big')
+            packet_payload = Reader(reader.read(packet_length))
+            yield Packet(packet_id, packet_payload.read_string(32))
+            data = reader.read()
+
     def data_received(self, data: bytes):
-        raw_packets = data.decode().split("#")
-        for raw_packet in raw_packets:
-            if raw_packet:
-                packet = Packet.decode(raw_packet)
+        for packet in self.decode_packets(data):
+            if packet.pid in packets:
                 logger.debug(f"[{packet.pid}] Received packet!")
-                asyncio.create_task(self._start_task(packets[packet.pid],
-                                                     packet=packet,
-                                                     game_manager=self.game_manager,
+                asyncio.create_task(self._start_task(packets[packet.pid], packet=packet, game_manager=self.game_manager,
                                                      connections_manager=self.connections,
                                                      file_manager=self.file_manager))
 

@@ -2,7 +2,7 @@ import asyncio
 import socket
 
 from box import Box
-from managers.instruments.bytestream import Reader, Writer
+from misc.bytestream import Reader, Writer
 
 
 class SupercellServer:

@@ -1,5 +1,7 @@
+from database import ChannelTable
 from database import FingerprintTable
 from managers import connections
+from packets.base import Packet
 
 
 class Handlers:
@@ -30,12 +32,23 @@ class Handlers:
                     await FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
                                                          build_v=raw_version[1], revision_v=raw_version[2])
             elif game_data.server_code == 8:
-                # Здесь будет рассылка пакетов ботам
-                pass
+                channels = await ChannelTable.get_list(ChannelTable.prod_update_mailing == True)
+                for channel in channels:
+                    await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                                                          chat_id=channel.channel_id,
+                                                          text=channel.mailing_data.prod_update.text,
+                                                          form_args=game_data))
 
             elif game_data.server_code == 10:
-                # Здесь будет рассылка пакетов ботам
-                if game_data.maintenance_is_end:
-                    pass
-                else:
-                    pass
+                channels = await ChannelTable.get_list(ChannelTable.prod_maintenance_mailing == True)
+                for channel in channels:
+                    if game_data.maintenance_is_end:
+                        await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                                                              chat_id=channel.channel_id,
+                                                              text=channel.mailing_data.prod_maintenance_end.text,
+                                                              form_args=game_data))
+                    else:
+                        await self.cm.send_by_handlers(Packet(22100, platform_name=channel.platform_name,
+                                                              chat_id=channel.channel_id,
+                                                              text=channel.mailing_data.prod_maintenance_start.text,
+                                                              form_args=game_data))

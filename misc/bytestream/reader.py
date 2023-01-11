@@ -1,3 +1,4 @@
+import lzma
 from io import BufferedReader, BytesIO
 from struct import unpack
 
@@ -25,3 +26,10 @@ class Reader(BufferedReader):
         if length == -1:
             return ""
         return self.read_char(length)
+
+    @staticmethod
+    def decompress_data(data: bytes):
+        try:
+            return lzma.decompress(data)
+        except lzma.LZMAError:
+            return b""
