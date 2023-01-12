@@ -1,5 +1,5 @@
 from aiogram import BaseMiddleware, Bot
-from aiogram.types import TelegramObject, Message, CallbackQuery
+from aiogram.types import TelegramObject, Message, CallbackQuery, error_event
 from typing import Callable, Dict, Any, Awaitable
 from packets.base import Packet
 
@@ -15,7 +15,14 @@ class Middleware(BaseMiddleware):
         data["server"] = self.server
 
     async def server_data(self, data: Dict[str, Any], obj: TelegramObject):
-        message = obj if isinstance(obj, Message) else obj.message if isinstance(obj, CallbackQuery) else None
+        message = None
+        if isinstance(obj, Message):
+            message = obj
+        elif isinstance(obj, CallbackQuery):
+            message = obj.message
+        elif isinstance(obj, error_event.ErrorEvent):
+            message = obj.update.message or obj.update.callback_query
+
         if message:
             data["config_data"] = self.server.events_handler.config_data
             if user_data := await self.server.send(Packet(11100, tg_id=message.from_user.id)):

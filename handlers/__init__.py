@@ -1,4 +1,5 @@
 from aiogram import Router, Bot, F
+from aiogram.filters import Command, CommandStart
 from misc.middleware import Middleware
 
 from .start import command_start
@@ -27,15 +28,15 @@ def create_public_router(bot: Bot, server) -> Router:
     public_router.errors.middleware(middleware)
     public_router.errors.register(error_handler)
 
-    public_router.message.register(command_start, commands=["start"])
-    public_router.message.register(command_setname, commands=["set_name"])
+    public_router.message.register(command_start, CommandStart())
+    public_router.message.register(command_setname, Command("set_name"))
     public_router.message.register(state_waitname, UserStates.wait_name)
-    public_router.message.register(command_profile, commands=["profile"])
+    public_router.message.register(command_profile, Command("profile"))
     public_router.callback_query.register(profile_set_language, ProfileCallback.filter(F.action == "set_language"))
-    public_router.message.register(command_fingers, commands=["fingers"])
-    public_router.message.register(command_markets, commands=["markets"])
-    public_router.message.register(command_download, commands=["download"])
+    public_router.message.register(command_fingers, Command("fingers"))
+    public_router.message.register(command_markets, Command("markets"))
+    public_router.message.register(command_download, Command("download"))
     public_router.callback_query.register(download_archive, DownloadCallback.filter(F.action == "archive"))
-    public_router.message.register(compressed_photo, content_types=['photo'])
+    public_router.message.register(compressed_photo, F.photo)
 
     return public_router

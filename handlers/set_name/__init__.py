@@ -1,4 +1,4 @@
-from aiogram.dispatcher.fsm.context import FSMContext
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from misc.states import UserStates
 from misc.utils import FormString
