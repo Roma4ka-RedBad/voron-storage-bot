@@ -1,5 +1,4 @@
 from box import Box
-from peewee import Model
 from bson import json_util
 from pathlib import Path, WindowsPath
 from misc.bytestream import Writer
@@ -35,8 +34,6 @@ class Packet:
     def str_payload(self) -> str:
         encode_payload = self.buffer.payload.copy()
         for key, value in encode_payload.items():
-            if isinstance(value, Model):
-                encode_payload[key] = value.__data__
             if isinstance(value, (Path, WindowsPath)):
                 encode_payload[key] = str(value.resolve())
         return json_util.dumps(encode_payload)
