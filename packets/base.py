@@ -1,5 +1,5 @@
 from box import Box
-from peewee import Model
+from peewee_aio import Model
 from bson import json_util
 from pathlib import Path, WindowsPath
 from misc.bytestream import Writer

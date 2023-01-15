@@ -28,7 +28,7 @@ class Handlers:
                     actual_sha = actual_sha.sha
 
                 if actual_sha != game_data.fingerprint.sha:
-                    await FingerprintTable.get_and_update(FingerprintTable.is_actual == True, is_actual=False)
+                    await FingerprintTable.update(is_actual=False).where(FingerprintTable.is_actual)
                     await FingerprintTable.get_or_create(sha=game_data.fingerprint.sha, major_v=raw_version[0],
                                                          build_v=raw_version[1], revision_v=raw_version[2])
             elif game_data.server_code == 8:

@@ -1,5 +1,5 @@
 from peewee import BigIntegerField, CharField, BooleanField
-from .base import BaseModel, JSONField
+from .base import database, JSONField
 
 
 def get_mailing_data(mailing_types: list):
@@ -13,7 +13,7 @@ def get_mailing_data(mailing_types: list):
     return result
 
 
-class Channels(BaseModel):
+class Channels(database.Model):
     channel_id = BigIntegerField(null=False)
     platform_name = CharField(max_length=2, null=False)
     prod_update_mailing = BooleanField(default=False)
@@ -27,4 +27,5 @@ class Channels(BaseModel):
 
     @classmethod
     async def get_list(cls, *args) -> list:
-        return list(await cls.execute(super().select().where(*args)))
+        print(await cls.select().where(*args))
+        return list(await cls.select().where(*args))

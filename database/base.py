@@ -2,72 +2,23 @@ from logic_objects.config import Config
 from json import loads, dumps
 from box import Box
 
-from peewee import Model, TextField
-from peewee_async import Manager, MySQLDatabase
+from peewee import TextField
+from peewee_aio import Manager
 from playhouse.shortcuts import ReconnectMixin
 
 
-class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
-    pass
+#class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
+#    pass
 
 
-database = ReconnectMySQLDatabase(
+'''database = ReconnectMySQLDatabase(
     Config.MYSQL.database,
     host=Config.MYSQL.host,
     port=Config.MYSQL.port,
     user=Config.MYSQL.username,
     password=Config.MYSQL.password
-)
-
-
-class MyManager(Manager):
-    database = database
-
-
-class BaseModel(Model):
-    @classmethod
-    async def execute(cls, query):
-        objects = MyManager()
-        return await objects.execute(query)
-
-    @classmethod
-    async def get(cls, *query, **filters):
-        objects = MyManager()
-        return await objects.get(cls, *query, **filters)
-
-    @classmethod
-    async def get_by_id(cls, pk):
-        objects = MyManager()
-        return await objects.get(cls, cls._meta.primary_key == pk)
-
-    @classmethod
-    async def get_or_create(cls, **kwargs):
-        objects = MyManager()
-        return await objects.get_or_create(cls, defaults=None, **kwargs)
-
-    @classmethod
-    async def get_or_none(cls, *query, **filters):
-        objects = MyManager()
-        try:
-            return await objects.get(cls, *query, **filters)
-        except:
-            pass
-
-    async def asave(self):
-        objects = MyManager()
-        await objects.update(self)
-
-    @classmethod
-    async def get_and_update(cls, *args, **kwargs):
-        objects = MyManager()
-        data = await objects.get(cls, *args)
-        if data:
-            for key, value in kwargs.items():
-                setattr(data, key, value)
-        await objects.update(data)
-
-    class Meta:
-        database = database
+)'''
+database = Manager("aiosqlite:///database.db")
 
 
 class ArrayField(TextField):

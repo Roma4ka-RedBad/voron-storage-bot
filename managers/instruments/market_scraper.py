@@ -108,14 +108,19 @@ class MarketScraper:
         return app
 
     @staticmethod
-    async def get_itunes_app_details(app_id, country="us", flatten=True):
+    async def get_itunes_app_details(app_id, country="us", language_code="en", flatten=True):
         try:
             app_id = int(app_id)
             id_field = "id"
         except ValueError:
             id_field = "bundleId"
 
-        url = "https://itunes.apple.com/lookup?%s=%s&country=%s&entity=software" % (id_field, app_id, country)
+        url = "https://itunes.apple.com/lookup?{field}={value}&l={lang}&country={country}&entity=software".format(
+            field=id_field,
+            value=app_id,
+            country=country,
+            lang=language_code
+        )
 
         result = await async_request(url, 'text')
         if result:

@@ -17,19 +17,22 @@ class GameManager:
     def __init__(self, server_connection: tuple, connections_manager):
         self.server = SupercellServer(*server_connection)
         self.handlers = Handlers(self, connections_manager)
-        self.data = Box()
+
+        self.playmarket_url = "https://play.google.com/store/apps/details?id=com.supercell.brawlstars"
+        self.appstore_url = "https://apps.apple.com/ua/app/brawl-stars/id1229016807"
+        self.assets_url = "https://game-assets.brawlstarsgame.com"
 
     async def _init(self):
         app_store = await self.server_data(1, 1, 1, market_type=1)
         playmarket = await self.server_data(1, 1, 1, market_type=2)
         if playmarket.server_code == 8:
-            self.data.appstore_url = app_store.download_game_link
-            self.data.playmarket_url = playmarket.download_game_link
+            self.appstore_url = app_store.download_game_link
+            self.playmarket_url = playmarket.download_game_link
 
         version = (await self.get_market_data(1)).version.split('.')
         game_data = await self.server_data(int(version[0]), int(version[1]), 1)
         if game_data.server_code == 7:
-            self.data.assets_url = game_data.assets_link
+            self.assets_url = game_data.assets_link
 
         self.handlers.init_handlers()
 
@@ -90,7 +93,7 @@ class GameManager:
         return links
 
     async def download_file(self, fingerprint_sha: str, file_name: str, result_path: Path = None, return_type="bytes"):
-        request = await async_request(f"{self.data.assets_url}/{fingerprint_sha}/{file_name}", return_type)
+        request = await async_request(f"{self.assets_url}/{fingerprint_sha}/{file_name}", return_type)
         if result_path:
             result_path = str((result_path / file_name.split('/')[-1]).resolve())
             return await asyncio.to_thread(file_writer, result_path, request)
@@ -113,13 +116,13 @@ class GameManager:
 
         return result
 
-    async def get_market_data(self, market_type: int, language_code: str = "ru", country: str = "us"):
+    async def get_market_data(self, market_type: int, language_code: str = "en", country: str = "us"):
         game_data = None
         if market_type == 2:
-            app_id = self.data.playmarket_url.split('=')[-1]
+            app_id = self.playmarket_url.split('=')[-1]
             game_data = await MarketScraper.get_google_app_details(app_id, lang=language_code, country=country)
         elif market_type == 1:
-            app_id = self.data.appstore_url.split('id')[-1]
-            game_data = await MarketScraper.get_itunes_app_details(app_id, country=country)
+            app_id = self.appstore_url.split('id')[-1]
+            game_data = await MarketScraper.get_itunes_app_details(app_id, country=country, language_code=language_code)
 
         return Box(game_data)

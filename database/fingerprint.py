@@ -1,10 +1,10 @@
 from datetime import datetime
 from peewee import IntegerField, TextField, DateTimeField, BooleanField
 
-from .base import BaseModel
+from .base import database
 
 
-class Fingerprints(BaseModel):
+class Fingerprints(database.Model):
     major_v = IntegerField(null=False)
     build_v = IntegerField(null=False)
     revision_v = IntegerField(null=False)

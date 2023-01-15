@@ -1,47 +1,12 @@
-import random
-import asyncio
-import shutil
-from pathlib import Path
-from pytz import timezone
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 from datetime import datetime, timedelta
+from pytz import timezone
 
 from managers.connections import ConnectionsManager
+from managers.manager_models import SearchingQuery, File
 from logic_objects.config import Config
-from misc.utils import file_writer
 from packets.base import Packet
-
-
-class SearchingQuery:
-    def __init__(self, major_v: int, build_v: int, revision_v: int, text_query: str, user_message_id: int,
-                 chat_id: int, platform_name: str):
-        self.major_v = major_v
-        self.build_v = build_v
-        self.revision_v = revision_v
-        self.text_query = text_query
-
-        self.user_message_id = user_message_id
-        self.bot_message_ids = []
-        self.chat_id = chat_id
-        self.platform_name = platform_name
-
-        self.object_id = random.randint(0, 10000000)
-        self.path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
-
-    def __repr__(self):
-        return f"<SearchingQuery id={self.object_id} query={self.text_query}>"
-
-    def create_path(self):
-        self.path.mkdir(parents=True, exist_ok=True)
-
-    async def create_text_document(self, data):
-        self.create_path()
-        return await asyncio.to_thread(file_writer, self.path / "files.txt", data, mode="w")
-
-    async def object_deleter(self):
-        shutil.rmtree(self.path, ignore_errors=True)
 
 
 class FileManager:
@@ -50,10 +15,12 @@ class FileManager:
         self.scheduler = AsyncIOScheduler()
         self.cm = connection_manager
 
-    async def register(self, object_type: str, **kwargs) -> SearchingQuery:
+    async def register(self, object_type: str, **kwargs) -> SearchingQuery | File:
         _object = None
         if object_type == 'query':
             _object = SearchingQuery(**kwargs)
+        elif object_type == 'file':
+            _object = File(**kwargs)
 
         if _object:
             self.objects.append(_object)
@@ -82,7 +49,7 @@ class FileManager:
                            chat_id=__object.chat_id))
                 self.objects.remove(__object)
 
-    async def get(self, object_id: int) -> SearchingQuery:
+    async def get(self, object_id: int) -> SearchingQuery | File:
         for _object in self.objects:
             if _object.object_id == object_id:
                 return _object
