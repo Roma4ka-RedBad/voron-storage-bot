@@ -11,6 +11,7 @@ from .fingers import command_fingers
 from .markets import command_markets
 from .download import command_download
 from .download.download_archive_callback import download_archive
+from .working import command_working
 from .working.compressed_photos import compressed_photo
 from .error import error_handler
 
@@ -37,6 +38,7 @@ def create_public_router(bot: Bot, server) -> Router:
     public_router.message.register(command_markets, Command("markets"))
     public_router.message.register(command_download, Command("download"))
     public_router.callback_query.register(download_archive, DownloadCallback.filter(F.action == "archive"))
+    public_router.message.register(command_working, F.document)
     public_router.message.register(compressed_photo, F.photo)
 
     return public_router
