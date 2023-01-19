@@ -1,5 +1,5 @@
 import asyncio
-from managers.manager_models import Connection
+from managers.models import Connection
 
 
 class ConnectionsManager:

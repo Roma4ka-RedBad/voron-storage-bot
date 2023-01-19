@@ -8,6 +8,7 @@ from .brawlstars.get_markets_data import brawlstars_get_markets_data
 from .brawlstars.search_files_by_query import brawlstars_search_files_query
 from .brawlstars.download_files_by_query import brawlstars_download_files_query
 from .files.register import files_register
+from .files.check_file import files_check
 
 
 packets = {
@@ -21,5 +22,6 @@ packets = {
     13101: brawlstars_get_markets_data,
     13102: brawlstars_search_files_query,
     13103: brawlstars_download_files_query,
-    14100: files_register
+    14100: files_register,
+    14101: files_check
 }

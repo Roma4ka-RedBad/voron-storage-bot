@@ -13,6 +13,5 @@ async def files_register(instance, packet: Packet, file_manager):
                                               platform_name=packet.payload.platform_name)
         _object.create_path()
         await instance.client_connection.send(
-            Packet(packet.pid, object_id=_object.object_id, path=_object.dir_path.resolve(),
-                   converts=_object.get_available_converts())
+            Packet(packet.pid, object_id=_object.object_id, path=_object.dir_path.resolve())
         )

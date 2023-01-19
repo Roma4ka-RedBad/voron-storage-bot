@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from pytz import timezone
 
 from managers.connections import ConnectionsManager
-from managers.manager_models import SearchingQuery, File
+from managers.models import SearchingQuery, File, Archive
 from logic_objects.config import Config
 from packets.base import Packet
 
@@ -37,16 +37,19 @@ class FileManager:
             )
             return _object
 
-    async def remove(self, object_id: int = None, _object: object = None, forcibly_remove_job: bool = False):
+    async def remove(self, object_id: int = None, _object: File | SearchingQuery | Archive = None,
+                     forcibly_remove_job: bool = False,
+                     remove_messages: bool = True):
         for __object in self.objects:
             if __object.object_id == object_id or __object == _object:
                 await __object.object_deleter()
                 if forcibly_remove_job:
                     self.scheduler.get_job(str(__object.object_id)).remove()
-                await self.cm.send_by_handlers(
-                    Packet(20102, platform_name=__object.platform_name,
-                           message_ids=[__object.user_message_id] + __object.bot_message_ids,
-                           chat_id=__object.chat_id))
+                if remove_messages:
+                    await self.cm.send_by_handlers(
+                        Packet(20102, platform_name=__object.platform_name,
+                               message_ids=[__object.user_message_id] + __object.bot_message_ids,
+                               chat_id=__object.chat_id))
                 self.objects.remove(__object)
 
     async def get(self, object_id: int) -> SearchingQuery | File:
