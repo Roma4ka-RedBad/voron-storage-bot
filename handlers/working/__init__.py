@@ -17,3 +17,4 @@ async def command_working(message: Message, bot: Bot, localization, user_data, s
         else:
             file = await bot.get_file(document.file_id)
             shutil.copy(file.file_path, f"{packet.payload.path}/{document.file_name}")
+            await server.send(Packet(14101, object_id=packet.payload.object_id), no_answer=True)

@@ -64,6 +64,7 @@ class FormString:
 
         return parts
 
+
 async def get_version_and_query_by_string(string: str):
     raw_text = string.split()
     raw_text.pop(0)
