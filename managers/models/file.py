@@ -1,10 +1,8 @@
-import random
 import shutil
 from pathlib import Path
-from zipfile import is_zipfile
-from rarfile import is_rarfile
-from py7zr import is_7zfile
+
 from logic_objects.config import Config
+from misc.utils import guess_file_format
 
 
 class File:
@@ -14,23 +12,21 @@ class File:
         self.chat_id = chat_id
         self.platform_name = platform_name
 
-        self.object_id = random.randint(0, 10000000)
         self.dir_path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
         self.file_path = self.dir_path / file_name
         self.file_name = file_name
+        self.user_extension = file_name.split('.')[-1]
 
-    def __repr__(self):
-        return f"<File id={self.object_id} path={self.file_path.resolve()}>"
+        self.tree_file_instance = None
+
+        self.filetype, self.filetype_extension, self.file_is = guess_file_format(
+                Path(self.file_name), open(self.file_path, 'rb'))
 
     def create_path(self):
         self.dir_path.mkdir(parents=True, exist_ok=True)
 
-    def is_archive(self):
-        return is_zipfile(self.file_path) or is_rarfile(self.file_path) or is_7zfile(self.file_path)
-
-    def get_available_converts(self):
-        converts = Config.get_converts()
-        return converts.get(self.file_path.suffix[1:], None)
-
     async def object_deleter(self):
         shutil.rmtree(self.dir_path, ignore_errors=True)
+
+    def __repr__(self):
+        return f"< path={self.file_path.resolve()}>"
