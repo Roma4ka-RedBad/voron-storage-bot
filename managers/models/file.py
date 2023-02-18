@@ -1,32 +1,30 @@
-import shutil
 from pathlib import Path
-
-from logic_objects.config import Config
-from misc.utils import guess_file_format
 
 
 class File:
-    def __init__(self, file_name: str, user_message_id: int, chat_id: int, platform_name: str):
-        self.user_message_id = user_message_id
-        self.bot_message_ids = []
-        self.chat_id = chat_id
-        self.platform_name = platform_name
-
-        self.dir_path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
-        self.file_path = self.dir_path / file_name
+    def __init__(self, file_name: str, dir_path: Path, owner):
+        self.owner = owner  # ссылка на Storage, в котором находится этот файл
+        self.file_path = dir_path / file_name
         self.file_name = file_name
         self.user_extension = file_name.split('.')[-1]
 
-        self.tree_file_instance = None
+        self.tree_file_instance = None  # Ссылка на Tree.File
+        self.id = None  # self.tree_file_instance._id
 
-        self.filetype, self.filetype_extension, self.file_is = guess_file_format(
-                Path(self.file_name), open(self.file_path, 'rb'))
+        self.filetype = None
+        self.filetype_extension = None
+        self.file_is = None
 
-    def create_path(self):
-        self.dir_path.mkdir(parents=True, exist_ok=True)
+    def set_attributes(self, **attributes):
+        for attr, value in attributes:
+            self.__setattr__(attr, value)
 
-    async def object_deleter(self):
-        shutil.rmtree(self.dir_path, ignore_errors=True)
+    def get_buttons(self):
+        return self.tree_file_instance.buttons
+
+    def exists(self):
+        return self.file_path.exists()
 
     def __repr__(self):
-        return f"< path={self.file_path.resolve()}>"
+        return f"<name={self.file_name} id={self.tree_file_instance.id} path={self.file_path.resolve()} file_type=" \
+               f"{self.file_is}>"

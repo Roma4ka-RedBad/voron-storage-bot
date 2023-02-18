@@ -4,7 +4,7 @@ from zipfile import ZipInfo
 from py7zr import py7zr
 from rarfile import RarInfo
 
-from misc.utils import BytesIO, IO, guess_file_format
+from misc.utils import BytesIO, IO
 
 
 class BaseArchiveFile:
@@ -23,10 +23,9 @@ class BaseArchiveFile:
             self.bytes_io = BytesIO(bytes_io)
 
         self.user_extension = self.origin.filename.split('.')[-1]
-
-        # определяется по заголовку и по совокупности условий
-        # рекомендуется использовать file_is
-        self.filetype, self.filetype_extension, self.file_is = guess_file_format(self.origin.origin, bytes_io)
+        self.filetype = None
+        self.filetype_extension = None
+        self.file_is = None
 
     def get_format(self):
         return self.user_extension
@@ -42,6 +41,13 @@ class BaseArchiveFile:
 
     def extract(self, path):
         return self.owner.archive_obj.extract(self.origin, path)
+
+    def set_attributes(self, **attributes):
+        for attr, value in attributes:
+            self.__setattr__(attr, value)
+
+    def get_buttons(self):
+        return self.tree_file_instance.buttons
 
     def __repr__(self):
         return str({

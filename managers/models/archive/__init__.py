@@ -37,7 +37,7 @@ class Archive(ZipArchive, RarArchive, GzipArchive):
         shutil.rmtree(self.dir_path, ignore_errors=True)
 
     @staticmethod
-    def is_archive(file_object) -> Union["Archive", bool]:
+    def is_archive(file_object, return_file_object: bool = False) -> Union["Archive", bool]:
         if is_zipfile(file_object.file_path):
             return Archive(file_object, 'zip')
 
@@ -47,7 +47,9 @@ class Archive(ZipArchive, RarArchive, GzipArchive):
         elif is_rarfile(file_object.file_path):
             return Archive(file_object, 'rar')
 
+        if return_file_object:
+            return file_object
         return False
 
     def __repr__(self):
-        return f"<Path={self.file_path.resolve()}>"
+        return f"<Path={self.file_path.resolve()} files_count={len(self)}>"

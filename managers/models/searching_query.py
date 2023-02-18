@@ -8,7 +8,7 @@ from logic_objects.config import Config
 
 class SearchingQuery:
     def __init__(self, major_v: int, build_v: int, revision_v: int, text_query: str, user_message_id: int,
-                 chat_id: int, platform_name: str):
+                 chat_id: int, platform_name: str, obj_id: int):
         self.major_v = major_v
         self.build_v = build_v
         self.revision_v = revision_v
@@ -19,7 +19,7 @@ class SearchingQuery:
         self.chat_id = chat_id
         self.platform_name = platform_name
 
-        self.object_id = random.randint(0, 10000000)
+        self.object_id = obj_id
         self.path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
 
     def __repr__(self):
