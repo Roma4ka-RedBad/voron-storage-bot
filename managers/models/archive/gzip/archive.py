@@ -8,9 +8,8 @@ class GzipArchive(BaseArchive):
     def __init__(self, path, **kwargs):
         archive = SevenZipFile(path, **kwargs)
         super().__init__(path, archive)
-        print('is gzip')
 
-    def get_files(self):
+    def get_files(self) -> list[GzipArchiveFile]:
         if self.files:
             return self.files
 
@@ -23,5 +22,5 @@ class GzipArchive(BaseArchive):
         self.files = new_files_list
         return new_files_list
 
-    def count(self):
+    def count(self) -> int:
         return len([file for file in self.archive_obj.files if not file.is_directory])

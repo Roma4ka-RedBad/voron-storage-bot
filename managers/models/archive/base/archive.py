@@ -1,6 +1,5 @@
 import shutil
 from pathlib import Path
-from typing import Union
 from zipfile import ZipFile
 
 from py7zr import SevenZipFile
@@ -10,7 +9,7 @@ from .file import BaseArchiveFile
 
 
 class BaseArchive:
-    def __init__(self, path: Path, archive_obj: Union[ZipFile, RarFile, SevenZipFile]):
+    def __init__(self, path: Path, archive_obj: ZipFile | RarFile | SevenZipFile):
         self.archive_obj = archive_obj
 
         self.dir_path = Path(path.parent)
@@ -44,7 +43,7 @@ class BaseArchive:
         self.archive_obj.close()
         return self.file_path
 
-    def get_file(self, instance: Union[int, str]):
+    def get_file(self, instance: int | str):
         if isinstance(instance, int):
             for file in self.files:
                 if file.file_id == instance:
@@ -69,4 +68,4 @@ class BaseArchive:
         return self.count()
 
     def __repr__(self):
-        return f"<Archive id={self.id} path={self.file_path.resolve()}>"
+        return f"<Archive owner_id={self._owner_id} path={self.file_path.resolve()}>"

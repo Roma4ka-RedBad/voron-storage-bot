@@ -46,7 +46,7 @@
   "WORK_DONE": "{name}, ваш файл:",
   "WORK_DONE_FOR_MANY_FILES": "{name}, ваши файлы:",
   "WORK_FILE_NOT_CONVERT_ERROR": "{name}, не удалось конвертировать файл(-ы)!",
-  "WORK_COMPRESSED_PHOTOS": "Обнаружены сжатые фотографии. Чтобы открыть больше функий, отправьте фотографии документами!",
+  "WORK_COMPRESSED_PHOTOS": "Обнаружены сжатые фотографии. Чтобы открыть больше функций, отправьте фотографии документами!",
   "WORK_METHOD_IS_UNAVAILABLE_ERROR": "Функция недоступна!",
   "WORK_SOME_FILES_CONVERTED_ERROR": "{name}, не все файлы удалось конвертировать!",
   "WORK_CONVERT_TO": "Скачать в {format}",
@@ -73,7 +73,6 @@
   "DOWNLOADFILES_NOT_FOUND_ERROR": "{name}, файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
   "DOWNLOADFILES_QUERY_MISSING_ERROR": "{name}, поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения, если хотите!",
   "DOWNLOADFILES_WITHIN_LIMIT": "{name}, вы можете скачать только {limit} файлов одновременно! Будут скачаны первые {limit} файлов (из {files_count})",
-
   "MISSING_ERROR": "ОТСУТСТВУЕТ",
   "UNKNOWN_ERROR": "Произошла ошибка!",
   "NO_CONNECTION_ERROR": "Отсутствует подключение к серверу!",

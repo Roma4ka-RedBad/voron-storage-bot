@@ -11,10 +11,10 @@ class GzipArchiveFile(BaseArchiveFile):
                  bytes_io: BinaryIO | IO):
         super().__init__(archive_file, archive_file_object, bytes_io)
 
-    def is_dir(self):
+    def is_dir(self) -> bool:
         return self.origin.is_directory
 
-    def size_to_mb(self):
+    def size_to_mb(self) -> int:
         return self.origin.uncompressed / 1024 / 1024  # на самом деле тут int отдается
 
     def extract(self, path):

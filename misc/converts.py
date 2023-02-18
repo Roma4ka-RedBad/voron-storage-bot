@@ -1,9 +1,9 @@
 import re
-from pathlib import Path, PurePath
+from pathlib import PurePath
 from typing import Optional, Union, Iterable
-from os import PathLike
-from managers.models.file import File
+
 from managers.models.archive.base import BaseArchiveFile
+from managers.models.file import File
 
 """
 basic usage example:

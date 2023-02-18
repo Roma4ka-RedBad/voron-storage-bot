@@ -1,9 +1,9 @@
-import random
 import asyncio
 import shutil
 from pathlib import Path
-from misc.utils import file_writer
+
 from logic_objects.config import Config
+from misc.utils import file_writer
 
 
 class SearchingQuery:
@@ -22,15 +22,15 @@ class SearchingQuery:
         self.object_id = obj_id
         self.path = Path(f"{Config.UFS.path}/{self.platform_name}/{self.chat_id}/{self.user_message_id}")
 
-    def __repr__(self):
-        return f"<SearchingQuery id={self.object_id} query={self.text_query}>"
-
     def create_path(self):
         self.path.mkdir(parents=True, exist_ok=True)
 
-    async def create_text_document(self, data):
+    async def create_text_document(self, data) -> str:
         self.create_path()
         return await asyncio.to_thread(file_writer, self.path / "files.txt", data, mode="w")
 
     async def object_deleter(self):
         shutil.rmtree(self.path, ignore_errors=True)
+
+    def __repr__(self):
+        return f"<SearchingQuery id={self.object_id} query={self.text_query}>"

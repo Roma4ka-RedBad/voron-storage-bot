@@ -19,10 +19,10 @@ class File:
         for attr, value in attributes:
             self.__setattr__(attr, value)
 
-    def get_buttons(self):
+    def get_buttons(self) -> list[str]:
         return self.tree_file_instance.buttons
 
-    def exists(self):
+    def exists(self) -> bool:
         return self.file_path.exists()
 
     def __repr__(self):

@@ -22,7 +22,7 @@ class GameManager:
         self.appstore_url = "https://apps.apple.com/ua/app/brawl-stars/id1229016807"
         self.assets_url = "https://game-assets.brawlstarsgame.com"
 
-    async def _init(self):
+    async def init(self):
         app_store = await self.server_data(1, 1, 1, market_type=1)
         playmarket = await self.server_data(1, 1, 1, market_type=2)
         if playmarket.server_code == 8:

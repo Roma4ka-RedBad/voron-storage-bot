@@ -12,7 +12,8 @@ class ZipArchive(BaseArchive):
         print('is zip')
 
     @staticmethod
-    def create_empty(path: Union[Path, str], mode: Literal["w", "x", "a"] = 'w', compress_level: int = 10, **kwargs):
+    def create_empty(path: Union[Path, str], mode: Literal["w", "x", "a"] = 'w', compress_level: int = 10,
+                     **kwargs) -> "ZipArchive":
         if isinstance(path, str):
             path = Path(path)
         path = path.absolute().resolve()

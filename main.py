@@ -18,6 +18,8 @@ class Server(asyncio.Protocol):
         self.game_manager = game_manager
         self.file_manager = file_manager
 
+        self.client_connection = None
+
     def connection_made(self, transport: asyncio.Transport):
         self.client_connection = self.connections.register(transport)
 
@@ -69,7 +71,7 @@ async def main():
     file_manager = FileManager(connections_manager)
     game_manager = GameManager(("game.brawlstarsgame.com", 9339), connections_manager)
     file_manager.scheduler.start()
-    await game_manager._init()
+    await game_manager.init()
     for handler in game_manager.handlers.handlers:
         loop.create_task(handler)
 

@@ -1,26 +1,15 @@
-import aiohttp
-import os
-from zipfile import ZipFile
-from pathlib import Path, PurePath
-
-from typing import BinaryIO, Literal, Union, IO
 import functools
-import itertools
+import os
 import sys
 from json import load
-from typing import Union, BinaryIO
-from zipfile import ZipFile, ZipInfo
+from pathlib import Path, PurePath
+from typing import Literal, IO, BinaryIO
+from zipfile import ZipFile
 
+import aiohttp
 from filetype import guess
-from py7zr import SevenZipFile, py7zr
-from rarfile import RarFile, RarInfo
-from sc_compression.signatures import Signatures, get_signature
-
 from filetype.types import IMAGE, VIDEO, AUDIO, ARCHIVE, FONT, DOCUMENT
-from py7zr import SevenZipFile, py7zr
-from rarfile import RarFile, RarInfo
 from sc_compression.signatures import Signatures, get_signature
-
 
 AVAILABLE_TYPES = ['image', 'compressed_image', 'video', 'audio', 'archive', 'font', 'doc', 'json', 'sc', '3d',
                    'shader']
@@ -124,8 +113,7 @@ async def async_request(url: str, return_type: str, data=None):
                         return await resp.text()
 
 
-async def compress_to_archive(archive_path: str,
-                              file_paths: list = None):
+async def compress_to_archive(archive_path: str, file_paths: list = None):
     archive = ZipFile(file_writer(archive_path, b""), "w", compresslevel=10)
     if file_paths:
         for path in file_paths:
@@ -144,7 +132,7 @@ async def compress_to_archive(archive_path: str,
     return archive_path
 
 
-def file_writer(file_name: str, data: Union[bytes, str], mode: Literal['w', 'wb', 'a'] = "wb"):
+def file_writer(file_name: str, data: bytes | str, mode: Literal['w', 'wb', 'a'] = "wb") -> str:
     with open(file_name, mode) as file:
         file.write(data)
 
@@ -152,7 +140,7 @@ def file_writer(file_name: str, data: Union[bytes, str], mode: Literal['w', 'wb'
 
 
 def super_(*subclasses):
-    """Кастомный super, позволяющий наследовать от нужного класса
+    """Кастомный super, позволяющий наследовать от нужного класса.
 
     Аргументы функции это класс(ы), от которых нужно наследовать метод.
 
@@ -205,7 +193,7 @@ def super_(*subclasses):
     return Proxy()
 
 
-def guess_file_format(path: Union[Path, PurePath], bytes_io: Union[IO, BinaryIO, BytesIO]):
+def guess_file_format(path: Path | PurePath, bytes_io: IO | BinaryIO | BytesIO) -> tuple:
     """
     :param path: путь до файла.
     :param bytes_io: файловый объект, открытый для чтения в бинарном режиме.

@@ -1,17 +1,17 @@
+import shutil
+from datetime import datetime, timedelta
+from pathlib import Path
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
-from datetime import datetime, timedelta
 from pytz import timezone
 
+from logic_objects.config import Config
 from managers.connections import ConnectionsManager
 from managers.models import SearchingQuery, Archive, File
-from logic_objects.config import Config
-from packets.base import Packet
 from misc.converts import Tree, Converts
-from typing import Union, Optional
-from pathlib import Path
-import shutil
 from misc.utils import guess_file_format
+from packets.base import Packet
 
 
 class Storage:
@@ -52,7 +52,7 @@ class Storage:
 
         return last_size
 
-    def add(self, file: Union[File, Archive]):
+    def add(self, file: File | Archive):
         if isinstance(file, File):
             self.file_objects.append(file)
             temp = guess_file_format(Path(file.file_name), open(file.file_path, 'rb'))
@@ -84,7 +84,7 @@ class Storage:
             if not file_object.exists():
                 self.add(Archive.is_archive(file_object, return_file_object=True))
 
-    def get_available_converts(self, *converts: Optional[Union[Converts]]):
+    def get_available_converts(self, *converts: Converts | None) -> dict:
         """
         :param converts: Список конкретных конвертаций, на которые нужно сделать проверку.
         :return: Словарь кнопок и массив ид файлов, которые подходят под категорию конвертации. Может быть пустым.
@@ -100,9 +100,6 @@ class Storage:
         self.dir_path.mkdir(parents=True, exist_ok=True)
 
     async def object_deleter(self):
-        del self.tree
-        del self.raw_objects
-        del self.file_objects
         shutil.rmtree(self.dir_path, ignore_errors=True)
 
 
@@ -173,7 +170,7 @@ class FileManager:
         if object_task := self.scheduler.get_job(str(object_id)):
             object_task.resume()
 
-    def _get_unique_id(self):
+    def _get_unique_id(self) -> int:
         self._unique_id += 1
         # яхз может вообще по приколу бесконечным сделать? Я просто думал, что в пакете есть ограничение на размер
         # этого значения
