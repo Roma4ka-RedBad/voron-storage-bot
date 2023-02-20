@@ -75,8 +75,8 @@ async def main():
     for handler in game_manager.handlers.handlers:
         loop.create_task(handler)
 
-    server = await loop.create_server(lambda: Server(connections_manager, game_manager, file_manager), '127.0.0.1',
-                                      8888)
+    server = await loop.create_server(lambda: Server(connections_manager, game_manager, file_manager),
+                                      '127.0.0.1',  8910)
 
     logger.info("Server running!")
     async with server:

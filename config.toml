@@ -10,7 +10,7 @@ admin_ids = [1225973623]
 [VK]
 bot_token = 'vk1.a.1gA3IEeoxhrAMnIURrUh-6j3M48P53dE5zqSfvHgsX-gLg0etEip9w53KhIzHbrCCMKK4JLyOaYvr1IqpV8CNKjyDQQHDfCqq8PcXmPcpRoFZd5lZnHnjec5th7UQP-c3iB9pu69wBl3QTLcywr6nxo9C0mtjBi1Yl9Y4t7VhbLi-Q0p9w5CjxWEEdOvxeNQIvU-x4OaFAhzzna4KskxNA'
 user_token = 'vk1.a.n5JFyo07vJ9p8VKvh50v5xuuj7dq-szd6sCb0uZ6mQIL5M6A_RGOI1IwQlhDuwZtPnKMxtrrmUg-8cywyjnDmlHhhBhDrSYSWan0AcVzkcs6w1mX7xGeIJL6oT0iAfgtjBaXZEDhZHeg3AekXW8yiEv65MYoYjOFLJDKolASAflE3lRKqI_up4F5DQhwEivv'
-admin_ids = []
+admin_ids = [508214061]
 
 [MYSQL]
 host = '213.32.35.58'

@@ -16,7 +16,12 @@ class Users(database.Model):
     metadata = ForeignKeyField(Metadata, backref='user')
 
     @classmethod
-    async def get_by_tg_or_vk(cls, tg_id: int = None, vk_id: int = None):
+    async def get_by_tg_or_vk(cls, payload):
+        tg_id = payload.get('tg_id')
+        vk_id = payload.get('vk_id')
+        if tg_id is None and vk_id is None:
+            return None
+
         data = None
         if vk_id is not None:
             data = await cls.get_or_none(vk_id=vk_id)
