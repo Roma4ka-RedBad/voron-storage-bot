@@ -10,7 +10,7 @@ labeler.vbml_ignore_case = True
 
 @labeler.private_message(regexp=commands_to_regex('команды', 'помощь', 'commands', 'help'))
 @labeler.private_message(text=('команды', 'помощь', 'commands', 'help'))
-async def commands_handler(message, localization):
+async def commands_handler(message: Message, localization):
     keyboard = commands_keyboard(localization)
     await message.answer(localization.START_VK_COMMANDS, keyboard=keyboard)
 
