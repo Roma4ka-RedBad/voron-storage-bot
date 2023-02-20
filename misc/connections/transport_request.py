@@ -2,7 +2,7 @@ import asyncio
 from io import BytesIO
 
 from misc.bytestream import Reader
-from packets.base import Packet
+from misc.packets import Packet
 
 
 class TransportRequest(asyncio.Protocol):

@@ -1,4 +1,7 @@
 import re
+from bot_config import Config
+from vkbottle import API
+from .models import UserModel
 
 
 def commands_to_regex(*args: str, exactly: bool = False) -> str:
@@ -15,9 +18,12 @@ def commands_to_regex(*args: str, exactly: bool = False) -> str:
     return f'{start}({command})\b' if exactly else f'{start}({command})'
 
 
-async def get_nickname(userdata, api, clickable=False):
+async def get_nickname(userdata: UserModel, api: API = None, clickable: bool = False):
+    if api is None:
+        api = Config.bot_api
+
     nickname = userdata.nickname
-    if userdata.nickname is None or userdata.nickname == '':
+    if nickname == '':
         nickname = (await api.users.get(user_ids=[userdata.vk_id]))[0].first_name
 
     if clickable:

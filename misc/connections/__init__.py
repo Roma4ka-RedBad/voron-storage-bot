@@ -1,5 +1,5 @@
 import asyncio
-from packets.base import Packet
+from misc.packets import Packet
 from loguru import logger
 from .events_handle import EventsHandler
 from .transport_request import TransportRequest

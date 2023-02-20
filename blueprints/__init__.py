@@ -1,5 +1,6 @@
-from . import default_commans
+from . import default_commans, profile
 
 __all__ = [
-    default_commans
+    default_commans,
+    profile
 ]

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime
 
-__all__ = ['ConfigModel']
+__all__ = ['ConfigModel', 'UserModel']
 
 
 class ConfigVars:

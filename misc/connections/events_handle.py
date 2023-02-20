@@ -4,8 +4,8 @@ from io import BytesIO
 from loguru import logger
 
 from misc.bytestream import Reader
-from packets import packets
-from packets.base import Packet
+from misc.packets import packets
+from misc.packets import Packet
 
 
 class EventsHandler(asyncio.Protocol):

@@ -73,7 +73,7 @@ def audio_keyboard(message_id: int, localization) -> str:
                 [
                     [
                         {
-                            'label': localization.TID_CONVERT_TO.format(format='mp3'),
+                            'label': localization.WORK_CONVERT_TO.format(format='mp3'),
                             'type': 'callback',
                             'color': 'positive',
                             'payload': {
@@ -84,7 +84,7 @@ def audio_keyboard(message_id: int, localization) -> str:
                             }
                         },
                         {
-                            'label': localization.TID_CONVERT_TO.format(format='ogg'),
+                            'label': localization.WORK_CONVERT_TO.format(format='ogg'),
                             'type': 'callback',
                             'color': 'positive',
                             'payload': {
@@ -97,7 +97,7 @@ def audio_keyboard(message_id: int, localization) -> str:
                     ],
                     [
                         {
-                            'label': localization.TID_CONVERT_AND_COMPRESS.format(format='mp3'),
+                            'label': localization.WORK_CONVERT_AND_COMPRESS.format(format='mp3'),
                             'type': 'callback',
                             'color': 'secondary',
                             'payload': {
@@ -108,7 +108,7 @@ def audio_keyboard(message_id: int, localization) -> str:
                             }
                         },
                         {
-                            'label': localization.TID_CONVERT_AND_COMPRESS.format(format='ogg'),
+                            'label': localization.WORK_CONVERT_AND_COMPRESS.format(format='ogg'),
                             'type': 'callback',
                             'color': 'secondary',
                             'payload': {
@@ -158,7 +158,7 @@ def change_language_keyboard(localization):
         Keyboard(one_time=False, inline=True)
         .schema([
             [{
-                'label': localization.TID_SET_LANGUAGE,
+                'label': localization.PROFILE_SET_LANGUAGE,
                 'type': 'callback',
                 'payload': {'command': 'change_language'}}]
         ])

@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from box import Box
-from vkbottle import API, BuiltinStateDispenser
-from vkbottle.bot import BotLabeler
+from vkbottle import API, BuiltinStateDispenser, GroupEventType
+from vkbottle.bot import BotLabeler, MessageEvent
 
 from misc.models import ConfigModel
 
@@ -34,6 +34,8 @@ class Config:
     server_config: ConfigModel = None
     default_path: Path = None
     localizations: dict | Box = None
+
+    callback = GroupEventType.MESSAGE_EVENT
 
     @classmethod
     async def init(cls, server, *_):

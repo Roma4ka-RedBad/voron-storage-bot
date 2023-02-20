@@ -7,7 +7,7 @@ from vkbottle.bot import Message, Bot
 from bot_config import Config
 from misc.connections import ServerConnection
 from misc.models import UserModel
-from packets.base import Packet
+from misc.packets import Packet
 
 
 class AddArgumentsToMessageEventMiddleware(BaseMiddleware[Message]):
@@ -55,7 +55,7 @@ class AddArgumentsToCallbackEventMiddleware(BaseMiddleware[Message]):
 
     async def pre(self):
         event = Box(self.event)
-        userdata = await self.__class__.server.send(Packet(11100, vk_id=self.event.from_id))
+        userdata = await self.__class__.server.send(Packet(11100, vk_id=event.object.user_id))
 
         if not userdata.payload:
             if event.object.user_id in Config.server_config.VK.admin_ids:
