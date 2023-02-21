@@ -16,12 +16,14 @@ async def brawlstars_download_files_query(instance, packet: Packet, game_manager
         if not fingerprint:
             fingerprint = await FingerprintTable.get(is_actual=True)
 
-        files = await game_manager.search_files(_object.text_query, fingerprint.sha)
+        files = await game_manager.search_files(packet.payload.get('query') or _object.text_query, fingerprint.sha)
         _object.create_path()
+
         results = []
+        divider = packet.payload.get('divider') or 3
         for file in files:
             results.append(await game_manager.download_file(fingerprint.sha, file, result_path=_object.path))
-            if len(results) % 3 == 0:
+            if len(results) % divider == 0:
                 await connections_manager.send_by_handlers(
                     Packet(20101, platform_name=_object.platform_name, message_id=packet.payload.message_id,
                            chat_id=_object.chat_id, tid="DOWNLOADFILES_START",
