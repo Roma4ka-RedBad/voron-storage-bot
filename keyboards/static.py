@@ -168,16 +168,17 @@ def change_language_keyboard(localization):
     return keyboard
 
 
-def server_downloads_keyboard(localization, message_id):
+def server_downloads_keyboard(localization, obj_id: int, has_music: bool, many_files: bool, count: int):
     keyboard = (
         Keyboard(one_time=False, inline=True)
         .schema([
             [{
-                'label': localization.TID_DOWNLOADFILES_BUTTON,
+                'label': localization.DOWNLOADFILES_BUTTON,
                 'type': 'callback',
-                'payload': {'command': 'download_all_files', 'msg_id': message_id}}],
+                'payload': {'command': 'download_all_files', 'obj_id': obj_id, 'has_misic': has_music,
+                            'many_files': many_files, 'count': count}}],
             [{
-                'label': localization.TID_DOWNLOADFILES_REMOVE_PARENTS,
+                'label': localization.DOWNLOADFILES_REMOVE_PARENTS,
                 'type': 'callback',
                 'payload': {'command': 'remove_paths'}}]
         ])
@@ -192,7 +193,7 @@ def archive_with_all_files_keyboard(localization, message_id):
         Keyboard(one_time=False, inline=True)
         .schema([
             [{
-                'label': localization.TID_DOWNLOADFILES_BUTTON,
+                'label': localization.DOWNLOADFILES_BUTTON,
                 'type': 'callback',
                 'payload': {'command': 'download_all_files', 'msg_id': message_id}}]
         ])

@@ -2,7 +2,7 @@ from pathlib import Path
 from random import randint
 
 from aiohttp import ClientSession
-from vkbottle import API
+from bot_config import Config
 from vkbottle_types.objects import MessagesForward
 
 
@@ -14,16 +14,15 @@ def get_valid_link(response):
     return f'doc{owner}_{doc_id}{("_" + access_key) if access_key else ""}'
 
 
-async def upload(docs: list[Path], user_api: API, bot_api: API, localization, peer_id, rename: bool = False
-                 ) -> tuple[list[str], bool]:
+async def upload(docs: list[Path], localization, peer_id, rename: bool = False) -> tuple[list[str], bool]:
     have_big_file = any(file.stat().st_size > 220 * 1024 * 1024 for file in docs)
     files = []
     if have_big_file:
-        server = await user_api.docs.get_upload_server()
-        api = user_api
+        server = await Config.user_api.docs.get_upload_server()
+        api = Config.user_api
     else:
-        server = await bot_api.docs.get_messages_upload_server(type='doc', peer_id=peer_id)
-        api = bot_api
+        server = await Config.bot_api.docs.get_messages_upload_server(type='doc', peer_id=peer_id)
+        api = Config.bot_api
 
     async with ClientSession() as session:
         for filepath in docs:
@@ -41,8 +40,8 @@ async def upload(docs: list[Path], user_api: API, bot_api: API, localization, pe
 
     if have_big_file:
         text = localization.TID_FILES_LOADED_VIA_USERAPI if len(files) > 1 else localization.TID_FILE_LOADED_VIA_USERAPI
-        message = await user_api.messages.get_by_id([
-            await user_api.messages.send(
+        message = await Config.user_api.messages.get_by_id([
+            await Config.user_api.messages.send(
                     message=text,
                     attachment=files or None,
                     user_id=-198411230,
