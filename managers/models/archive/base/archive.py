@@ -14,7 +14,7 @@ class BaseArchive:
 
         self.dir_path = Path(path.parent)
         self.file_name = path.name
-        self.file_path = path
+        self.file_path = path.resolve()
 
         self.files = None
         self._owner_id = None
