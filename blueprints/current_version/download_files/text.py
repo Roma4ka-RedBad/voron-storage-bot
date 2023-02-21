@@ -88,8 +88,12 @@ async def download_file_handler(message: Message, server: ServerConnection, user
                        compress_to_archive=has_music or packet.files_count > 5,
                        divider=1))
 
-        if response.payload.get('error_tid', None):
-            await message.answer(localization[response.payload.error_tid])
+        if response:
+            if response.payload.get('error_tid', None):
+                await message.answer(localization[response.payload.error_tid])
+                return
+        else:
+            await message.answer(localization.UNKNOWN_ERROR)
             return
 
         if isinstance(response.payload.result, list):

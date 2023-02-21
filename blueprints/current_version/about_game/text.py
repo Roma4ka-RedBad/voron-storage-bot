@@ -33,3 +33,5 @@ async def about_game_handler(message: Message, server: ServerConnection, localiz
                 ),
                 attachment=photo
         )
+    else:
+        await event.send_message(localization.UNKNOWN_ERROR)

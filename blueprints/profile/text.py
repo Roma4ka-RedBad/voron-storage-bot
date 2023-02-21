@@ -39,7 +39,11 @@ async def change_nickname_handler(message: Message, userdata: UserModel, server:
         return
 
     user = await server.send(Packet(11101, vk_id=userdata.vk_id, set_key='nickname', set_value=message.text))
-    await message.reply(localization.SETNAME_DONE.format(name=user.payload.nickname))
+    if user:
+        await message.reply(localization.SETNAME_DONE.format(name=user.payload.nickname))
+    else:
+        await message.answer(localization.UNKNOWN_ERROR)
+
 
 
 @labeler.private_message(text=('Привязать к TG', 'Bind to TG'))

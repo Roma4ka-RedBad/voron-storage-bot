@@ -13,10 +13,14 @@ labeler.vbml_ignore_case = True
 
 
 @labeler.raw_event(Config.callback, MessageEvent, PayloadRule({'command': 'change_language'}))
-async def hello_callback_handler(event: MessageEvent, userdata: UserModel, server: ServerConnection):
+async def hello_callback_handler(event: MessageEvent, userdata: UserModel, server: ServerConnection, localization):
     user = (await Config.bot_api.users.get(user_ids=[event.user_id]))[0]
     lg_code = {'ru': 'en', 'en': 'ru'}[userdata.language_code]
-    await server.send(Packet(11101, vk_id=userdata.vk_id, set_key='language_code', set_value=lg_code))
+    packet = await server.send(Packet(11101, vk_id=userdata.vk_id, set_key='language_code', set_value=lg_code))
+    if not packet:
+        await event.send_message(localization.UNKNOWN_ERROR)
+        return
+
     localization = Config.localizations[lg_code]
 
     await event.edit_message(
