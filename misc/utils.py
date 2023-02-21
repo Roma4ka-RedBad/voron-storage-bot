@@ -129,7 +129,7 @@ async def compress_to_archive(archive_path: str, file_paths: list = None):
                 else:
                     archive.write(path)
     archive.close()
-    return archive_path
+    return Path(archive_path).resolve()
 
 
 def file_writer(file_name: str, data: bytes | str, mode: Literal['w', 'wb', 'a'] = "wb") -> str:
