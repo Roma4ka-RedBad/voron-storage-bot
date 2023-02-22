@@ -1,6 +1,7 @@
 from ..base import Packet
 
 
+# 13101
 async def brawlstars_get_markets_data(instance, packet: Packet, game_manager):
     await instance.client_connection.send(
         Packet(

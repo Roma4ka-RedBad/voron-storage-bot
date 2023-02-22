@@ -2,6 +2,7 @@ from database import UserTable
 from ..base import Packet
 
 
+# 11100
 async def users_get(instance, packet: Packet):
     user = await UserTable.get_by_tg_or_vk(packet.payload)
     if user:
@@ -10,6 +11,7 @@ async def users_get(instance, packet: Packet):
         await instance.client_connection.send(Packet(packet.pid, None))
 
 
+# 11101
 async def users_set(instance, packet: Packet):
     user = await UserTable.get_by_tg_or_vk(packet.payload)
     if user:
