@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime
 
-__all__ = ['ConfigModel', 'UserModel']
+__all__ = ['ConfigModel', 'UserModel', 'FileModel']
 
 
 class ConfigVars:
@@ -58,3 +58,11 @@ class UserModel(BaseModel):
     warns: int = 0
     created_at: datetime = datetime.now()
     metadata: UserMetadata
+
+
+class FileModel(BaseModel):
+    name: str = None
+    url: str = None
+    ext: str = None
+    file_size: int = None
+    path: str = None

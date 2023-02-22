@@ -35,7 +35,7 @@ def compressed_photos_keyboard(message_id: int) -> str:
                             'type': 'callback',
                             'color': 'negative',
                             'payload': {
-                                'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
+                                'TID': 'WORK_METHOD_IS_UNAVAILABLE_ERROR',
                                 'type': 'show_snackbar'
                             }
                         },
@@ -44,7 +44,7 @@ def compressed_photos_keyboard(message_id: int) -> str:
                             'type': 'callback',
                             'color': 'negative',
                             'payload': {
-                                'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
+                                'TID': 'WORK_METHOD_IS_UNAVAILABLE_ERROR',
                                 'type': 'show_snackbar'
                             }
                         },
@@ -53,7 +53,7 @@ def compressed_photos_keyboard(message_id: int) -> str:
                             'type': 'callback',
                             'color': 'negative',
                             'payload': {
-                                'TID': 'TID_SNACKBAR_METHOD_IS_UNAVAILABLE',
+                                'TID': 'WORK_METHOD_IS_UNAVAILABLE_ERROR',
                                 'type': 'show_snackbar'
                             }
                         }
