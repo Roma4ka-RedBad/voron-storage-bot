@@ -1,7 +1,7 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Union, Literal
+from typing import Union, Literal, Iterable
 from zipfile import is_zipfile
 
 from py7zr import is_7zfile
@@ -56,23 +56,29 @@ class Archive(ZipArchive, RarArchive, GzipArchive):
         return False
 
     @staticmethod
-    async def compress_to_archive(archive_path: str, file_paths: list = None, close_archive: bool = True,
+    async def compress_to_archive(archive_path: str, file_paths: list[str | Path] | str | Path,
+                                  close_archive: bool = True,
                                   archive_type: Literal['zip', 'rar', '7z'] = 'zip', **kwargs):
         # Если нужны другие типы архивов, кроме зип - нужно создать функцию create_empty
         archive = Archive.archive_types[archive_type].create_empty(archive_path, **kwargs)
-        if file_paths:
-            for path in file_paths:
-                if path:
-                    if os.path.isdir(path):
-                        for folder, _, files in os.walk(path):
-                            for _file in files:
-                                arc_name = os.path.join(folder.replace(path, ''), _file)
-                                file_name = os.path.join(folder, _file)
-                                if arc_name is None:
-                                    arc_name = Path(file_name).name
-                                archive.write(filepath=file_name, arc_name=arc_name)
-                    else:
-                        archive.write(path)
+
+        if isinstance(file_paths, Iterable):
+            file_paths = [Path(p) for p in file_paths]
+        else:
+            file_paths = [Path(file_paths)]
+
+        # Если передаётся путь до папки, то её файлы сжимаются, сохраняя структуру
+        for path in file_paths:
+            if path.is_dir():
+                for folder, _, files in os.walk(path):
+                    for _file in files:
+                        arc_name = os.path.join(folder.replace(str(path), ''), _file)
+                        file_name = os.path.join(folder, _file)
+                        if arc_name is None:
+                            arc_name = Path(file_name).name
+                        archive.write(filepath=file_name, arc_name=arc_name)
+            else:
+                archive.write(path)
 
         if close_archive:
             return archive.close()  # возвращает путь до архива
