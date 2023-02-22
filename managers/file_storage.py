@@ -80,8 +80,9 @@ class Storage:
 
     def register_files(self):
         self.tree = Tree()
+        self.file_objects.clear()
         for file_object in self.raw_objects:
-            if not file_object.exists():
+            if file_object.exists():
                 self.add(Archive.is_archive(file_object, return_file_object=True))
 
     def get_available_converts(self, *converts: Converts | None) -> dict:
@@ -92,9 +93,20 @@ class Storage:
         """
         if not converts:
             converts = Converts.__all__()
-        self.converts = Converts.match_available_converts(self.file_objects, *converts)
+        self.converts = Converts.match_available_converts(self.tree.files.values(), *converts)
 
         return self.converts
+
+    async def convert_to(self, method: str):
+        if self.converts is None:
+            self.get_available_converts()
+
+        if method not in self.converts:
+            # Нужно отослать сообщение юзеру с ошибкой о том, что эти файлы нельзя конвертировать в этот формат
+            return
+        #  Ну и по идее, тут файлы добавляются в очередь и ждётся ответ.
+        #  Возвращается список путей на конвертированные файлы
+        return [str(obj.file_path.resolve()) for obj in self.file_objects]
 
     def create_path(self):
         self.dir_path.mkdir(parents=True, exist_ok=True)

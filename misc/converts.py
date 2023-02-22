@@ -8,12 +8,11 @@ from managers.models.file import File
 """
 basic usage example:
 
-tree_files = []
 tree = Tree()
 for file in files:
-    files.append(tree.add(file))
+    tree.add(file)
 
-converts = Converts.match_available_converts(files)
+converts = Converts.match_available_converts(tree.files.values())
 """
 
 
@@ -121,6 +120,7 @@ class Tree:
             subfolder = self
             if not with_self:
                 subfolder = self.back()
+            result.append(subfolder.name)
 
             while subfolder.back() is not None:
                 result.append(subfolder.name)
@@ -378,7 +378,6 @@ class MatchObject:
                     past = file.back()
                     if past is None:
                         return
-
                 return past.get_root(with_self=True)
 
 
@@ -389,7 +388,6 @@ class СукаБлятьРомаПомогиЭтоНазвать:
 
     def get_result(self):
         result = {}
-
         if len(self.match_object.CONDITIONS.conditions) == 1:
             for file in self.storage:
                 for button in self.match_object.BUTTONS:
@@ -462,7 +460,6 @@ class СукаБлятьРомаПомогиЭтоНазвать:
                     subfolder = file.back()
                     for folder_id in pattern:
                         if (folder := temp.get(folder_id)) is not None:
-                            print(folder, subfolder)
                             if subfolder != folder:
                                 return None
                         else:
@@ -568,10 +565,17 @@ class Converts:
             for method in methods:
                 method.check_file(file)
 
-        result = []
+        result = {}
         for method in methods:
             if res := method.get_result():
-                result.append(res)
+                for button, files in res.items():
+                    if button not in result:
+                        result[button] = set(files)
+                    else:
+                        result[button].update(files)
+
+        for button in result:
+            result[button] = sorted(result[button])
 
         return result
 

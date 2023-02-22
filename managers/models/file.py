@@ -16,7 +16,7 @@ class File:
         self.file_is = None
 
     def set_attributes(self, **attributes):
-        for attr, value in attributes:
+        for attr, value in attributes.items():
             self.__setattr__(attr, value)
 
     def get_buttons(self) -> list[str]:
