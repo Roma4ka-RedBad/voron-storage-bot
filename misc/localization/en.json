@@ -38,6 +38,7 @@
   "WORK_BUTTON_ARCHIVE_BY_FILE": "FILE SELECTION FOR CONVERSION",
   "WORK_FILE_NOT_EXIST_ERROR": "{name}, you need to attach a file to the command!",
   "WORK_DOWNLOAD_FAIL_ERROR": "{name}, failed to download the file! Perhaps it weighs too much...",
+  "WORK_DOWNLOAD_MANY_FAIL_ERROR": "{name}, failed to download files! Perhaps they weigh too much...",
   "WORK_DOWNLOAD_AUDIOS_FAILED_ERROR": "{name}, audio download failed!",
   "WORK_DOWNLOAD_SOME_AUDIOS_FAILED_ERROR": "{name}, some audio failed to download.",
   "WORK_FORMATS_NOT_FOUND_ERROR": "{name}, this file cannot be converted to any of the available formats!",
