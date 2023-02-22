@@ -37,7 +37,8 @@
   "WORK_BUTTON_ARCHIVE_ALL": "КОНВЕРТИРОВАТЬ ВСЁ В ОДИН ФОРМАТ",
   "WORK_BUTTON_ARCHIVE_BY_FILE": "ВЫБОР ФАЙЛА ДЛЯ КОНВЕРТИРОВАНИЯ",
   "WORK_FILE_NOT_EXIST_ERROR": "{name}, для работы команды нужно прикрепить файл!",
-  "WORK_DOWNLOAD_FAIL_ERROR": "{name}, не удалось скачать файл! Возможно он слишком много весит...",
+  "WORK_DOWNLOAD_FAIL_ERROR": "{name}, не удалось скачать файл! Возможно, он слишком много весит...",
+  "WORK_DOWNLOAD_MANY_FAIL_ERROR": "{name}, не удалось скачать файлы! Возможно, они слишком много весят...",
   "WORK_DOWNLOAD_AUDIOS_FAILED_ERROR": "{name}, не удалось скачать аудио!",
   "WORK_DOWNLOAD_SOME_AUDIOS_FAILED_ERROR": "{name}, некоторые аудио не удалось скачать.",
   "WORK_FORMATS_NOT_FOUND_ERROR": "{name}, этот файл нельзя конвертировать ни в один из доступных форматов!",
@@ -74,9 +75,10 @@
   "DOWNLOADFILES_NOT_FOUND_ERROR": "{name}, файл(-ы) не найден(-ы)!\nПопробуйте измените поисковой запрос или версию игры!",
   "DOWNLOADFILES_QUERY_MISSING_ERROR": "{name}, поисковой запрос не найден!\nВы можете использовать для поиска регулярные выражения, если хотите!",
   "DOWNLOADFILES_WITHIN_LIMIT": "{name}, вы можете скачать только {limit} файлов одновременно! Будут скачаны первые {limit} файлов (из {files_count})",
+
   "MISSING_ERROR": "ОТСУТСТВУЕТ",
   "UNKNOWN_ERROR": "Произошла ошибка!",
   "NO_CONNECTION_ERROR": "Отсутствует подключение к серверу!",
   "COMMAND_IN_DEVELOPMENT_ERROR": "Команда находится в разработке!",
-  "PROCESS_DONE": "Готово!"
+  "PROCESS_DONE": "Готово!",
 }
