@@ -80,5 +80,5 @@
   "UNKNOWN_ERROR": "Произошла ошибка!",
   "NO_CONNECTION_ERROR": "Отсутствует подключение к серверу!",
   "COMMAND_IN_DEVELOPMENT_ERROR": "Команда находится в разработке!",
-  "PROCESS_DONE": "Готово!"
+  "PROCESS_DONE": "Готово!",
 }
