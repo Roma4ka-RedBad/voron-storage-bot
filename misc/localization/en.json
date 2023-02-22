@@ -79,5 +79,5 @@
   "UNKNOWN_ERROR": "An error has occurred!",
   "NO_CONNECTION_ERROR": "No connection to the server!",
   "COMMAND_IN_DEVELOPMENT_ERROR": "The command is in development!",
-  "PROCESS_DONE": "Done!",
+  "PROCESS_DONE": "Done!"
 }
