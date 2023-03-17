@@ -18,6 +18,13 @@ import builtins
 builtins.super()
 """
 
+"""
+Обычно не нужно явно вызывать какой-то из классов архивов, достаточно одного Archive.
+Каждому типу архивов можно присобачить его собственные методы, как и явно использовать один из типов архивов, 
+например, для создания и записи файлов. Архивы схожи с объкектом File, но для определения конвертаций все-таки бОльшую 
+роль играет объект Tree, так как объединяет в себя все файлы пользователя и позволяет добавить новые.
+"""
+
 __all__ = ['ZipArchive', 'RarArchive', 'GzipArchive', 'Archive']
 
 
@@ -35,6 +42,7 @@ class Archive(ZipArchive, RarArchive, GzipArchive):
         self.platform_name = file_object.platform_name
 
         path = file_object.file_path
+        # По моему мнению супер должен вот так работать, а не как сделано в питоне
         super(self.__class__.archive_types[archive_type]).__init__(path, **kwargs)
 
     async def object_deleter(self):
@@ -59,7 +67,7 @@ class Archive(ZipArchive, RarArchive, GzipArchive):
     async def compress_to_archive(archive_path: str, file_paths: list[str | Path] | str | Path,
                                   close_archive: bool = True,
                                   archive_type: Literal['zip', 'rar', '7z'] = 'zip', **kwargs):
-        # Если нужны другие типы архивов, кроме зип - нужно создать функцию create_empty
+        # Если нужны другие типы архивов, кроме зип - нужно создать функцию create_empty в нужном типе архива
         archive = Archive.archive_types[archive_type].create_empty(archive_path, **kwargs)
 
         if isinstance(file_paths, Iterable):

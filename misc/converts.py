@@ -28,6 +28,10 @@ class Tree:
         self.file_id = 0
 
     def add(self, file_object: Union[File, BaseArchiveFile]) -> Optional["Tree.File"]:
+        """
+        Добавляет файл к дереву. Возвращает объект файла дерева.
+        Поддерживает синтаксис tree[id:]
+        """
         if isinstance(file_object, File):
             added = self._add_file(path=PurePath(file_object.file_name),
                                    filetype=file_object.file_is,
@@ -80,7 +84,7 @@ class Tree:
 
     class Subfolder:
         """
-        Объект папки
+        Объект папки. Обычно не используется явно
         """
 
         def __init__(self, owner: "Tree", uniq_id: int, name: str, past=None, is_root=False):
@@ -97,7 +101,7 @@ class Tree:
 
         def next(self) -> list[int]:
             """
-            Возвращает список ид всего, что находится в этой папке
+            Возвращает список ид каждого объекта, что находятся в этой папке
             """
             return [item.id for item in self.inside]
 
@@ -108,6 +112,10 @@ class Tree:
             return self.past_folder
 
         def get_inside(self) -> list["Tree.Subfolder", "Tree.File"]:
+            """
+            Возвращает все объекты, находящиеся в этой папке.
+            :return:
+            """
             return [i for i in self.inside]
 
         def get_root(self, with_self=False) -> str:
@@ -168,6 +176,9 @@ class Tree:
             self.buttons = []
 
         def back(self) -> "Tree.Subfolder":
+            """
+            Возвращает папку, в которой находится этот файл
+            """
             return self.subfolder
 
         def __repr__(self):
@@ -178,6 +189,10 @@ class Tree:
 
 
 class Utils:
+    """
+    Что-то вроде pydantic, только для создания условий для поиска нужных файлов.
+    Элементы этого класса используются только в контексте условий для поиска файлов.
+    """
     ARCHIVE: "Utils.Folder"
     AVAILABLE_TYPES = ['image', 'compressed_image', 'video', 'audio', 'archive', 'font', 'doc', 'json', 'sc', '3d',
                        'shader']  # Берутся из archive.base.AVAILABLE_TYPES
@@ -269,6 +284,12 @@ class Utils:
 
 
 class MatchObject:
+    """
+    Этот класс переопределяет классы условий поиска. Не вызывается явно. Наследует имя класса условий (например, ToSC)
+    Здесь задаются условия поиска, то есть CONDITIONS в классах в CONVERTS преобразовываются в то, с чем можно работать,
+    как с обычным классом. Грубо говоря, это и есть класс проверки условий, который можно используется посредством
+    Converts.ToSC или любого другого класса конвертаций
+   """
     def __init__(self, method):
         self.BUTTONS = method.BUTTONS
         self.CONDITIONS = self.Conditions(method.CONDITIONS)
@@ -276,6 +297,9 @@ class MatchObject:
         self.__name__ = method.__name__
 
     def create_storage(self):
+        """
+        Временное хранилище файлов пользователя. Сделано чтобы не допускать перемешивания разных файлов.
+        """
         return СукаБлятьРомаПомогиЭтоНазвать(self)
 
     class Conditions:
@@ -382,6 +406,10 @@ class MatchObject:
 
 
 class СукаБлятьРомаПомогиЭтоНазвать:
+    """
+    Класс, выполняющий поиск файлов по шаблону. Его можно использовать явно, но лучше использовать
+    Converts.match_available_converts с параметрами нужных конвертаций
+    """
     def __init__(self, match_object: MatchObject):
         self.match_object = match_object
         self.storage: list[dict] = []
@@ -452,6 +480,9 @@ class СукаБлятьРомаПомогиЭтоНазвать:
         return result
 
     def check_folders(self, folders: dict) -> Optional[dict]:
+        """
+        Проверяет соответствие подпапок файлов
+        """
         temp = {}
         for cond in folders.values():
             for _id in cond:

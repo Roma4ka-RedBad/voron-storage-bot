@@ -120,7 +120,6 @@ def file_writer(file_name: str, data: bytes | str, mode: Literal['w', 'wb', 'a']
 
 def super_(*subclasses):
     """Кастомный super, позволяющий наследовать от нужного класса.
-
     Аргументы функции это класс(ы), от которых нужно наследовать метод.
 
     Пример использования:
@@ -174,6 +173,7 @@ def super_(*subclasses):
 
 def guess_file_format(path: Path | PurePath, bytes_io: IO | BinaryIO | BytesIO) -> tuple:
     """
+    Суда можно спокойно накидывать новые условия.
     :param path: путь до файла.
     :param bytes_io: файловый объект, открытый для чтения в бинарном режиме.
     :return: tuple(тип файла (по заголовку), расширение файла, тип файла (по условиям))
