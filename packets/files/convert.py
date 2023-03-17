@@ -1,4 +1,4 @@
-from ..base import Packet
+from packets.base import Packet
 from managers.models import Archive
 
 
@@ -9,12 +9,11 @@ async def convert(instance, packet: Packet, file_manager):
         await file_manager.stop_task(_object.object_id)
 
         result = await _object.convert_to(packet.payload.convert_method)
-        if result:
-            if packet.payload.get("compress_to_archive", None):
-                result = await Archive.compress_to_archive(str(_object.path / 'files.zip'), file_paths=result)
-            await instance.client_connection.send(Packet(packet.pid, result=result))
+        if 'error_tid' in result:
+            await instance.client_connection.send(Packet(packet.pid, error_tid=result['error_tid']))
         else:
-            await instance.client_connection.send(Packet(packet.pid, error_tid="WORK_FILE_NOT_CONVERT_ERROR"))
-
+            if packet.payload.get("compress_to_archive", None):
+                result = await Archive.compress_to_archive(str(_object.path / 'files.zip'), file_paths=result['paths'])
+            await instance.client_connection.send(Packet(packet.pid, result=result))
     else:
         await instance.client_connection.send(Packet(packet.pid, error_tid="WORK_FILE_NOT_FOUND_ERROR"))

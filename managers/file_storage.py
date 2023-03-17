@@ -102,11 +102,10 @@ class Storage:
             self.get_available_converts()
 
         if method not in self.converts:
-            # Нужно отослать сообщение юзеру с ошибкой о том, что эти файлы нельзя конвертировать в этот формат
-            return
+            return {'error_tid': 'WORK_FILE_NOT_CONVERT_ERROR'}
         #  Ну и по идее, тут файлы добавляются в очередь и ждётся ответ.
         #  Возвращается список путей на конвертированные файлы
-        return [str(obj.file_path.resolve()) for obj in self.file_objects]
+        return {'paths': [str(obj.file_path.resolve()) for obj in self.file_objects]}
 
     def create_path(self):
         self.dir_path.mkdir(parents=True, exist_ok=True)
