@@ -11,6 +11,7 @@ from misc.utils import async_request, file_writer
 from misc.handlers import Handlers
 from managers.instruments.supercell_server import SupercellServer
 from managers.instruments.market_scraper import MarketScraper
+import zlib
 
 
 class GameManager:
@@ -42,10 +43,35 @@ class GameManager:
             message = await asyncio.to_thread(self.server.send_message_sync, message)
         else:
             message = await self.server.send_message(message)
-        game_data = await self.server.decode_server_message(message)
+
+        game_data = await self.server.decode_server_message(message, int(args[0]))
         if game_data.server_code == 7:
-            game_data.fingerprint = json_util.loads(game_data.fingerprint)
+            if int(args[0]) < 50:
+                game_data.fingerprint = json_util.loads(game_data.fingerprint)
+            else:
+                game_data.fingerprint = self.decompress_fingerprint(game_data.fingerprint)
         return game_data
+
+    @staticmethod
+    def decompress_fingerprint(data: bytes):
+        length = int.from_bytes(data[:4], 'little')
+        decompressor = zlib.decompressobj(-zlib.MAX_WBITS)
+
+        # по какой - то причине у меня нужно обрезать 6 байтов, а у Щелкова - 4
+        try:
+            decompressed = decompressor.decompress(data[6:])
+            decompressed += decompressor.flush()
+        except zlib.error:
+            try:
+                decompressed = decompressor.decompress(data[4:])
+                decompressed += decompressor.flush()
+            except zlib.error:
+                raise f'Corrupt fingerprint data! ({len(data)})' from zlib.error
+
+        if length == len(decompressed):
+            return json_util.loads(decompressed.decode('utf-8'))
+        else:
+            raise 'Decompress error' from zlib.error
 
     async def handle_server_update(self, actual_version: str = None):
         version = actual_version.split('.')

@@ -53,7 +53,7 @@ class SupercellServer:
         return message
 
     @staticmethod
-    async def decode_server_message(message: bytes):
+    async def decode_server_message(message: bytes, major_v: int):
         reader = Reader(message)
         data = Box()
 
@@ -64,18 +64,34 @@ class SupercellServer:
             data.maintenance_end_time = reader.read_int(32, False)
             for _ in range(5, 14):
                 data[f'unk{_}'] = reader.read_int(32, False)
+
         elif data.server_code in [7, 8, 9, 16]:
-            data.fingerprint = reader.read_string(32)
-            data.redirect_host = reader.read_string(32)
-            data.assets_link = reader.read_string(32)
-            data.download_game_link = reader.read_string(32)
-            data.unk1 = reader.read_string(32)
-            data.unk2 = reader.read_int(32, False)
-            data.unk3 = reader.read_bool()
-            data.unk4 = reader.read_int(32, False)
-            data.unk5 = reader.read_int(32, False)
-            data.content_link = reader.read_string(32)
-            data.assets2_link = reader.read_string(32)
+            if major_v < 50:
+                data.fingerprint = reader.read_string(32)
+                data.redirect_host = reader.read_string(32)
+                data.assets_link = reader.read_string(32)
+                data.download_game_link = reader.read_string(32)
+                data.unk1 = reader.read_string(32)
+                data.unk2 = reader.read_int(32, False)
+                data.unk3 = reader.read_bool()
+                data.unk4 = reader.read_int(32, False)
+                data.unk5 = reader.read_int(32, False)
+                data.content_link = reader.read_string(32)
+                data.assets2_link = reader.read_string(32)
+
+            # после 50 версии была изменена структура пакета и сжат фингер
+            else:
+                data.unk1 = reader.read_string(32)
+                data.unk2 = reader.read_string(32)
+                data.assets_link = reader.read_string(32)
+                data.unk4 = reader.read_string(32)
+                data.unk5 = reader.read_string(32)
+                data.unk6 = reader.read_string(32)
+                data.unk7 = reader.read_int(8, False)
+                data.fingerprint = reader.read_string(32, decode=False)
+                data.unk8 = reader.read_int(32, False)
+                data.content_link = reader.read_string(32)
+                data.assets2_link = reader.read_string(32)
 
         return data
 
