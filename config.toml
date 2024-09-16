@@ -3,20 +3,20 @@ path = '../ufs/'
 wait_for_delete_dir = 30 # minutes
 
 [TG]
-token = '5213124403:AAHvGZ5-HtB1Wa1ZXVUA_tBuqa2hs33XvOs'
-telegraph_token = '5cade08f78e188681bd4306fab11d69ceb1bc202e91cb6d7cf7843aa2809'
-admins_ids = [1225973623]
+token = ''
+telegraph_token = ''
+admins_ids = []
 
 [VK]
-bot_token = 'vk1.a.1gA3IEeoxhrAMnIURrUh-6j3M48P53dE5zqSfvHgsX-gLg0etEip9w53KhIzHbrCCMKK4JLyOaYvr1IqpV8CNKjyDQQHDfCqq8PcXmPcpRoFZd5lZnHnjec5th7UQP-c3iB9pu69wBl3QTLcywr6nxo9C0mtjBi1Yl9Y4t7VhbLi-Q0p9w5CjxWEEdOvxeNQIvU-x4OaFAhzzna4KskxNA'
-user_token = 'vk1.a.n5JFyo07vJ9p8VKvh50v5xuuj7dq-szd6sCb0uZ6mQIL5M6A_RGOI1IwQlhDuwZtPnKMxtrrmUg-8cywyjnDmlHhhBhDrSYSWan0AcVzkcs6w1mX7xGeIJL6oT0iAfgtjBaXZEDhZHeg3AekXW8yiEv65MYoYjOFLJDKolASAflE3lRKqI_up4F5DQhwEivv'
+bot_token = ''
+user_token = ''
 
 [MYSQL]
-host = '213.32.35.58'
+host = ''
 port = 3306
 username = 'root'
-password = 'Storage1213'
-database='voronstorage_test'
+password = ''
+database=''
 
 [SERVER]
 timezone = 'Europe/Moscow'
